@@ -36,8 +36,8 @@ A robust **NestJS-based backend service** for the UCCX IVR Monitoring Dashboard,
 Clone the repository and install dependencies:
 
 ```bash
-git clone https://github.com/your-org/uccx-ivr-monitoring-backend.git
-cd uccx-ivr-monitoring-backend
+git clone https://github.com/aliyasoubi/uccx-wallboard.git
+cd uccx-wallboard
 npm install
 ```
 ---
