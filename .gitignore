@@ -1,97 +1,60 @@
-# --- LOGS ---
-logs/
-*.log
-npm-debug.log*
-yarn-debug.log*
-lerna-debug.log*
-.pnpm-debug.log*
+# Compiled output
+/dist
+/tmp
+/out-tsc
+/bazel-out
 
-# --- DIAGNOSTIC REPORTS ---
-report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+# Node
+/node_modules
+npm-debug.log
+yarn-error.log
 
-# --- RUNTIME DATA ---
-pids/
-*.pid
-*.seed
-*.pid.lock
+# Angular CLI cache
+.angular/cache
+.angular/
 
-# --- COVERAGE ---
-coverage/
-*.lcov
-.nyc_output/
+# Editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 
-# --- BUILD / DIST DIRECTORIES ---
-dist/
-build/
-lib-cov/
-build/Release/
+# Miscellaneous
+/.angular
+.sass-cache/
+/connect.lock
+/coverage
+/libpeerconnection.log
+testem.log
+/typings
 
-# --- NODE / DEPENDENCY DIRS ---
-node_modules/
-jspm_packages/
-bower_components/
-web_modules/
-
-# --- MONOREPO: Explicitly ignore nested deps ---
-/backend/node_modules/
-/frontend/node_modules/
-/backend/dist/
-/frontend/dist/
-
-# --- TYPESCRIPT ---
-*.tsbuildinfo
-
-# --- CACHE FILES ---
-.npm/
-.cache/
-.parcel-cache/
-.rpt2_cache/
-.rts2_cache_*/
-.nyc_output/
-.eslintcache
-.stylelintcache
-.yarn-integrity
-.yarn/cache/
-.yarn/unplugged/
-.yarn/build-state.yml
-.yarn/install-state.gz
-.pnp.*
-.temp/
-.cache/
-.docusaurus/
-.serverless/
-.fusebox/
-.dynamodb/
-.tern-port
-.vscode-test
-
-# --- DOTENV / ENV FILES ---
-.env
-.env.*
-!.env.example  # <-- (keep your template/example env file)
-
-# --- FRONTEND / STATIC SITE GENERATORS ---
-.next/
-out/
-.nuxt/
-.vuepress/dist/
-**/.vitepress/dist/
-**/.vitepress/cache/
-public/
-.cache/
-
-# --- MISC PACKAGING & OUTPUT ---
-*.tgz
-
-# --- OS / IDE FILES ---
+# OS files
 .DS_Store
 Thumbs.db
-.idea/
-.vscode/
-*.sublime-workspace
-*.sublime-project
 
-# --- OTHER TOOLING ---
-.lock-wscript
-.grunt/
-**/.git
+# System / build environment
+/bazel-out
+
+# Logs
+*.log
+
+# Local environment overrides — only relevant if you later add a
+# environment.local.ts for personal machine-specific values (e.g. a
+# developer's own local BFF port). Not present in this repo yet, but
+# ignored proactively so nobody accidentally commits one.
+src/environments/environment.local.ts
+
+# Cypress/Playwright (if e2e tooling gets added later, per the README's
+# testing strategy)
+/cypress/videos/
+/cypress/screenshots/
+/playwright-report/
+/test-results/

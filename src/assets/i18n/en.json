@@ -1,0 +1,30 @@
+{
+  "dashboard": {
+    "title": "Call Center Dashboard",
+    "live": "Live",
+    "stale": "Reconnecting…",
+    "error": "Connection lost",
+    "updated": "Updated {{time}}"
+  },
+  "metrics": {
+    "totalCalls": "Total calls",
+    "handledCalls": "Handled",
+    "abandonedCalls": "Abandoned",
+    "avgWait": "Avg wait",
+    "avgTalk": "Avg talk",
+    "callsWaiting": "Calls in queue",
+    "sla": "SLA",
+    "csat": "CSAT"
+  },
+  "agents": {
+    "title": "Agent summary",
+    "ready": "Ready",
+    "talking": "Talking",
+    "notReady": "Not ready",
+    "onlineCount": "{{count}} agent online",
+    "onlineCount_plural": "{{count}} agents online"
+  },
+  "queue": {
+    "noActivity": "No activity"
+  }
+}

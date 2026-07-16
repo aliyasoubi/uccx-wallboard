@@ -1,0 +1,11 @@
+<div class="card">
+  @if (agent()?.photoUrl) {
+    <img [src]="agent()!.photoUrl" alt="" class="photo" />
+  } @else {
+    <div class="photo photo--fallback">{{ initials() }}</div>
+  }
+  <div class="info">
+    <p class="eyebrow">Agent of the month</p>
+    <p class="name">{{ agent()?.name ?? '—' }}</p>
+  </div>
+</div>

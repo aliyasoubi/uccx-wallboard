@@ -1,0 +1,32 @@
+.donut {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.ring {
+  width: 84px;
+  height: 84px;
+  flex-shrink: 0;
+  transform: rotate(-90deg);
+}
+
+.track {
+  fill: none;
+  stroke: var(--color-surface-2);
+  stroke-width: 6;
+}
+
+.segment {
+  fill: none;
+  stroke-width: 6;
+  transition: stroke-dasharray var(--motion-medium) var(--motion-easing);
+}
+
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font-size: var(--font-size-label);
+  font-weight: 500;
+}

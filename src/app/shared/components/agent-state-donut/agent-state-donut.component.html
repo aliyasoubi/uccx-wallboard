@@ -1,0 +1,27 @@
+<div class="donut">
+  <svg viewBox="0 0 42 42" class="ring">
+    <circle cx="21" cy="21" r="15.9" class="track" />
+    @for (seg of segments(); track seg.key) {
+      <circle
+        cx="21"
+        cy="21"
+        r="15.9"
+        class="segment"
+        [style.stroke]="seg.colorVar"
+        [style.strokeDasharray]="seg.dashArray"
+        [style.strokeDashoffset]="seg.dashOffset"
+      />
+    }
+  </svg>
+  <div class="legend">
+    <span class="legend-item" style="color: var(--color-status-normal)">
+      {{ 'agents.ready' | transloco }} {{ summary()?.ready ?? 0 }}
+    </span>
+    <span class="legend-item" style="color: var(--color-status-accent)">
+      {{ 'agents.talking' | transloco }} {{ summary()?.talking ?? 0 }}
+    </span>
+    <span class="legend-item" style="color: var(--color-status-critical)">
+      {{ 'agents.notReady' | transloco }} {{ summary()?.notReady ?? 0 }}
+    </span>
+  </div>
+</div>

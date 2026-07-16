@@ -1,0 +1,154 @@
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.live-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-label);
+  color: var(--color-text-secondary);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-status-normal);
+}
+
+.dot--live {
+  background: var(--color-status-normal);
+  animation: pulse var(--motion-pulse) var(--motion-easing) infinite;
+}
+
+.dot--stale {
+  background: var(--color-status-warning);
+}
+
+.dot--error {
+  background: var(--color-status-critical);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.updated {
+  color: var(--color-text-muted);
+}
+
+.lang-switch {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.lang-switch button {
+  background: var(--color-surface-1);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 4px var(--space-3);
+  font-size: var(--font-size-label);
+  cursor: pointer;
+}
+
+.row {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.row--top {
+  // Agent of the Month gets an "auto" track sized to its own content instead
+  // of an even fr share — its content is compact, so an equal fr fraction
+  // left a large dead-space margin inside the card (visible in the last
+  // screenshot). align-items: stretch is kept so its height still matches
+  // the taller SLA/CSAT cluster beside it.
+  grid-template-columns: 2fr 1.6fr auto;
+  align-items: stretch;
+}
+
+.row--calls {
+  // Inbound/Outbound have less content than Shift metrics (one count + a
+  // top/lowest row vs. two full metric blocks). Forcing equal height left a
+  // large empty gap at the bottom of the shorter cards — sizing to content
+  // instead removes that dead space.
+  grid-template-columns: repeat(3, 1fr);
+  align-items: start;
+}
+
+.row--roster {
+  // Agents state donut + Top skills now stack vertically in one column
+  // (see .stack below) instead of sitting as separate equal-height cards —
+  // the donut alone was much shorter than the five-row Agent summary table
+  // it was being stretched to match, leaving a large empty gap underneath it.
+  grid-template-columns: 1.3fr 2fr;
+  align-items: start;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.row--bottom {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.panel-shell {
+  background: var(--color-surface-1);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+@media (max-width: 1400px) {
+  .row--top {
+    grid-template-columns: 1fr 1fr;
+  }
+  .row--top > :last-child {
+    grid-column: span 2;
+  }
+  .row--calls {
+    grid-template-columns: 1fr 1fr;
+  }
+  .row--calls > :last-child {
+    grid-column: span 2;
+  }
+  .row--roster {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .row--top,
+  .row--calls,
+  .row--roster {
+    grid-template-columns: 1fr;
+  }
+  .row--top > *,
+  .row--calls > *,
+  .row--roster > * {
+    grid-column: span 1;
+  }
+}
+
+.panel-title {
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-size-heading);
+  font-weight: 600;
+}

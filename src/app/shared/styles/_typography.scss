@@ -1,0 +1,11 @@
+:root {
+  --font-family-base: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-family-mono: 'IBM Plex Mono', 'JetBrains Mono', monospace;
+
+  // Fluid scale via clamp() — bounded, unlike raw vw/vh sizing.
+  --font-size-label: clamp(0.7rem, 0.65rem + 0.2vw, 0.8rem);
+  --font-size-body: clamp(0.85rem, 0.8rem + 0.2vw, 0.95rem);
+  --font-size-metric: clamp(1.5rem, 1.1rem + 1.4vw, 2.5rem);
+  --font-size-metric-lg: clamp(2rem, 1.4rem + 2vw, 3.25rem);
+  --font-size-heading: clamp(1rem, 0.9rem + 0.4vw, 1.25rem);
+}

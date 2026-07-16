@@ -1,0 +1,47 @@
+.meter {
+  position: relative;
+  width: 100%;
+  max-width: 120px;
+  aspect-ratio: 1 / 1;
+  margin-inline: auto;
+}
+
+.ring {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.ring-track {
+  fill: none;
+  stroke: var(--color-surface-2);
+  stroke-width: 8;
+}
+
+.ring-value {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dasharray var(--motion-medium) var(--motion-easing);
+}
+
+.meter-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.meter-value {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-heading);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.meter-label {
+  font-size: var(--font-size-label);
+  color: var(--color-text-secondary);
+}

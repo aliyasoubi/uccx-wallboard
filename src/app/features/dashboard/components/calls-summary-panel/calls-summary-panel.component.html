@@ -1,0 +1,25 @@
+<div class="panel">
+  <app-metric-tile
+    [label]="'metrics.totalCalls' | transloco"
+    [value]="summary()?.totalCalls ?? '—'"
+  />
+  <app-metric-tile
+    [label]="'metrics.handledCalls' | transloco"
+    [value]="summary()?.handledCalls ?? '—'"
+  />
+  <app-metric-tile
+    [label]="'metrics.abandonedCalls' | transloco"
+    [value]="summary()?.abandonedCalls ?? '—'"
+    [severity]="abandonedSeverity()"
+  />
+  <app-metric-tile
+    [label]="'metrics.avgWait' | transloco"
+    [value]="(summary()?.avgWaitSeconds | formatDuration)"
+    [severity]="waitSeverity()"
+  />
+  <app-metric-tile
+    [label]="'metrics.avgTalk' | transloco"
+    [value]="(summary()?.avgTalkSeconds | formatDuration)"
+    [severity]="talkSeverity()"
+  />
+</div>

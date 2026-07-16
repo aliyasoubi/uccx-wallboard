@@ -1,0 +1,10 @@
+.panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  background: var(--color-surface-1);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  height: 100%;
+}

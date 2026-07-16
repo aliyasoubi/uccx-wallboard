@@ -1,0 +1,17 @@
+<div class="panel">
+  <p class="title">
+    <i class="ti {{ icon() }}" aria-hidden="true"></i>
+    {{ stats()?.direction === 'outbound' ? 'Outbound calls' : 'Inbound calls' }}
+  </p>
+  <p class="count">{{ stats()?.count ?? '—' }}</p>
+  <div class="agents">
+    <div>
+      <p class="label">Top agent</p>
+      <p class="value">{{ stats()?.topAgentCalls ?? '—' }}</p>
+    </div>
+    <div>
+      <p class="label">Lowest agent</p>
+      <p class="value">{{ stats()?.lowestAgentCalls ?? '—' }}</p>
+    </div>
+  </div>
+</div>

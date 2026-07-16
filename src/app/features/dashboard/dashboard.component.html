@@ -1,0 +1,57 @@
+<div class="dashboard">
+  <header class="header">
+    <div class="live-indicator">
+      <span
+        class="dot"
+        [class.dot--live]="store.connectionState() === 'live'"
+        [class.dot--stale]="store.connectionState() === 'stale'"
+        [class.dot--error]="store.connectionState() === 'error'"
+      ></span>
+      <span class="live-text">
+        {{ 'dashboard.' + store.connectionState() | transloco }}
+      </span>
+      @if (store.lastUpdated(); as updated) {
+        <span class="updated">
+          {{ 'dashboard.updated' | transloco: { time: (updated | date: 'shortTime') } }}
+        </span>
+      }
+    </div>
+    <div class="lang-switch">
+      <button type="button" (click)="setLang('en')">EN</button>
+      <button type="button" (click)="setLang('fa')">FA</button>
+    </div>
+  </header>
+
+  <section class="row row--top">
+    <app-calls-summary-panel class="col col--wide" [summary]="store.callSummary()" />
+    <app-service-metrics-panel
+      class="col"
+      [metrics]="store.serviceMetrics()"
+      [callsWaiting]="store.callSummary()?.callsWaiting ?? 0"
+    />
+    <app-agent-of-month-card class="col" [agent]="store.agentOfMonth()" />
+  </section>
+
+  <section class="row row--calls">
+    <app-call-direction-panel class="col" [stats]="store.inboundStats()" icon="ti-phone-incoming" />
+    <app-call-direction-panel class="col" [stats]="store.outboundStats()" icon="ti-phone-outgoing" />
+    <app-shift-metrics-panel class="col" [metrics]="store.shiftMetrics()" />
+  </section>
+
+  <section class="row row--roster">
+    <div class="col stack">
+      <div class="panel-shell">
+        <p class="panel-title">Agents state</p>
+        <app-agent-state-donut [summary]="store.agentStateSummary()" />
+      </div>
+      <app-top-skills-panel [skills]="store.topSkills()" />
+    </div>
+    <app-agent-roster class="col col--wide" [agents]="store.agents()" />
+  </section>
+
+  <section class="row row--bottom">
+    @for (queue of store.queues(); track trackByQueueName($index, queue)) {
+      <app-queue-panel class="col" [queue]="queue" />
+    }
+  </section>
+</div>

@@ -1,0 +1,24 @@
+@use './app/shared/styles/tokens';
+@use './app/shared/styles/typography';
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--color-surface-0);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-base);
+}
+
+body {
+  min-height: 100vh;
+}
+
+[dir='rtl'] {
+  direction: rtl;
+}

@@ -1,0 +1,29 @@
+{
+  "dashboard": {
+    "title": "داشبورد مرکز تماس",
+    "live": "زنده",
+    "stale": "در حال اتصال مجدد…",
+    "error": "اتصال قطع شد",
+    "updated": "به‌روزرسانی {{time}}"
+  },
+  "metrics": {
+    "totalCalls": "کل تماس‌ها",
+    "handledCalls": "پاسخ داده شده",
+    "abandonedCalls": "قطع شده",
+    "avgWait": "میانگین انتظار",
+    "avgTalk": "میانگین مکالمه",
+    "callsWaiting": "در صف",
+    "sla": "SLA",
+    "csat": "CSAT"
+  },
+  "agents": {
+    "title": "وضعیت اپراتورها",
+    "ready": "آماده",
+    "talking": "در حال مکالمه",
+    "notReady": "غیرآماده",
+    "onlineCount": "{{count}} اپراتور آنلاین"
+  },
+  "queue": {
+    "noActivity": "بدون فعالیت"
+  }
+}

@@ -1,0 +1,21 @@
+<div class="panel">
+  <p class="title">Top skills</p>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Agent ID</th>
+        <th>Skill</th>
+        <th class="num">Count</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (skill of skills(); track trackBySkill($index, skill)) {
+        <tr>
+          <td>{{ skill.agentId }}</td>
+          <td>{{ skill.name }}</td>
+          <td class="num">{{ skill.count }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

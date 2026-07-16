@@ -1,0 +1,37 @@
+[
+    {
+        "agentID": "A1001",
+        "agentName": "John Smith",
+        "agentState": "READY",
+        "agentStateDuration": 1240,
+        "reason": ""
+    },
+    {
+        "agentID": "A1002",
+        "agentName": "Sarah Johnson",
+        "agentState": "TALKING",
+        "agentStateDuration": 187,
+        "reason": ""
+    },
+    {
+        "agentID": "A1003",
+        "agentName": "Michael Brown",
+        "agentState": "NOT_READY",
+        "agentStateDuration": 965,
+        "reason": "Break"
+    },
+    {
+        "agentID": "A1004",
+        "agentName": "Emily Davis",
+        "agentState": "READY",
+        "agentStateDuration": 453,
+        "reason": ""
+    },
+    {
+        "agentID": "A1005",
+        "agentName": "David Wilson",
+        "agentState": "NOT_READY",
+        "agentStateDuration": 3210,
+        "reason": "Meeting"
+    }
+]
