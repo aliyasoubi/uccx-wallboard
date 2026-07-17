@@ -1,5 +1,5 @@
 // Matches AgentStateStats.json exactly.
-export interface AgentStateStatsDto {
+export interface AgentStateCountsDto {
   total: number;
   ready: number;
   talking: number;

@@ -6,7 +6,6 @@ import { CallSummary } from './call-summary.model';
 import { Queue } from './queue.model';
 import { ServiceMetrics } from './service-metrics.model';
 import { ShiftMetrics } from './shift-metrics.model';
-import { Skill } from './skill.model';
 
 // The single shape the store consumes, regardless of how many source
 // requests it took to build it (that's the DataSource/BFF's job to assemble).
@@ -17,7 +16,6 @@ export interface DashboardSnapshot {
   agents: Agent[];
   queues: Queue[];
   agentOfMonth: AgentOfMonth;
-  topSkills: Skill[];
   inboundStats: CallDirectionStats;
   outboundStats: CallDirectionStats;
   shiftMetrics: ShiftMetrics;

@@ -7,7 +7,6 @@ import { CallsSummaryPanelComponent } from './components/calls-summary-panel/cal
 import { ServiceMetricsPanelComponent } from './components/service-metrics-panel/service-metrics-panel.component';
 import { AgentRosterComponent } from './components/agent-roster/agent-roster.component';
 import { QueuePanelComponent } from './components/queue-panel/queue-panel.component';
-import { TopSkillsPanelComponent } from './components/top-skills-panel/top-skills-panel.component';
 import { CallDirectionPanelComponent } from './components/call-direction-panel/call-direction-panel.component';
 import { ShiftMetricsPanelComponent } from './components/shift-metrics-panel/shift-metrics-panel.component';
 
@@ -24,7 +23,6 @@ import { ShiftMetricsPanelComponent } from './components/shift-metrics-panel/shi
     QueuePanelComponent,
     AgentOfMonthCardComponent,
     AgentStateDonutComponent,
-    TopSkillsPanelComponent,
     CallDirectionPanelComponent,
     ShiftMetricsPanelComponent,
   ],

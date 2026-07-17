@@ -8,6 +8,6 @@ export function mapCallSummary(dto: CallStatsDto): CallSummary {
     abandonedCalls: dto.abandonedCalls,
     avgWaitSeconds: dto.avgWaitDuration,
     avgTalkSeconds: dto.avgTalkDuration,
-    callsWaiting: dto.callsWaiting,
+    callsWaiting: dto.waitingCalls,
   };
 }

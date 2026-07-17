@@ -10,18 +10,16 @@ import {
   mapQueues,
   mapServiceMetrics,
   mapShiftMetrics,
-  mapSkills,
 } from '../mappers';
 import {
   AgentOfMonthDto,
   AgentStateDto,
-  AgentStateStatsDto,
+  AgentStateCountsDto,
   CallDirectionStatsDto,
   CallStatsDto,
   CsqStatsDto,
   CustomerServiceMetricsDto,
   ShiftMetricsDto,
-  SkillStatDto,
 } from '../models/dto';
 import { DashboardSnapshot } from '../models/domain';
 
@@ -41,12 +39,11 @@ export class BffClientService {
       serviceMetrics: this.http.get<CustomerServiceMetricsDto>(
         this.endpoint('CustomerServiceMetrics.json', '/service-metrics'),
       ),
-      agentStateStats: this.http.get<AgentStateStatsDto>(
+      agentStateStats: this.http.get<AgentStateCountsDto>(
         this.endpoint('AgentStateStats.json', '/agent-state-stats'),
       ),
       queues: this.http.get<CsqStatsDto[]>(this.endpoint('CsqStats.json', '/queues')),
       agentOfMonth: this.http.get<AgentOfMonthDto>(this.endpoint('AgentOfMonth.json', '/agent-of-month')),
-      topSkills: this.http.get<SkillStatDto[]>(this.endpoint('TopSkills.json', '/top-skills')),
       inboundStats: this.http.get<CallDirectionStatsDto>(
         this.endpoint('InboundStats.json', '/call-direction/inbound'),
       ),
@@ -63,7 +60,6 @@ export class BffClientService {
           agentStateStats,
           queues,
           agentOfMonth,
-          topSkills,
           inboundStats,
           outboundStats,
           shiftMetrics,
@@ -76,7 +72,6 @@ export class BffClientService {
             agents: mappedAgents,
             queues: mapQueues(queues),
             agentOfMonth: mapAgentOfMonth(agentOfMonth, mappedAgents),
-            topSkills: mapSkills(topSkills),
             inboundStats: mapCallDirectionStats(inboundStats, 'inbound'),
             outboundStats: mapCallDirectionStats(outboundStats, 'outbound'),
             shiftMetrics: mapShiftMetrics(shiftMetrics),

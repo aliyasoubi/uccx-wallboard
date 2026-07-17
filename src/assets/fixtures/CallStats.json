@@ -4,5 +4,5 @@
     "abandonedCalls": 17,
     "handledCalls": 483,
     "totalCalls": 500,
-    "callsWaiting": 6
+    "waitingCalls": 6
 }

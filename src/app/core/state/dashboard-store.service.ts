@@ -9,7 +9,6 @@ import {
   Queue,
   ServiceMetrics,
   ShiftMetrics,
-  Skill,
 } from '../models/domain';
 import { DATA_SOURCE } from '../data-access/data-source.token';
 
@@ -25,7 +24,6 @@ export class DashboardStoreService {
   private readonly _agents = signal<Agent[]>([]);
   private readonly _queues = signal<Queue[]>([]);
   private readonly _agentOfMonth = signal<AgentOfMonth | null>(null);
-  private readonly _topSkills = signal<Skill[]>([]);
   private readonly _inboundStats = signal<CallDirectionStats | null>(null);
   private readonly _outboundStats = signal<CallDirectionStats | null>(null);
   private readonly _shiftMetrics = signal<ShiftMetrics | null>(null);
@@ -38,7 +36,6 @@ export class DashboardStoreService {
   readonly agents = this._agents.asReadonly();
   readonly queues = this._queues.asReadonly();
   readonly agentOfMonth = this._agentOfMonth.asReadonly();
-  readonly topSkills = this._topSkills.asReadonly();
   readonly inboundStats = this._inboundStats.asReadonly();
   readonly outboundStats = this._outboundStats.asReadonly();
   readonly shiftMetrics = this._shiftMetrics.asReadonly();
@@ -59,7 +56,6 @@ export class DashboardStoreService {
       this._agents.set(snapshot.agents);
       this._queues.set(snapshot.queues);
       this._agentOfMonth.set(snapshot.agentOfMonth);
-      this._topSkills.set(snapshot.topSkills);
       this._inboundStats.set(snapshot.inboundStats);
       this._outboundStats.set(snapshot.outboundStats);
       this._shiftMetrics.set(snapshot.shiftMetrics);

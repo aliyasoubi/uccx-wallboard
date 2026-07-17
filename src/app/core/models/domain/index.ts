@@ -6,6 +6,5 @@ export * from './agent-state-summary.model';
 export * from './queue.model';
 export * from './agent-of-month.model';
 export * from './dashboard-snapshot.model';
-export * from './skill.model';
 export * from './call-direction-stats.model';
 export * from './shift-metrics.model';

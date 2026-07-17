@@ -1,44 +1,50 @@
 [
     {
         "name": "Sales",
-        "totalCalls": 210,
-        "abandonedCalls": 5,
-        "handledlCalls": 205,
-        "avgWaitDuration": 32,
-        "agentStateStats": {
+        "callStats": {
+            "totalCalls": 210,
+            "abandonedCalls": 5,
+            "handledlCalls": 205,
+            "avgWaitDuration": 32,
+            "waitingCalls": 2
+        },
+        "agentStateCounts": {
             "total": 12,
             "ready": 5,
             "talking": 4,
             "notReady": 3
-        },
-        "waitingCalls": 2
+        }
     },
     {
         "name": "Support",
-        "totalCalls": 190,
-        "abandonedCalls": 8,
-        "handledlCalls": 182,
-        "avgWaitDuration": 55,
-        "agentStateStats": {
+        "callStats": {
+            "totalCalls": 190,
+            "abandonedCalls": 8,
+            "handledlCalls": 182,
+            "avgWaitDuration": 55,
+            "waitingCalls": 3
+        },
+        "agentStateCounts": {
             "total": 15,
             "ready": 6,
             "talking": 7,
             "notReady": 2
-        },
-        "waitingCalls": 3
+        }
     },
     {
         "name": "Billing",
-        "totalCalls": 100,
-        "abandonedCalls": 4,
-        "handledlCalls": 96,
-        "avgWaitDuration": 41,
-        "agentStateStats": {
+        "callStats": {
+            "totalCalls": 100,
+            "abandonedCalls": 4,
+            "handledlCalls": 96,
+            "avgWaitDuration": 41,
+            "waitingCalls": 1
+        },
+        "agentStateCounts": {
             "total": 8,
             "ready": 3,
             "talking": 2,
             "notReady": 3
-        },
-        "waitingCalls": 1
+        }
     }
 ]
