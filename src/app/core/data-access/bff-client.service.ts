@@ -13,13 +13,11 @@ import {
 } from '../mappers';
 import {
   AgentOfMonthDto,
-  AgentStateDto,
+  AgentDto,
   AgentStateCountsDto,
-  CallDirectionStatsDto,
   CallStatsDto,
-  CsqStatsDto,
+  CsqDto,
   CustomerServiceMetricsDto,
-  ShiftMetricsDto,
 } from '../models/dto';
 import { DashboardSnapshot } from '../models/domain';
 
@@ -34,47 +32,37 @@ export class BffClientService {
 
   fetchSnapshot(): Observable<DashboardSnapshot> {
     return forkJoin({
-      agents: this.http.get<AgentStateDto[]>(this.endpoint('AgentStates.json', '/agents')),
+      agents: this.http.get<AgentDto[]>(this.endpoint('AgentStates.json', '/agents')),
       callStats: this.http.get<CallStatsDto>(this.endpoint('CallStats.json', '/call-stats')),
       serviceMetrics: this.http.get<CustomerServiceMetricsDto>(
         this.endpoint('CustomerServiceMetrics.json', '/service-metrics'),
       ),
-      agentStateStats: this.http.get<AgentStateCountsDto>(
-        this.endpoint('AgentStateStats.json', '/agent-state-stats'),
+      agentStateCounts: this.http.get<AgentStateCountsDto>(
+        this.endpoint('AgentStateStats.json', '/agent-state-counts'),
       ),
-      queues: this.http.get<CsqStatsDto[]>(this.endpoint('CsqStats.json', '/queues')),
+      queues: this.http.get<CsqDto[]>(this.endpoint('CsqStats.json', '/csqs')),
       agentOfMonth: this.http.get<AgentOfMonthDto>(this.endpoint('AgentOfMonth.json', '/agent-of-month')),
-      inboundStats: this.http.get<CallDirectionStatsDto>(
-        this.endpoint('InboundStats.json', '/call-direction/inbound'),
-      ),
-      outboundStats: this.http.get<CallDirectionStatsDto>(
-        this.endpoint('OutboundStats.json', '/call-direction/outbound'),
-      ),
-      shiftMetrics: this.http.get<ShiftMetricsDto>(this.endpoint('ShiftMetrics.json', '/shift-metrics')),
     }).pipe(
       map(
         ({
           agents,
           callStats,
           serviceMetrics,
-          agentStateStats,
+          agentStateCounts,
           queues,
           agentOfMonth,
-          inboundStats,
-          outboundStats,
-          shiftMetrics,
         }) => {
           const mappedAgents = mapAgents(agents);
           return {
             callSummary: mapCallSummary(callStats),
             serviceMetrics: mapServiceMetrics(serviceMetrics),
-            agentStateSummary: agentStateStats,
+            agentStateSummary: agentStateCounts,
             agents: mappedAgents,
             queues: mapQueues(queues),
             agentOfMonth: mapAgentOfMonth(agentOfMonth, mappedAgents),
-            inboundStats: mapCallDirectionStats(inboundStats, 'inbound'),
-            outboundStats: mapCallDirectionStats(outboundStats, 'outbound'),
-            shiftMetrics: mapShiftMetrics(shiftMetrics),
+            inboundStats: mapCallDirectionStats(agents, 'inbound'),
+            outboundStats: mapCallDirectionStats(agents, 'outbound'),
+            shiftMetrics: mapShiftMetrics(agents),
             fetchedAt: new Date().toISOString(),
           } satisfies DashboardSnapshot;
         },

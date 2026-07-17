@@ -1,7 +1,7 @@
-import { CsqStatsDto } from '../models/dto';
+import { CsqDto } from '../models/dto';
 import { Queue } from '../models/domain';
 
-export function mapQueue(dto: CsqStatsDto): Queue {
+export function mapQueue(dto: CsqDto): Queue {
   return {
     name: dto.name,
     totalCalls: dto.callStats.totalCalls,
@@ -20,6 +20,6 @@ export function mapQueue(dto: CsqStatsDto): Queue {
   };
 }
 
-export function mapQueues(dtos: CsqStatsDto[]): Queue[] {
+export function mapQueues(dtos: CsqDto[]): Queue[] {
   return dtos.map(mapQueue);
 }
