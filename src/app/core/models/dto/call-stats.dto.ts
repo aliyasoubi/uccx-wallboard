@@ -1,9 +1,11 @@
 // Matches CallStats.json exactly.
 export interface CallStatsDto {
-  avgTalkDuration: number; // seconds
-  avgWaitDuration: number; // seconds
-  longestTalkDuration: number;
-  LongestWaitDuration: number;
+  maxTalkDuration: number;
+  avgTalkDuration: number;
+
+  maxWaitDuration: number;
+  avgWaitDuration: number;
+
   abandonedCalls: number;
   handledCalls: number;
   totalCalls: number;
