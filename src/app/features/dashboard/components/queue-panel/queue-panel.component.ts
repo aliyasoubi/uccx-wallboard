@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { TranslocoModule } from '@ngneat/transloco';
 import { Queue } from '../../../../core/models/domain';
 import { getRatioSeverity, STATUS_THRESHOLDS } from '../../../../core/policies/status-thresholds.policy';
 import { FormatDurationPipe } from '../../../../shared/pipes/format-duration.pipe';
@@ -8,7 +7,7 @@ import { FormatDurationPipe } from '../../../../shared/pipes/format-duration.pip
   selector: 'app-queue-panel',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormatDurationPipe, TranslocoModule],
+  imports: [FormatDurationPipe],
   templateUrl: './queue-panel.component.html',
   styleUrl: './queue-panel.component.scss',
 })

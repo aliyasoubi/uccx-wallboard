@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { TranslocoModule } from '@ngneat/transloco';
 import { Agent } from '../../../../core/models/domain';
 import { StatusBadgeComponent } from '../../../../shared/components';
 import { FormatDurationPipe } from '../../../../shared/pipes/format-duration.pipe';
@@ -8,7 +7,7 @@ import { FormatDurationPipe } from '../../../../shared/pipes/format-duration.pip
   selector: 'app-agent-roster',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [StatusBadgeComponent, FormatDurationPipe, TranslocoModule],
+  imports: [StatusBadgeComponent, FormatDurationPipe],
   templateUrl: './agent-roster.component.html',
   styleUrl: './agent-roster.component.scss',
 })

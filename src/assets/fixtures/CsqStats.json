@@ -1,50 +1,44 @@
 [
-    {
-        "name": "Sales",
-        "callStats": {
-            "totalCalls": 210,
-            "abandonedCalls": 5,
-            "handledlCalls": 205,
-            "avgWaitDuration": 32,
-            "waitingCalls": 2
-        },
-        "agentStateCounts": {
-            "total": 12,
-            "ready": 5,
-            "talking": 4,
-            "notReady": 3
-        }
+  {
+    "name": "Sales",
+    "callStats": {
+      "maxTalkDuration": 720,
+      "avgTalkDuration": 260,
+      "maxWaitDuration": 95,
+      "avgWaitDuration": 32,
+      "totalCalls": 210,
+      "abandonedCalls": 5,
+      "handledCalls": 205,
+      "waitingCalls": 2
     },
-    {
-        "name": "Support",
-        "callStats": {
-            "totalCalls": 190,
-            "abandonedCalls": 8,
-            "handledlCalls": 182,
-            "avgWaitDuration": 55,
-            "waitingCalls": 3
-        },
-        "agentStateCounts": {
-            "total": 15,
-            "ready": 6,
-            "talking": 7,
-            "notReady": 2
-        }
+    "agentStateCounts": { "total": 12, "ready": 5, "talking": 4, "notReady": 3 }
+  },
+  {
+    "name": "Support",
+    "callStats": {
+      "maxTalkDuration": 880,
+      "avgTalkDuration": 340,
+      "maxWaitDuration": 140,
+      "avgWaitDuration": 55,
+      "totalCalls": 190,
+      "abandonedCalls": 8,
+      "handledCalls": 182,
+      "waitingCalls": 3
     },
-    {
-        "name": "Billing",
-        "callStats": {
-            "totalCalls": 100,
-            "abandonedCalls": 4,
-            "handledlCalls": 96,
-            "avgWaitDuration": 41,
-            "waitingCalls": 1
-        },
-        "agentStateCounts": {
-            "total": 8,
-            "ready": 3,
-            "talking": 2,
-            "notReady": 3
-        }
-    }
+    "agentStateCounts": { "total": 15, "ready": 6, "talking": 7, "notReady": 2 }
+  },
+  {
+    "name": "Billing",
+    "callStats": {
+      "maxTalkDuration": 640,
+      "avgTalkDuration": 290,
+      "maxWaitDuration": 110,
+      "avgWaitDuration": 41,
+      "totalCalls": 100,
+      "abandonedCalls": 4,
+      "handledCalls": 96,
+      "waitingCalls": 1
+    },
+    "agentStateCounts": { "total": 8, "ready": 3, "talking": 2, "notReady": 3 }
+  }
 ]

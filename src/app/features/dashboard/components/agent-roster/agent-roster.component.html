@@ -1,8 +1,8 @@
 <div class="roster">
-  <p class="title">{{ 'agents.title' | transloco }}</p>
+  <p class="title">Agent summary</p>
 
   @if (agents().length === 0) {
-    <p class="empty">{{ 'queue.noActivity' | transloco }}</p>
+    <p class="empty">No activity</p>
   } @else {
     <ul class="list">
       @for (agent of agents(); track trackByAgentId($index, agent)) {
@@ -16,6 +16,6 @@
         </li>
       }
     </ul>
-    <p class="count">{{ 'agents.onlineCount' | transloco: { count: agents().length } }}</p>
+    <p class="count">{{ agents().length }} agent{{ agents().length === 1 ? '' : 's' }} online</p>
   }
 </div>

@@ -1,7 +1,0 @@
-[
-  { "agentId": "1122", "skillsName": "Domain Knowledge", "skillsCount": 31 },
-  { "agentId": "1133", "skillsName": "Attention to Organization", "skillsCount": 27 },
-  { "agentId": "1144", "skillsName": "Adaptability", "skillsCount": 20 },
-  { "agentId": "2211", "skillsName": "Empathy", "skillsCount": 20 },
-  { "agentId": "2233", "skillsName": "Patience", "skillsCount": 18 }
-]

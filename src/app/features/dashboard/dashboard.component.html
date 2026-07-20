@@ -7,19 +7,21 @@
         [class.dot--stale]="store.connectionState() === 'stale'"
         [class.dot--error]="store.connectionState() === 'error'"
       ></span>
+      <!-- Multi-language disabled for this release — plain English text
+           instead of the 'dashboard.live' / 'dashboard.stale' / 'dashboard.error'
+           translation keys. Keys still exist in assets/i18n/*.json. -->
       <span class="live-text">
-        {{ 'dashboard.' + store.connectionState() | transloco }}
+        @switch (store.connectionState()) {
+          @case ('live') { Live }
+          @case ('stale') { Reconnecting… }
+          @case ('error') { Connection lost }
+        }
       </span>
       @if (store.lastUpdated(); as updated) {
-        <span class="updated">
-          {{ 'dashboard.updated' | transloco: { time: (updated | date: 'shortTime') } }}
-        </span>
+        <span class="updated">Updated {{ updated | date: 'shortTime' }}</span>
       }
     </div>
-    <div class="lang-switch">
-      <button type="button" (click)="setLang('en')">EN</button>
-      <button type="button" (click)="setLang('fa')">FA</button>
-    </div>
+    <!-- Language switcher removed for this release (see app.config.ts) -->
   </header>
 
   <section class="row row--top">
@@ -35,15 +37,12 @@
   <section class="row row--calls">
     <app-call-direction-panel class="col" [stats]="store.inboundStats()" icon="ti-phone-incoming" />
     <app-call-direction-panel class="col" [stats]="store.outboundStats()" icon="ti-phone-outgoing" />
-    <app-shift-metrics-panel class="col" [metrics]="store.shiftMetrics()" />
   </section>
 
   <section class="row row--roster">
-    <div class="col stack">
-      <div class="panel-shell">
-        <p class="panel-title">Agents state</p>
-        <app-agent-state-donut [summary]="store.agentStateSummary()" />
-      </div>
+    <div class="col panel-shell">
+      <p class="panel-title">Agents state</p>
+      <app-agent-state-donut [summary]="store.agentStateSummary()" />
     </div>
     <app-agent-roster class="col col--wide" [agents]="store.agents()" />
   </section>

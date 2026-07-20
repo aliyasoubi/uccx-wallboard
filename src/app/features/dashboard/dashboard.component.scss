@@ -49,21 +49,6 @@
   color: var(--color-text-muted);
 }
 
-.lang-switch {
-  display: flex;
-  gap: var(--space-2);
-}
-
-.lang-switch button {
-  background: var(--color-surface-1);
-  color: var(--color-text-secondary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: 4px var(--space-3);
-  font-size: var(--font-size-label);
-  cursor: pointer;
-}
-
 .row {
   display: grid;
   gap: var(--space-4);
@@ -72,35 +57,26 @@
 .row--top {
   // Agent of the Month gets an "auto" track sized to its own content instead
   // of an even fr share — its content is compact, so an equal fr fraction
-  // left a large dead-space margin inside the card (visible in the last
-  // screenshot). align-items: stretch is kept so its height still matches
-  // the taller SLA/CSAT cluster beside it.
+  // left a large dead-space margin inside the card. align-items: stretch is
+  // kept so its height still matches the taller SLA/CSAT cluster beside it.
   grid-template-columns: 2fr 1.6fr auto;
   align-items: stretch;
 }
 
 .row--calls {
-  // Inbound/Outbound have less content than Shift metrics (one count + a
-  // top/lowest row vs. two full metric blocks). Forcing equal height left a
-  // large empty gap at the bottom of the shorter cards — sizing to content
-  // instead removes that dead space.
-  grid-template-columns: repeat(3, 1fr);
+  // Only Inbound and Outbound now (Shift metrics removed) — two even
+  // columns, sized to content rather than forced to match a taller sibling
+  // that no longer exists.
+  grid-template-columns: 1fr 1fr;
   align-items: start;
 }
 
 .row--roster {
-  // Agents state donut + Top skills now stack vertically in one column
-  // (see .stack below) instead of sitting as separate equal-height cards —
-  // the donut alone was much shorter than the five-row Agent summary table
-  // it was being stretched to match, leaving a large empty gap underneath it.
+  // Agents state donut is much shorter than the multi-row Agent summary
+  // table beside it — align-items: start lets it size to its own content
+  // instead of being stretched into a mostly-empty tall card.
   grid-template-columns: 1.3fr 2fr;
   align-items: start;
-}
-
-.stack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
 }
 
 .row--bottom {
@@ -116,17 +92,17 @@
   justify-content: center;
 }
 
+.panel-title {
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-size-heading);
+  font-weight: 600;
+}
+
 @media (max-width: 1400px) {
   .row--top {
     grid-template-columns: 1fr 1fr;
   }
   .row--top > :last-child {
-    grid-column: span 2;
-  }
-  .row--calls {
-    grid-template-columns: 1fr 1fr;
-  }
-  .row--calls > :last-child {
     grid-column: span 2;
   }
   .row--roster {
@@ -140,15 +116,7 @@
   .row--roster {
     grid-template-columns: 1fr;
   }
-  .row--top > *,
-  .row--calls > *,
-  .row--roster > * {
+  .row--top > * {
     grid-column: span 1;
   }
-}
-
-.panel-title {
-  margin: 0 0 var(--space-3);
-  font-size: var(--font-size-heading);
-  font-weight: 600;
 }

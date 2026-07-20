@@ -3,33 +3,33 @@
     <p class="title">{{ queue().name }}</p>
     <div class="stats">
       <div>
-        <p class="stat-label">{{ 'metrics.totalCalls' | transloco }}</p>
+        <p class="stat-label">Total calls</p>
         <p class="stat-value">{{ queue().totalCalls }}</p>
       </div>
       <div>
-        <p class="stat-label">{{ 'metrics.handledCalls' | transloco }}</p>
+        <p class="stat-label">Handled</p>
         <p class="stat-value">{{ queue().handledCalls }}</p>
       </div>
       <div>
-        <p class="stat-label">{{ 'metrics.abandonedCalls' | transloco }}</p>
+        <p class="stat-label">Abandoned</p>
         <p class="stat-value" [class.stat-value--warn]="abandonedSeverity() !== 'normal'">
           {{ queue().abandonedCalls }}
         </p>
       </div>
       <div>
-        <p class="stat-label">{{ 'metrics.avgWait' | transloco }}</p>
+        <p class="stat-label">Avg wait</p>
         <p class="stat-value">{{ queue().avgWaitSeconds | formatDuration }}</p>
       </div>
     </div>
     <div class="agent-states">
-      <span class="state state--ready">{{ 'agents.ready' | transloco }} {{ queue().agentStates.ready }}</span>
-      <span class="state state--talking">{{ 'agents.talking' | transloco }} {{ queue().agentStates.talking }}</span>
-      <span class="state state--not-ready">{{ 'agents.notReady' | transloco }} {{ queue().agentStates.notReady }}</span>
+      <span class="state state--ready">Ready {{ queue().agentStates.ready }}</span>
+      <span class="state state--talking">Talking {{ queue().agentStates.talking }}</span>
+      <span class="state state--not-ready">Not ready {{ queue().agentStates.notReady }}</span>
     </div>
   </div>
 } @else {
   <div class="panel panel--empty">
     <span class="title">{{ queue().name }}</span>
-    <span class="empty">{{ 'queue.noActivity' | transloco }}</span>
+    <span class="empty">No activity</span>
   </div>
 }

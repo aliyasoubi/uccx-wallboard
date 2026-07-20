@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { TranslocoModule } from '@ngneat/transloco';
 import { AgentStateSummary } from '../../../core/models/domain';
 
 interface Segment {
@@ -19,8 +18,7 @@ const CIRCUMFERENCE = 2 * Math.PI * 15.9;
   selector: 'app-agent-state-donut',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslocoModule],
-  templateUrl: './agent-state-donut.component.html',
+    templateUrl: './agent-state-donut.component.html',
   styleUrl: './agent-state-donut.component.scss',
 })
 export class AgentStateDonutComponent {

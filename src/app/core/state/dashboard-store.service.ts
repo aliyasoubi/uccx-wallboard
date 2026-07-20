@@ -8,7 +8,6 @@ import {
   CallSummary,
   Queue,
   ServiceMetrics,
-  ShiftMetrics,
 } from '../models/domain';
 import { DATA_SOURCE } from '../data-access/data-source.token';
 
@@ -26,7 +25,6 @@ export class DashboardStoreService {
   private readonly _agentOfMonth = signal<AgentOfMonth | null>(null);
   private readonly _inboundStats = signal<CallDirectionStats | null>(null);
   private readonly _outboundStats = signal<CallDirectionStats | null>(null);
-  private readonly _shiftMetrics = signal<ShiftMetrics | null>(null);
   private readonly _lastUpdated = signal<Date | null>(null);
   private readonly _connectionState = signal<'live' | 'stale' | 'error'>('live');
 
@@ -38,7 +36,6 @@ export class DashboardStoreService {
   readonly agentOfMonth = this._agentOfMonth.asReadonly();
   readonly inboundStats = this._inboundStats.asReadonly();
   readonly outboundStats = this._outboundStats.asReadonly();
-  readonly shiftMetrics = this._shiftMetrics.asReadonly();
   readonly lastUpdated = this._lastUpdated.asReadonly();
   readonly connectionState = this._connectionState.asReadonly();
 
@@ -58,7 +55,6 @@ export class DashboardStoreService {
       this._agentOfMonth.set(snapshot.agentOfMonth);
       this._inboundStats.set(snapshot.inboundStats);
       this._outboundStats.set(snapshot.outboundStats);
-      this._shiftMetrics.set(snapshot.shiftMetrics);
       this._lastUpdated.set(new Date(snapshot.fetchedAt));
     });
 

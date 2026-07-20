@@ -1,8 +1,10 @@
 {
-    "avgTalkDuration": 312,
-    "avgWaitDuration": 48,
-    "abandonedCalls": 17,
-    "handledCalls": 483,
-    "totalCalls": 500,
-    "waitingCalls": 6
+  "maxTalkDuration": 950,
+  "avgTalkDuration": 312,
+  "maxWaitDuration": 180,
+  "avgWaitDuration": 48,
+  "abandonedCalls": 17,
+  "handledCalls": 483,
+  "totalCalls": 500,
+  "waitingCalls": 6
 }

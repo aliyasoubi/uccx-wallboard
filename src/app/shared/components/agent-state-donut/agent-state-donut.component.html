@@ -15,13 +15,13 @@
   </svg>
   <div class="legend">
     <span class="legend-item" style="color: var(--color-status-normal)">
-      {{ 'agents.ready' | transloco }} {{ summary()?.ready ?? 0 }}
+      Ready {{ summary()?.ready ?? 0 }}
     </span>
     <span class="legend-item" style="color: var(--color-status-accent)">
-      {{ 'agents.talking' | transloco }} {{ summary()?.talking ?? 0 }}
+      Talking {{ summary()?.talking ?? 0 }}
     </span>
     <span class="legend-item" style="color: var(--color-status-critical)">
-      {{ 'agents.notReady' | transloco }} {{ summary()?.notReady ?? 0 }}
+      Not ready {{ summary()?.notReady ?? 0 }}
     </span>
   </div>
 </div>

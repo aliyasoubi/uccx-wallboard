@@ -1,19 +1,19 @@
 <div class="panel">
   <app-metric-tile
-    [label]="'metrics.callsWaiting' | transloco"
+    label="Calls in queue"
     [value]="callsWaiting()"
     [severity]="callsWaitingSeverity()"
     size="lg"
   />
   <app-meter
-    [label]="'metrics.sla' | transloco"
+    label="SLA"
     [value]="metrics()?.slaPercent ?? 0"
     [max]="100"
     [displayValue]="(metrics()?.slaPercent ?? 0) + '%'"
     [colorVar]="slaColor()"
   />
   <app-meter
-    [label]="'metrics.csat' | transloco"
+    label="CSAT"
     [value]="metrics()?.csatScore ?? 0"
     [max]="5"
     [displayValue]="(metrics()?.csatScore ?? 0).toFixed(1)"

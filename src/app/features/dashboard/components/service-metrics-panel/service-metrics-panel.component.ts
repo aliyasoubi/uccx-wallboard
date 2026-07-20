@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { TranslocoModule } from '@ngneat/transloco';
 import { ServiceMetrics } from '../../../../core/models/domain';
 import {
   getInverseSeverity,
@@ -12,7 +11,7 @@ import { MeterComponent, MetricTileComponent } from '../../../../shared/componen
   selector: 'app-service-metrics-panel',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MeterComponent, MetricTileComponent, TranslocoModule],
+  imports: [MeterComponent, MetricTileComponent],
   templateUrl: './service-metrics-panel.component.html',
   styleUrl: './service-metrics-panel.component.scss',
 })

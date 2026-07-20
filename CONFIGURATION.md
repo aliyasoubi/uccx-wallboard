@@ -136,3 +136,27 @@ deliberate scope decision to raise with you before adding — it's more
 moving parts than most internal ops dashboards need, but if multi-environment
 deployment from one build becomes a real requirement, that's the mechanism
 to reach for instead of more `environment.*.ts` files.
+
+## Changelog — this pass
+
+- **DTOs aligned to the real API contract.** `AgentDto` is now nested
+  (`state`, `stateStats`, `inboundCallStats`, `outboundCallStats` sub-objects)
+  and `CsqDto` now nests `callStats`/`agentStateCounts` instead of flat
+  fields. The domain models and every presentational component were
+  **unaffected** by this — that's the mapper layer doing its job. Only
+  `agent.mapper.ts` and `queue.mapper.ts` needed to change.
+- **Fixtures were out of sync with the new DTOs and have been rewritten**
+  to match exactly (`AgentStates.json`, `CallStats.json`, `CsqStats.json`).
+  The `handledlCalls` typo is gone from `CsqStats.json` — the new `CsqDto`
+  reuses the already-corrected `CallStatsDto`, so there's no longer a typo
+  to work around at the mapper level.
+- **Top Skills and Shift Metrics removed** — DTOs, domain models, mappers,
+  feature components, and unused fixture files (`TopSkills.json`,
+  `ShiftMetrics.json`, `InboundStats.json`, `OutboundStats.json` — the
+  latter two were already superseded by deriving inbound/outbound stats
+  from the agent roster) all deleted.
+- **Multi-language disabled for this release**, not deleted. `provideTransloco`
+  is commented out in `app.config.ts`, and every component reverted to
+  plain English strings. `transloco-loader.ts` and `assets/i18n/*.json` are
+  untouched and ready — see the comment block at the top of `app.config.ts`
+  for the exact 3-step re-enable process.

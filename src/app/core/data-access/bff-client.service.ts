@@ -9,7 +9,6 @@ import {
   mapCallSummary,
   mapQueues,
   mapServiceMetrics,
-  mapShiftMetrics,
 } from '../mappers';
 import {
   AgentOfMonthDto,
@@ -62,7 +61,6 @@ export class BffClientService {
             agentOfMonth: mapAgentOfMonth(agentOfMonth, mappedAgents),
             inboundStats: mapCallDirectionStats(agents, 'inbound'),
             outboundStats: mapCallDirectionStats(agents, 'outbound'),
-            shiftMetrics: mapShiftMetrics(agents),
             fetchedAt: new Date().toISOString(),
           } satisfies DashboardSnapshot;
         },

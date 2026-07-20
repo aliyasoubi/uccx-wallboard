@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { TranslocoModule } from '@ngneat/transloco';
 import { getRatioSeverity, getSeverity, STATUS_THRESHOLDS } from '../../../../core/policies/status-thresholds.policy';
 import { CallSummary } from '../../../../core/models/domain';
 import { FormatDurationPipe } from '../../../../shared/pipes/format-duration.pipe';
@@ -9,7 +8,7 @@ import { MetricTileComponent } from '../../../../shared/components';
   selector: 'app-calls-summary-panel',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MetricTileComponent, FormatDurationPipe, TranslocoModule],
+  imports: [MetricTileComponent, FormatDurationPipe],
   templateUrl: './calls-summary-panel.component.html',
   styleUrl: './calls-summary-panel.component.scss',
 })
