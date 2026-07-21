@@ -12,8 +12,8 @@ import {
   tap,
   timer,
 } from 'rxjs';
-import { environment } from '../../../environments/environment';
 import { DashboardSnapshot } from '../models/domain';
+import { AppConfigService } from '../config/app-config.service';
 import { BffClientService } from './bff-client.service';
 import { ConnectionState, DataSource } from './data-source.token';
 
@@ -22,13 +22,17 @@ import { ConnectionState, DataSource } from './data-source.token';
 @Injectable()
 export class PollingDataSource implements DataSource, OnDestroy {
   private readonly bffClient = inject(BffClientService);
+  private readonly appConfig = inject(AppConfigService);
   private readonly destroy$ = new Subject<void>();
   private readonly connectionState = new BehaviorSubject<ConnectionState>('live');
   private consecutiveFailures = 0;
 
   readonly connectionState$ = this.connectionState.asObservable();
 
-  readonly updates$: Observable<DashboardSnapshot> = interval(environment.pollIntervalMs).pipe(
+  // pollIntervalMs comes from assets/config.json (via AppConfigService),
+  // loaded once at app start by the APP_INITIALIZER in app.config.ts — see
+  // CONFIGURATION.md for how to change it without a rebuild.
+  readonly updates$: Observable<DashboardSnapshot> = interval(this.appConfig.config().pollIntervalMs).pipe(
     startWith(0),
     switchMap(() =>
       this.bffClient.fetchSnapshot().pipe(

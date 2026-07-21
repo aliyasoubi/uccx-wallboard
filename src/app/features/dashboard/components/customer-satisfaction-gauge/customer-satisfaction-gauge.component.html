@@ -1,0 +1,9 @@
+<div class="panel">
+  <app-meter
+    label="CSAT"
+    [value]="metrics()?.csatScore ?? 0"
+    [max]="maxScore"
+    [displayValue]="(metrics()?.csatScore ?? 0).toFixed(1)"
+    colorVar="var(--color-status-accent)"
+  />
+</div>

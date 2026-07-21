@@ -1,0 +1,10 @@
+<div class="panel">
+  <app-metric-tile label="Incoming calls" [value]="inboundStats()?.count ?? '—'" />
+  <app-metric-tile label="Outbound calls" [value]="outboundStats()?.count ?? '—'" />
+  <app-metric-tile label="Answered calls" [value]="summary()?.handledCalls ?? '—'" />
+  <app-metric-tile
+    label="Abandoned calls"
+    [value]="summary()?.abandonedCalls ?? '—'"
+    [severity]="abandonedSeverity()"
+  />
+</div>

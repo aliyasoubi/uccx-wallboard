@@ -1,0 +1,21 @@
+<div class="roster">
+  <p class="title">Agent summary</p>
+
+  @if (agents().length === 0) {
+    <p class="empty">No activity</p>
+  } @else {
+    <ul class="list">
+      @for (agent of agents(); track agent.id) {
+        <li class="row" [attr.data-agent-id]="agent.id">
+          <div class="identity">
+            <span class="avatar">{{ initialOf(agent.name) }}</span>
+            <span class="name">{{ agent.name }}</span>
+          </div>
+          <span class="duration">{{ agent.statusDurationSeconds | formatDuration }}</span>
+          <app-status-badge [status]="agent.status" />
+        </li>
+      }
+    </ul>
+    <p class="count">{{ agents().length }} agent{{ agents().length === 1 ? '' : 's' }} online</p>
+  }
+</div>

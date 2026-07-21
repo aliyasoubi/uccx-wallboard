@@ -1,0 +1,92 @@
+// Custom elements default to display:inline, which is fragile as a
+// flex/grid item (percentage heights on internal wrappers need a definite
+// height from this host). Every dashboard panel is meant to fill whatever
+// grid/flex cell the shell puts it in, so that's made explicit here rather
+// than relying on grid/flex auto-blockification.
+:host {
+  display: block;
+  height: 100%;
+  min-height: 0;
+}
+
+.roster {
+  background: var(--color-surface-1);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.title {
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-size-heading);
+  font-weight: 600;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  // flex:1 + min-height:0 is what lets this list actually shrink to fit
+  // inside .roster's fixed (100%) height instead of pushing the card (and
+  // the whole no-scroll page) taller than the viewport — overflow-y:auto
+  // only ever kicks in once the element is prevented from growing past
+  // its container, which the flex default (min-height:auto) does not do.
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.duration {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-label);
+  color: var(--color-text-muted);
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-status-accent-bg);
+  color: var(--color-status-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-label);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.name {
+  font-size: var(--font-size-body);
+}
+
+.count {
+  margin: var(--space-3) 0 0;
+  font-size: var(--font-size-label);
+  color: var(--color-text-muted);
+}
+
+.empty {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-body);
+}

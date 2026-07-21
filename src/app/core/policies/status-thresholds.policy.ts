@@ -8,8 +8,11 @@ export const STATUS_THRESHOLDS = {
   avgTalkSeconds: { warning: 120, critical: 180 },
   callsWaiting: { warning: 3, critical: 6 },
   notReadyRatio: { warning: 0.3, critical: 0.5 },
-  // Lower is worse for SLA, so these are floors, checked by getInverseSeverity.
+  // Lower is worse for SLA/FCR, so these are floors, checked by getInverseSeverity.
   slaPercent: { warning: 80, critical: 50 },
+  fcrPercent: { warning: 75, critical: 60 },
+  // CWD — Current Wait Duration, the longest a caller is waiting right now.
+  currentWaitSeconds: { warning: 45, critical: 90 },
 } as const;
 
 export interface Thresholds {

@@ -1,0 +1,52 @@
+// Custom elements default to display:inline, which is fragile as a
+// flex/grid item (percentage heights on internal wrappers need a definite
+// height from this host). Every dashboard panel is meant to fill whatever
+// grid/flex cell the shell puts it in, so that's made explicit here rather
+// than relying on grid/flex auto-blockification.
+:host {
+  display: block;
+  height: 100%;
+  min-height: 0;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  background: var(--color-surface-1);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.photo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.photo--fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-status-accent-bg);
+  color: var(--color-status-accent);
+  font-weight: 600;
+  font-size: var(--font-size-body);
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: var(--font-size-label);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+}
+
+.name {
+  margin: 2px 0 0;
+  font-size: var(--font-size-body);
+  font-weight: 600;
+}

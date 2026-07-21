@@ -14,6 +14,8 @@ export function mapAgent(dto: AgentDto): Agent {
     status: STATUS_MAP[dto.state.state],
     statusDurationSeconds: dto.state.duration,
     reason: dto.state.reason ? dto.state.reason : null,
+    inboundCalls: dto.inboundCallStats.totalCalls,
+    outboundCalls: dto.outboundCallStats.totalCalls,
   };
 }
 

@@ -1,12 +1,10 @@
 # Configuration guide
 
-This covers four things: how to point the app at a real backend, whether
-there's a `.env` file, what to do when a backend field gets renamed, and how
-often the dashboard polls. All of this builds on the BFF architecture from
-the first message in this thread (the original README's §3, "Backend — BFF,
-not direct-to-source") — that document is still the source of truth for
-*why* the app is shaped this way; this one is the practical "how do I
-actually change it" reference.
+This covers: how to point the app at a real backend/database address, how
+runtime config actually works now, what to do when a backend field gets
+renamed, and how often the dashboard polls. See README.md §3 for *why* the
+app is shaped this way (the BFF architecture); this is the practical "how
+do I actually change it" reference.
 
 ## 1. Is there a `.env` file?
 
@@ -14,149 +12,154 @@ No, and there won't be one — Angular doesn't support `.env` files the way a
 Node/React app does, because Angular apps are compiled to static files
 ahead of time; there's no server process at runtime to read a `.env` from.
 
-The Angular equivalent is `src/environments/environment*.ts`:
+There are two layers of config instead:
 
 ```
-src/environments/
-├── environment.ts              # used by `npm start` (dev)
-├── environment.staging.ts      # used by `ng build --configuration=staging`
-└── environment.production.ts   # used by `ng build --configuration=production`
+src/environments/                    # build-time — baked into the bundle
+├── environment.ts                   #   used by `npm start` (dev)
+├── environment.staging.ts           #   used by `ng build --configuration=staging`
+└── environment.production.ts        #   used by `ng build --configuration=production`
+
+src/assets/config.json               # runtime — read fresh on every page load
 ```
 
-Each exports the same shape:
+`environment.*.ts` exports:
 
 ```typescript
 export const environment = {
   production: false,
-  useMockFixtures: true,       // true = read src/assets/fixtures/*.json
-  apiBaseUrl: 'http://localhost:3000/api',
-  pollIntervalMs: 3000,
+  useMockFixtures: true, // true = read src/assets/fixtures/*.json
 };
 ```
 
-`angular.json` swaps the right file in at build time via `fileReplacements`
-— whichever `environment.*.ts` is selected becomes `environment.ts` in the
-compiled bundle. This means **changing environment values requires a
-rebuild**, not just a restart. If you need to change the API URL without
-rebuilding (e.g. the same build deployed to multiple environments), see the
-"runtime config" note at the bottom of this file.
+`assets/config.json` holds the two values you're most likely to want to
+change on a deployed server without rebuilding:
 
-## 2. How to point the app at a real backend/DB
+```json
+{
+  "apiBaseUrl": "assets/fixtures",
+  "pollIntervalMs": 3000
+}
+```
 
-The frontend never talks to a database directly — it talks to the BFF (see
-the original README §3). So "changing the backend" means changing which BFF
-the app calls, not connecting to a DB from Angular.
+## 2. How to point the app at a real backend/DB — the easy way (no rebuild)
 
-Two steps:
+**This is now the primary, working mechanism** — in an earlier pass,
+`AppConfigService` and `assets/config.json` existed in the codebase but
+were never actually registered with the app, so editing the JSON file had
+no effect and the app silently kept using the compiled-in
+`environment.ts` values instead. That's fixed: `app.config.ts` now runs
+`AppConfigService.load()` via an `APP_INITIALIZER` before the app renders,
+and both `BffClientService` (the API address) and `PollingDataSource` (the
+poll interval) read from `AppConfigService.config()` — which is exactly
+`assets/config.json` — instead of `environment.ts`.
 
-1. **Open the relevant environment file** (`environment.ts` for local dev,
-   `environment.staging.ts` / `environment.production.ts` for those
-   targets) and set:
-   ```typescript
-   useMockFixtures: false,
-   apiBaseUrl: 'https://your-real-bff.example.com/api',
+To point at a real backend/DB address:
+
+1. Edit `src/assets/config.json` on the deployed server (or in your local
+   `src/assets/` before building):
+   ```json
+   {
+     "apiBaseUrl": "https://your-real-bff.example.com/api",
+     "pollIntervalMs": 3000
+   }
    ```
-2. **Check the route paths in `BffClientService`** (`src/app/core/data-access/bff-client.service.ts`).
-   Each resource has a placeholder real-mode path, e.g. `/agents`,
-   `/call-stats`, `/queues` — these are guesses at what the real BFF's
-   routes will be called. Update the `realPath` argument in each
-   `this.endpoint(...)` call to match the BFF's actual route names.
+2. Set `useMockFixtures: false` in the relevant `environment.*.ts` (this
+   one stays build-time — it's a deployment-target decision, not something
+   you'd flip at runtime).
+3. Refresh the page. No rebuild, no redeploy of the JS bundle — just the
+   one JSON file.
+4. Check the route paths in `BffClientService` (`src/app/core/
+   data-access/bff-client.service.ts`). Each resource has a placeholder
+   real-mode path, e.g. `/agents`, `/call-stats`, `/csqs` — update the
+   `realPath` argument in each `this.endpoint(...)` call to match the real
+   BFF's actual route names.
 
 Nothing else changes. The mappers, the store, and every component are
-already decoupled from where the data comes from (see the original README's
-DataSource/BFF sections) — this is the entire point of that layering.
+already decoupled from where the data comes from — that's the entire
+point of the DataSource/BFF layering described in README.md §3–4.
 
 If the real backend *is* a database you're standing up yourself (rather
-than an existing telephony system), that DB sits behind the BFF, not behind
-Angular — the BFF is what should have a real `.env`/config for its DB
-connection string, credentials, etc. That's a separate service from this
-repo.
+than an existing telephony system), that DB sits behind the BFF, not
+behind Angular — the BFF is what should have a real `.env`/config for its
+DB connection string, credentials, etc. That's a separate service from
+this repo.
 
 ## 3. A backend field got renamed — what do I change?
 
-This is exactly the failure mode the mapper layer exists to contain (see
-the original code review — the old app's biggest bug was exactly this).
-The fix is always two edits, never more:
+This is exactly the failure mode the mapper layer exists to contain. The
+fix is always two edits, never more:
 
 **Example: the backend renames `agentID` to `agent_id` on `AgentStates`.**
 
-1. **Update the DTO** — `src/app/core/models/dto/agent-state.dto.ts` is the
-   only place allowed to know the wire format:
+1. **Update the DTO** — `src/app/core/models/dto/agent.dto.ts` is the only
+   place allowed to know the wire format:
    ```typescript
    export interface AgentStateDto {
-     agent_id: string;   // was: agentID
-     ...
+     agent_id: string; // was: agentID
+     // ...
    }
    ```
-2. **Update the matching mapper line** — `src/app/core/mappers/agent.mapper.ts`:
+2. **Update the matching mapper line** —
+   `src/app/core/mappers/agent.mapper.ts`:
    ```typescript
-   export function mapAgent(dto: AgentStateDto): Agent {
+   export function mapAgent(dto: AgentDto): Agent {
      return {
-       id: dto.agent_id,   // was: dto.agentID
-       ...
+       id: dto.agent_id, // was: dto.agentID
+       // ...
      };
    }
    ```
 
-That's it. TypeScript will actually catch you if you miss a usage —
-changing the DTO field name breaks the mapper at compile time, so there's
-no way to update the DTO and forget the mapper without the build failing.
-No component, no template, no fixture other than the one JSON file itself
-needs to change, because everything downstream of the mapper only ever sees
-the clean domain model (`Agent`), never the raw DTO.
+TypeScript will catch you if you miss a usage — changing the DTO field name
+breaks the mapper at compile time. No component, no template, no fixture
+other than the one JSON file itself needs to change, because everything
+downstream of the mapper only ever sees the clean domain model, never the
+raw DTO.
 
 If a **new** field gets added rather than renamed, add it to the DTO, add
 it to the domain model if the UI needs it, then map it across — same
-two-or-three-file pattern.
+two-or-three-file pattern. This exact pattern is how CWD/MAD/ACT, per-queue
+SLA, and FCR were added in this pass — see `queue-timing-stats.dto.ts`,
+`queue.mapper.ts`, and `service-metrics.mapper.ts` for worked examples.
 
 ## 4. Poll interval
 
-**Currently 3000ms (3 seconds)**, set in `environment.pollIntervalMs` and
-read by `src/app/core/data-access/polling-data-source.ts`. To change it,
-edit the value in the relevant `environment.*.ts` file — no code changes
-needed, it's already externalized as config rather than a hardcoded
-constant.
+**Currently 3000ms (3 seconds)**, set in `assets/config.json`'s
+`pollIntervalMs` and read by `PollingDataSource` via `AppConfigService`.
+To change it, edit that one JSON file on the server and refresh — no
+rebuild needed (see §2).
 
-Worth knowing: this fires 10 parallel `HTTP GET`s every interval (one per
-resource — agents, call stats, queues, etc.), via `forkJoin`. At 3s that's
-manageable for a handful of dashboard clients hitting fixtures or a fast
-BFF, but if this scales to many simultaneous wallboards hitting a real BFF,
-that's the moment to prioritize the WebSocket phase from the original
-README (§9, "later phase") — push-based updates remove the polling cost
-entirely rather than requiring interval tuning.
+Worth knowing: this fires 6 parallel `HTTP GET`s every interval (one per
+resource — agents, call stats, queues, service metrics, agent state
+counts, agent of month), via `forkJoin`. At 3s that's manageable for a
+handful of dashboard clients hitting fixtures or a fast BFF, but if this
+scales to many simultaneous wallboards hitting a real BFF, that's the
+moment to prioritize the WebSocket phase from README.md §4/§10 —
+push-based updates remove the polling cost entirely rather than requiring
+interval tuning.
 
-## Runtime config (if you need to change the API URL without rebuilding)
+## Changelog
 
-Not implemented in this scaffold, but worth knowing the pattern exists: if
-the same build artifact needs to be deployable to different environments
-without a rebuild (common for containerized deployments), the standard
-Angular approach is a `config.json` fetched once at startup via
-`APP_INITIALIZER`, rather than baked-in `environment.ts` values. That's a
-deliberate scope decision to raise with you before adding — it's more
-moving parts than most internal ops dashboards need, but if multi-environment
-deployment from one build becomes a real requirement, that's the mechanism
-to reach for instead of more `environment.*.ts` files.
+### This pass
+- **Runtime config actually wired up.** `AppConfigService` +
+  `assets/config.json` existed before but had no effect — now registered
+  via `APP_INITIALIZER`, and both `apiBaseUrl` and `pollIntervalMs` are
+  genuinely runtime-editable. See §2.
+- **Queue Displays extended** with CWD/MAD/ACT/SLA (`QueueTimingStatsDto`,
+  `CsqDto.serviceMetrics` now actually mapped) — see README.md §9 for the
+  documented/mocked-field caveats on these.
+- **FCR added** to `CustomerServiceMetricsDto` for the new KPI Metrics
+  module — mocked pending a real backend field.
 
-## Changelog — this pass
-
-- **DTOs aligned to the real API contract.** `AgentDto` is now nested
-  (`state`, `stateStats`, `inboundCallStats`, `outboundCallStats` sub-objects)
-  and `CsqDto` now nests `callStats`/`agentStateCounts` instead of flat
-  fields. The domain models and every presentational component were
-  **unaffected** by this — that's the mapper layer doing its job. Only
-  `agent.mapper.ts` and `queue.mapper.ts` needed to change.
-- **Fixtures were out of sync with the new DTOs and have been rewritten**
-  to match exactly (`AgentStates.json`, `CallStats.json`, `CsqStats.json`).
-  The `handledlCalls` typo is gone from `CsqStats.json` — the new `CsqDto`
-  reuses the already-corrected `CallStatsDto`, so there's no longer a typo
-  to work around at the mapper level.
-- **Top Skills and Shift Metrics removed** — DTOs, domain models, mappers,
-  feature components, and unused fixture files (`TopSkills.json`,
-  `ShiftMetrics.json`, `InboundStats.json`, `OutboundStats.json` — the
-  latter two were already superseded by deriving inbound/outbound stats
-  from the agent roster) all deleted.
-- **Multi-language disabled for this release**, not deleted. `provideTransloco`
-  is commented out in `app.config.ts`, and every component reverted to
-  plain English strings. `transloco-loader.ts` and `assets/i18n/*.json` are
-  untouched and ready — see the comment block at the top of `app.config.ts`
-  for the exact 3-step re-enable process.
+### Prior pass
+- DTOs aligned to the real API contract (`AgentDto` nested `state`/
+  `stateStats`/`inboundCallStats`/`outboundCallStats`; `CsqDto` nested
+  `callStats`/`agentStateCounts`). Domain models and presentational
+  components were unaffected — the mapper layer doing its job.
+- Fixtures rewritten to match; the `handledlCalls` typo corrected at the
+  mapper level (domain model uses `handledCalls`).
+- Top Skills and Shift Metrics removed (unused DTOs/models/mappers/
+  fixtures deleted).
+- Multi-language disabled for this release, not deleted — see
+  `app.config.ts` for the 3-step re-enable process.

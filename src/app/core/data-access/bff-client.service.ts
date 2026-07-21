@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { forkJoin, map, Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { AppConfigService } from '../config/app-config.service';
 import {
   mapAgentOfMonth,
   mapAgents,
@@ -27,7 +28,16 @@ import { DashboardSnapshot } from '../models/domain';
 @Injectable({ providedIn: 'root' })
 export class BffClientService {
   private readonly http = inject(HttpClient);
-  private readonly base = environment.useMockFixtures ? 'assets/fixtures' : environment.apiBaseUrl;
+  private readonly appConfig = inject(AppConfigService);
+
+  // useMockFixtures stays a build-time environment.ts concern (it decides
+  // whether this deployment target talks to fixtures at all). apiBaseUrl
+  // itself comes from the runtime config loaded by AppConfigService
+  // (assets/config.json) so the real API/DB address can be changed on a
+  // deployed server without a rebuild — see CONFIGURATION.md.
+  private get base(): string {
+    return environment.useMockFixtures ? 'assets/fixtures' : this.appConfig.config().apiBaseUrl;
+  }
 
   fetchSnapshot(): Observable<DashboardSnapshot> {
     return forkJoin({

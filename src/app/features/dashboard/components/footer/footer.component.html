@@ -1,0 +1,20 @@
+<footer class="footer">
+  <div class="status">
+    <span
+      class="dot"
+      [class.dot--live]="connectionState() === 'live'"
+      [class.dot--stale]="connectionState() === 'stale'"
+      [class.dot--error]="connectionState() === 'error'"
+    ></span>
+    <span class="status-text">
+      @switch (connectionState()) {
+        @case ('live') { System status: Live }
+        @case ('stale') { System status: Reconnecting… }
+        @case ('error') { System status: Connection lost }
+      }
+    </span>
+  </div>
+  @if (lastUpdated(); as updated) {
+    <span class="updated">Last update {{ updated | date: 'shortTime' }}</span>
+  }
+</footer>

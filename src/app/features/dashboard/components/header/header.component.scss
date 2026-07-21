@@ -1,0 +1,37 @@
+:host {
+  display: block;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--font-size-metric);
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.datetime {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  font-family: var(--font-family-mono);
+}
+
+.clock {
+  font-size: var(--font-size-heading);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.date {
+  font-size: var(--font-size-label);
+  color: var(--color-text-secondary);
+}

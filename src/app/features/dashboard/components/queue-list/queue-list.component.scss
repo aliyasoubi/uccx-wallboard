@@ -1,0 +1,100 @@
+// Custom elements default to display:inline, which is fragile as a
+// flex/grid item (percentage heights on internal wrappers need a definite
+// height from this host). Every dashboard panel is meant to fill whatever
+// grid/flex cell the shell puts it in, so that's made explicit here rather
+// than relying on grid/flex auto-blockification.
+:host {
+  display: block;
+  height: 100%;
+  min-height: 0;
+}
+
+.queue-list {
+  background: var(--color-surface-1);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.title {
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-size-heading);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  flex: 0 0 auto;
+}
+
+.empty {
+  margin: 0;
+  font-size: var(--font-size-body);
+  color: var(--color-text-muted);
+}
+
+.table {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  // Rows are allowed to scroll internally as a last resort if the queue
+  // list ever grows past what the panel can show — the page itself never
+  // scrolls (see dashboard.component.scss), only this one region would.
+  overflow-y: auto;
+}
+
+.head-row,
+.row {
+  display: grid;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+}
+
+.table--waiting .head-row,
+.table--waiting .row {
+  grid-template-columns: 1.4fr repeat(6, 1fr);
+}
+
+.table--serving .head-row,
+.table--serving .row {
+  grid-template-columns: 1.4fr repeat(3, 1fr);
+}
+
+.head-row {
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--font-size-label);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.row {
+  border-bottom: 1px solid var(--color-border);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-body);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.cell {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.cell--name {
+  text-align: start;
+  font-family: var(--font-family-base);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.cell--warn {
+  color: var(--color-status-critical);
+  font-weight: 600;
+}

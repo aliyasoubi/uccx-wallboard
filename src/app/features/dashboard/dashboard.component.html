@@ -1,55 +1,51 @@
 <div class="dashboard">
-  <header class="header">
-    <div class="live-indicator">
-      <span
-        class="dot"
-        [class.dot--live]="store.connectionState() === 'live'"
-        [class.dot--stale]="store.connectionState() === 'stale'"
-        [class.dot--error]="store.connectionState() === 'error'"
-      ></span>
-      <!-- Multi-language disabled for this release — plain English text
-           instead of the 'dashboard.live' / 'dashboard.stale' / 'dashboard.error'
-           translation keys. Keys still exist in assets/i18n/*.json. -->
-      <span class="live-text">
-        @switch (store.connectionState()) {
-          @case ('live') { Live }
-          @case ('stale') { Reconnecting… }
-          @case ('error') { Connection lost }
-        }
-      </span>
-      @if (store.lastUpdated(); as updated) {
-        <span class="updated">Updated {{ updated | date: 'shortTime' }}</span>
-      }
-    </div>
-    <!-- Language switcher removed for this release (see app.config.ts) -->
-  </header>
+  <app-header />
 
-  <section class="row row--top">
-    <app-calls-summary-panel class="col col--wide" [summary]="store.callSummary()" />
-    <app-service-metrics-panel
-      class="col"
-      [metrics]="store.serviceMetrics()"
-      [callsWaiting]="store.callSummary()?.callsWaiting ?? 0"
-    />
-    <app-agent-of-month-card class="col" [agent]="store.agentOfMonth()" />
-  </section>
+  <div class="board">
+    <!-- Column 1: call volume -> top performers -> service gauges -> KPIs -->
+    <section class="column column--1">
+      <app-call-summary-displays
+        class="band band--summary"
+        [summary]="store.callSummary()"
+        [inboundStats]="store.inboundStats()"
+        [outboundStats]="store.outboundStats()"
+      />
 
-  <section class="row row--calls">
-    <app-call-direction-panel class="col" [stats]="store.inboundStats()" icon="ti-phone-incoming" />
-    <app-call-direction-panel class="col" [stats]="store.outboundStats()" icon="ti-phone-outgoing" />
-  </section>
+      <div class="band band--pair">
+        <app-top-agent class="pair-item" direction="inbound" [agents]="store.agents()" />
+        <app-top-agent class="pair-item" direction="outbound" [agents]="store.agents()" />
+      </div>
 
-  <section class="row row--roster">
-    <div class="col panel-shell">
-      <p class="panel-title">Agents state</p>
-      <app-agent-state-donut [summary]="store.agentStateSummary()" />
-    </div>
-    <app-agent-roster class="col col--wide" [agents]="store.agents()" />
-  </section>
+      <div class="band band--pair">
+        <app-sla-gauge class="pair-item" [metrics]="store.serviceMetrics()" />
+        <app-customer-satisfaction-gauge class="pair-item" [metrics]="store.serviceMetrics()" />
+      </div>
 
-  <section class="row row--bottom">
-    @for (queue of store.queues(); track trackByQueueName($index, queue)) {
-      <app-queue-panel class="col" [queue]="queue" />
-    }
-  </section>
+      <app-kpi-metrics
+        class="band band--kpi"
+        [summary]="store.callSummary()"
+        [serviceMetrics]="store.serviceMetrics()"
+      />
+    </section>
+
+    <!-- Column 2: queue health (waiting/serving) -> agent state -> agent of the month -->
+    <section class="column column--2">
+      <div class="band band--pair band--queues">
+        <app-queue-list class="pair-item" variant="waiting" [queues]="store.queues()" />
+        <app-queue-list class="pair-item" variant="serving" [queues]="store.queues()" />
+      </div>
+
+      <div class="band band--pair">
+        <app-agent-state class="pair-item" [summary]="store.agentStateSummary()" />
+        <app-agent-of-month class="pair-item" [agent]="store.agentOfMonth()" />
+      </div>
+    </section>
+
+    <!-- Column 3: agent summary, full height -->
+    <section class="column column--3">
+      <app-agent-summary class="band band--fill" [agents]="store.agents()" />
+    </section>
+  </div>
+
+  <app-footer [connectionState]="store.connectionState()" [lastUpdated]="store.lastUpdated()" />
 </div>

@@ -1,122 +1,123 @@
+// ----------------------------------------------------------------------
+// Wallboard shell: fills exactly one viewport (HD, 4K, anything between),
+// never scrolls the page, and scales fluidly rather than jumping between
+// fixed breakpoints. Two techniques do the work:
+//   1. `height: 100dvh` + `overflow: hidden` on the shell — the page can
+//      never grow taller than the screen, so there is nothing to scroll.
+//   2. Every row/column is sized with `fr` units (proportional shares of
+//      whatever height/width is available) instead of fixed pixels, so
+//      the same layout re-flows correctly on a 1920x1080 display and a
+//      3840x2160 one without a separate "4K version".
+// The one deliberate exception is Agent Summary (column 3): an agent
+// roster is inherently unbounded, so that single card scrolls internally
+// if the roster is long — see agent-summary.component.scss. That is a
+// contained scroll region, not a page scrollbar.
+// ----------------------------------------------------------------------
+
 .dashboard {
+  --board-gap: clamp(0.5rem, 0.6vw, 1rem);
+  --board-padding: clamp(0.5rem, 0.8vw, 1.25rem);
+
+  height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
-  padding: var(--space-5);
-  min-height: 100vh;
+  gap: var(--board-gap);
+  padding: var(--board-padding);
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.live-indicator {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--font-size-label);
-  color: var(--color-text-secondary);
-}
-
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--color-status-normal);
-}
-
-.dot--live {
-  background: var(--color-status-normal);
-  animation: pulse var(--motion-pulse) var(--motion-easing) infinite;
-}
-
-.dot--stale {
-  background: var(--color-status-warning);
-}
-
-.dot--error {
-  background: var(--color-status-critical);
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
-
-.updated {
-  color: var(--color-text-muted);
-}
-
-.row {
+.board {
+  flex: 1 1 auto;
+  min-height: 0;
   display: grid;
-  gap: var(--space-4);
+  // Column 3 (Agent Summary) gets a touch more width — it's a name/status
+  // list, the widest content of the three columns.
+  grid-template-columns: 1fr 1.05fr 0.9fr;
+  gap: var(--board-gap);
+  min-width: 0;
 }
 
-.row--top {
-  // Agent of the Month gets an "auto" track sized to its own content instead
-  // of an even fr share — its content is compact, so an equal fr fraction
-  // left a large dead-space margin inside the card. align-items: stretch is
-  // kept so its height still matches the taller SLA/CSAT cluster beside it.
-  grid-template-columns: 2fr 1.6fr auto;
-  align-items: stretch;
-}
-
-.row--calls {
-  // Only Inbound and Outbound now (Shift metrics removed) — two even
-  // columns, sized to content rather than forced to match a taller sibling
-  // that no longer exists.
-  grid-template-columns: 1fr 1fr;
-  align-items: start;
-}
-
-.row--roster {
-  // Agents state donut is much shorter than the multi-row Agent summary
-  // table beside it — align-items: start lets it size to its own content
-  // instead of being stretched into a mostly-empty tall card.
-  grid-template-columns: 1.3fr 2fr;
-  align-items: start;
-}
-
-.row--bottom {
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-}
-
-.panel-shell {
-  background: var(--color-surface-1);
-  border-radius: var(--radius-md);
-  padding: var(--space-4);
+.column {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  gap: var(--board-gap);
+  min-height: 0;
+  min-width: 0;
 }
 
-.panel-title {
-  margin: 0 0 var(--space-3);
-  font-size: var(--font-size-heading);
-  font-weight: 600;
+// A "band" is one horizontal slice of a column. Bands default to sharing
+// the column's height equally (flex: 1); band--summary and band--kpi are
+// compact metric-tile grids that don't need as much vertical room as a
+// pair of gauges/cards, so they're sized to their own content instead.
+.band {
+  min-height: 0;
+  min-width: 0;
 }
 
-@media (max-width: 1400px) {
-  .row--top {
-    grid-template-columns: 1fr 1fr;
+.band--summary,
+.band--kpi {
+  flex: 0 0 auto;
+}
+
+.band--pair {
+  flex: 1 1 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--board-gap);
+  min-height: 0;
+}
+
+// The two queue tables want more room than a card pair (they're tables,
+// not tiles) — give that band a slightly larger share of column 2.
+.band--queues {
+  flex-grow: 1.3;
+}
+
+.band--fill {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.pair-item {
+  min-width: 0;
+  min-height: 0;
+}
+
+// ----------------------------------------------------------------------
+// Responsive fallback: below this width there isn't room for three
+// columns of a data-dense wallboard to stay legible even at the smallest
+// end of the fluid type scale. Stack columns instead and allow the page
+// to scroll — the no-scroll guarantee is a desktop/kiosk-monitor promise
+// (HD/4K wallboards), not a phone-in-portrait one.
+// ----------------------------------------------------------------------
+@media (max-width: 1000px) {
+  .dashboard {
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow: visible;
   }
-  .row--top > :last-child {
-    grid-column: span 2;
-  }
-  .row--roster {
+
+  .board {
     grid-template-columns: 1fr;
+    overflow: visible;
   }
-}
 
-@media (max-width: 900px) {
-  .row--top,
-  .row--calls,
-  .row--roster {
-    grid-template-columns: 1fr;
+  .column {
+    min-height: 0;
   }
-  .row--top > * {
-    grid-column: span 1;
+
+  .band--fill {
+    // Agent Summary's internal scroll only makes sense when it's
+    // constrained to a fixed-height column; stacked on mobile it can just
+    // grow with the page like everything else.
+    max-height: 70vh;
+  }
+
+  .band--pair,
+  .band--queues {
+    grid-template-columns: 1fr;
   }
 }

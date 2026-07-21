@@ -1,0 +1,22 @@
+<div class="panel">
+  <app-metric-tile
+    label="FCR"
+    [value]="(serviceMetrics()?.fcrPercent ?? 0) + '%'"
+    [severity]="fcrSeverity()"
+  />
+  <app-metric-tile
+    label="AWD"
+    [value]="(summary()?.avgWaitSeconds | formatDuration)"
+    [severity]="awdSeverity()"
+  />
+  <app-metric-tile
+    label="AHT"
+    [value]="(summary()?.avgTalkSeconds | formatDuration)"
+    [severity]="ahtSeverity()"
+  />
+  <app-metric-tile
+    label="Calls in queue"
+    [value]="summary()?.callsWaiting ?? '—'"
+    [severity]="callsWaitingSeverity()"
+  />
+</div>

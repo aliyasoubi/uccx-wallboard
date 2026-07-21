@@ -11,7 +11,9 @@
       "handledCalls": 205,
       "waitingCalls": 2
     },
-    "agentStateCounts": { "total": 12, "ready": 5, "talking": 4, "notReady": 3 }
+    "agentStateCounts": { "total": 12, "ready": 5, "talking": 4, "notReady": 3 },
+    "serviceMetrics": { "sla": 96.1, "csat": 4.7, "fcr": 81.2 },
+    "timings": { "currentWaitDuration": 28, "maxAbandonDuration": 74, "avgHandleDuration": 292 }
   },
   {
     "name": "Support",
@@ -25,7 +27,9 @@
       "handledCalls": 182,
       "waitingCalls": 3
     },
-    "agentStateCounts": { "total": 15, "ready": 6, "talking": 7, "notReady": 2 }
+    "agentStateCounts": { "total": 15, "ready": 6, "talking": 7, "notReady": 2 },
+    "serviceMetrics": { "sla": 88.4, "csat": 4.3, "fcr": 74.6 },
+    "timings": { "currentWaitDuration": 61, "maxAbandonDuration": 133, "avgHandleDuration": 372 }
   },
   {
     "name": "Billing",
@@ -39,6 +43,8 @@
       "handledCalls": 96,
       "waitingCalls": 1
     },
-    "agentStateCounts": { "total": 8, "ready": 3, "talking": 2, "notReady": 3 }
+    "agentStateCounts": { "total": 8, "ready": 3, "talking": 2, "notReady": 3 },
+    "serviceMetrics": { "sla": 92.7, "csat": 4.5, "fcr": 78.9 },
+    "timings": { "currentWaitDuration": 19, "maxAbandonDuration": 102, "avgHandleDuration": 305 }
   }
 ]

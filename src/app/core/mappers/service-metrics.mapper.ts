@@ -5,5 +5,6 @@ export function mapServiceMetrics(dto: CustomerServiceMetricsDto): ServiceMetric
   return {
     slaPercent: dto.sla,
     csatScore: dto.csat,
+    fcrPercent: dto.fcr,
   };
 }

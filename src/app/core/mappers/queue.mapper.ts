@@ -15,6 +15,12 @@ export function mapQueue(dto: CsqDto): Queue {
       talking: dto.agentStateCounts.talking,
       notReady: dto.agentStateCounts.notReady,
     },
+    // dto.serviceMetrics was declared on CsqDto but never actually read here —
+    // the Queue Displays "SLA" field now closes that gap.
+    slaPercent: dto.serviceMetrics.sla,
+    currentWaitSeconds: dto.timings.currentWaitDuration,
+    maxAbandonSeconds: dto.timings.maxAbandonDuration,
+    avgHandleSeconds: dto.timings.avgHandleDuration,
   };
 }
 

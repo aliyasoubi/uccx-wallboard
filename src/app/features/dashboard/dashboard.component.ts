@@ -1,36 +1,46 @@
-import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 // Multi-language disabled for this release — see app.config.ts for how to
 // re-enable. TranslocoModule import and setLang() removed from here too.
 import { DashboardStoreService } from '../../core/state/dashboard-store.service';
-import { AgentOfMonthCardComponent, AgentStateDonutComponent } from '../../shared/components';
-import { CallsSummaryPanelComponent } from './components/calls-summary-panel/calls-summary-panel.component';
-import { ServiceMetricsPanelComponent } from './components/service-metrics-panel/service-metrics-panel.component';
-import { AgentRosterComponent } from './components/agent-roster/agent-roster.component';
-import { QueuePanelComponent } from './components/queue-panel/queue-panel.component';
-import { CallDirectionPanelComponent } from './components/call-direction-panel/call-direction-panel.component';
+import { HeaderComponent } from './components/header/header.component';
+import { FooterComponent } from './components/footer/footer.component';
+import { CallSummaryDisplaysComponent } from './components/call-summary-displays/call-summary-displays.component';
+import { KpiMetricsComponent } from './components/kpi-metrics/kpi-metrics.component';
+import { SlaGaugeComponent } from './components/sla-gauge/sla-gauge.component';
+import { CustomerSatisfactionGaugeComponent } from './components/customer-satisfaction-gauge/customer-satisfaction-gauge.component';
+import { TopAgentComponent } from './components/top-agent/top-agent.component';
+import { AgentOfMonthComponent } from './components/agent-of-month/agent-of-month.component';
+import { AgentStateComponent } from './components/agent-state/agent-state.component';
+import { AgentSummaryComponent } from './components/agent-summary/agent-summary.component';
+import { QueueListComponent } from './components/queue-list/queue-list.component';
 
+// The dashboard shell: reads the store, renders every required module, and
+// owns no business logic of its own (no HTTP, no thresholds, no
+// aggregation) — that all lives in core/. Each <app-*> child below is a
+// standalone, independently testable module per the modular-architecture
+// constraint; the shell's only job is composition and a fixed 3-column,
+// no-page-scroll layout — see dashboard.component.scss for how that's
+// enforced across HD/4K/responsive viewports.
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    DatePipe,
-    CallsSummaryPanelComponent,
-    ServiceMetricsPanelComponent,
-    AgentRosterComponent,
-    QueuePanelComponent,
-    AgentOfMonthCardComponent,
-    AgentStateDonutComponent,
-    CallDirectionPanelComponent,
+    HeaderComponent,
+    FooterComponent,
+    CallSummaryDisplaysComponent,
+    KpiMetricsComponent,
+    SlaGaugeComponent,
+    CustomerSatisfactionGaugeComponent,
+    TopAgentComponent,
+    AgentOfMonthComponent,
+    AgentStateComponent,
+    AgentSummaryComponent,
+    QueueListComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
 export class DashboardComponent {
   readonly store = inject(DashboardStoreService);
-
-  trackByQueueName(_index: number, queue: { name: string }): string {
-    return queue.name;
-  }
 }

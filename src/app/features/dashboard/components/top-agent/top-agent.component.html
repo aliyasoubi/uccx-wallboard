@@ -1,0 +1,10 @@
+<div class="panel">
+  <p class="title">{{ title() }}</p>
+  @if (top(); as leader) {
+    <p class="value">{{ leader.value }}</p>
+    <p class="agent-name">{{ leader.agentName }}</p>
+  } @else {
+    <p class="empty">No data yet</p>
+  }
+  <p class="caveat">Resets every 24h</p>
+</div>
