@@ -1,4 +1,7 @@
 <div class="tile" [class.tile--lg]="size() === 'lg'" [style.background]="bgVar()">
   <p class="label">{{ label() }}</p>
   <p class="value" [style.color]="colorVar()">{{ value() }}</p>
+  @if (icon()) {
+    <i class="ti {{ icon() }} tile-icon" [style.color]="iconColorVar()" aria-hidden="true"></i>
+  }
 </div>

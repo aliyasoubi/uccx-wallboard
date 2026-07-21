@@ -14,6 +14,10 @@ export class MetricTileComponent {
   /** 'normal' | 'warning' | 'critical' — drives color from the shared token set, nothing hardcoded per-call site. */
   readonly severity = input<Severity>('normal');
   readonly size = input<'md' | 'lg'>('md');
+  /** Optional Tabler icon class (e.g. 'ti-phone-incoming'). Omitted tiles render exactly as before — this is additive, not a breaking change to existing call sites. */
+  readonly icon = input<string>('');
+  /** Optional CSS color (var(...) or any valid color) for the icon. Defaults to the shared accent token — never a one-off hardcoded hex at the call site. */
+  readonly iconColorVar = input<string>('var(--color-status-accent)');
 
   readonly colorVar = computed(() => {
     switch (this.severity()) {

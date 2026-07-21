@@ -69,11 +69,10 @@
   min-height: 0;
 }
 
-// The two queue tables want more room than a card pair (they're tables,
-// not tiles) — give that band a slightly larger share of column 2.
-.band--queues {
-  flex-grow: 1.3;
-}
+// Queue content used to need extra room here (three stacked per-queue
+// blocks); now it's one compact, centered aggregate block per panel, so
+// this band shares column 2 evenly with agent-state/agent-of-month
+// instead of taking a larger cut.
 
 .band--fill {
   flex: 1 1 auto;

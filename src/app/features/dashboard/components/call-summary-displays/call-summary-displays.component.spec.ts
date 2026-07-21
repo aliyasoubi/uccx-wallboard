@@ -52,4 +52,25 @@ describe('CallSummaryDisplaysComponent', () => {
     fixture.detectChanges();
     expect(component.abandonedSeverity()).toBe('normal');
   });
+
+  it('gives each of the four tiles its related icon, each with a distinct color', () => {
+    fixture.componentRef.setInput('summary', summary);
+    fixture.componentRef.setInput('inboundStats', null);
+    fixture.componentRef.setInput('outboundStats', null);
+    fixture.detectChanges();
+    const el = fixture.nativeElement;
+
+    const incoming: HTMLElement = el.querySelector('i.ti-phone-incoming');
+    const outgoing: HTMLElement = el.querySelector('i.ti-phone-outgoing');
+    const answered: HTMLElement = el.querySelector('i.ti-phone-check');
+    const abandoned: HTMLElement = el.querySelector('i.ti-phone-x');
+
+    expect(incoming).not.toBeNull();
+    expect(outgoing).not.toBeNull();
+    expect(answered).not.toBeNull();
+    expect(abandoned).not.toBeNull();
+
+    const colors = [incoming.style.color, outgoing.style.color, answered.style.color, abandoned.style.color];
+    expect(new Set(colors).size).toBe(4); // all four distinct
+  });
 });

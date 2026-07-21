@@ -57,7 +57,7 @@ npm run test:ci     # headless single run with coverage (CI-friendly)
 didn't work out of the box. That's fixed (`karma.conf.js` +
 `tsconfig.spec.json` added).
 
-Current coverage: 97 specs, all passing, ~90% statement / ~88% function
+Current coverage: 109 specs, all passing, ~90% statement / ~89% function
 coverage. Covers:
 - Every function in `core/mappers/*`, including the previously-dropped
   `Agent.inboundCalls`/`outboundCalls` mapping and the previously-unmapped
@@ -78,8 +78,12 @@ coverage. Covers:
   wasn't reproducible against this codebase — see README.md §11.4).
 - `AppConfigService`, `DashboardStoreService`, and most of the new/changed
   dashboard components (`HeaderComponent`'s clock, `FooterComponent`'s
-  status text, `QueueListComponent`'s waiting/serving variants and severities,
-  `TopAgentComponent`'s per-direction wiring, `CallSummaryDisplaysComponent`).
+  status text, `QueueListComponent`'s cross-queue aggregation (sum/max/
+  weighted-average rules) and full 9-parameter single-column list for
+  both variants, `TopAgentComponent`'s
+  per-direction wiring, `CallSummaryDisplaysComponent`).
+- `MetricTileComponent`'s optional `icon` input — renders when provided,
+  stays absent (backward compatible) when not.
 
 Not yet covered (lower priority — pure composition/layout, no logic of
 their own): `DashboardComponent` itself, `SlaGaugeComponent` /

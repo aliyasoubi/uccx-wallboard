@@ -29,3 +29,12 @@
 .tile--lg .value {
   font-size: var(--font-size-metric-lg);
 }
+
+// Big, colorful, and placed under the value (not a small inline glyph
+// next to the label) — a deliberate signature flourish per tile rather
+// than a neutral label decoration.
+.tile-icon {
+  font-size: clamp(1.75rem, 1.3rem + 1.6vw, 2.75rem);
+  line-height: 1;
+  margin-top: var(--space-1);
+}

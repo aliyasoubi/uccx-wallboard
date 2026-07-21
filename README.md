@@ -17,7 +17,7 @@ used to be called, where it lives now, and what changed.
 
 | # | Required module | Selector | Path | Mapped from |
 |---|---|---|---|---|
-| 1 | Call Summary Displays (Abandoned/Incoming/Outbound/Answered) | `app-call-summary-displays` | `features/dashboard/components/call-summary-displays/` | Renamed & refocused from `CallsSummaryPanelComponent`. AWD/AHT moved out to KPI Metrics (module 9) — see §11.2 |
+| 1 | Call Summary Displays (Abandoned/Incoming/Outbound/Answered) | `app-call-summary-displays` | `features/dashboard/components/call-summary-displays/` | Renamed & refocused from `CallsSummaryPanelComponent`. AWD/AHT moved out to KPI Metrics (module 9) — see §11.2. Each tile carries a related Tabler icon (§13.3) |
 | 2 | Top Inbound Agent | `app-top-agent` (direction="inbound") | `features/dashboard/components/top-agent/` | New. Backed by `core/state/top-agent-tracker.ts` |
 | 3 | Top Outbound Agent | `app-top-agent` (direction="outbound") | same component, `direction` input | New — same component as #2, DRY over two near-duplicates, matching the existing inbound/outbound pattern in this codebase |
 | 4 | Agent Summary | `app-agent-summary` | `features/dashboard/components/agent-summary/` | Renamed from `AgentRosterComponent`. See §11.4 for the "only first row" investigation |
@@ -26,7 +26,7 @@ used to be called, where it lives now, and what changed.
 | 7 | SLA Gauge | `app-sla-gauge` | `features/dashboard/components/sla-gauge/` | Split out of `ServiceMetricsPanelComponent`, which bundled SLA + CSAT + calls-waiting into one panel |
 | 8 | Customer Satisfaction | `app-customer-satisfaction-gauge` | `features/dashboard/components/customer-satisfaction-gauge/` | Split out of `ServiceMetricsPanelComponent`, alongside #7 |
 | 9 | KPI Metrics (FCR/AWD/AHT) | `app-kpi-metrics` | `features/dashboard/components/kpi-metrics/` | New. AWD/AHT relocated here from the old calls-summary panel; FCR is new (mocked — see §11.3). Also keeps the "calls in queue" tile that used to live on `ServiceMetricsPanelComponent` |
-| 10 | Queue Displays (Inbound/Handled/In Queue/Abandons/CWD/MAD/ACT/Ready Agents/SLA) | `app-queue-list` (variant="waiting" / variant="serving") | `features/dashboard/components/queue-list/` | Renamed from `QueuePanelComponent`, extended with CWD/MAD/ACT/SLA (§11.1), then reshaped from one card-per-queue into two compact tables — see §12.1 for why |
+| 10 | Queue Displays (Inbound/Handled/In Queue/Abandons/CWD/MAD/ACT/Ready Agents/SLA) | `app-queue-list` (variant="waiting" / variant="serving") | `features/dashboard/components/queue-list/` | Renamed from `QueuePanelComponent`, extended with CWD/MAD/ACT/SLA (§11.1), then reshaped into two panels that each show one aggregated set of all nine parameters as a single-column list (no per-queue breakdown) — see §12.1/§15 |
 | 11 | Header (Title/Clock/Date) | `app-header` | `features/dashboard/components/header/` | New. The old inline `<header>` in `dashboard.component.html` only had the live-connection indicator, which moved to Footer (#12) |
 | 12 | Footer (System Status/Last Update) | `app-footer` | `features/dashboard/components/footer/` | New — carries the live/stale/error indicator that used to be in the dashboard shell's `<header>`, unchanged in behavior, just relocated to its own module |
 
@@ -119,7 +119,7 @@ Queue Displays module).
 
 ## 7. Testing
 
-97 Jasmine/Karma specs across mappers, the severity policy, the new
+109 Jasmine/Karma specs across mappers, the severity policy, the new
 `TopAgentTracker`/`TopAgentComponent`, `AppConfigService`, `PollingDataSource`
 (error/backoff behavior), `DashboardStoreService`, and every new/changed
 component. Priority followed SETUP.md's own list (mappers, policy,
@@ -225,7 +225,7 @@ confirm with the real backend/BFF team before go-live:
    before this pass, `assets/config.json` existed but had no effect.
 8. **Test infrastructure added.** `angular.json` had no `test` target at
    all (`ng test` didn't work); added it, plus `karma.conf.js` and
-   `tsconfig.spec.json`, and 97 passing specs — see §7.
+   `tsconfig.spec.json`, and 109 passing specs — see §7.
 9. **`.gitignore` added** — was missing (`node_modules`, `dist`, `coverage`,
    `.angular/cache` were previously untracked-ignore-less).
 
@@ -290,23 +290,107 @@ rather than shipping a separate "4K version".
    re-enabled — verified at tablet (768×1024, fits without scroll) and
    phone (390×844, scrolls as expected) widths.
 
-### 12.1 Queue Displays reshaped into two tables, not per-queue cards
+### 12.1 Queue Displays: two panels, each an aggregate of every queue
 
-The original per-queue design (`QueueDisplayComponent`, one card per CSQ
-showing all 9 fields) doesn't fit the no-scroll constraint once there's
-more than one or two queues — three queue cards, each with 9 stats,
-stacked in a fixed-height column, simply don't fit. `QueueListComponent`
-replaces it with two compact tables (`variant="waiting"` /
-`variant="serving"`), one row per queue, so the queue count can grow
-without growing the column's height:
+`QueueListComponent` backs both "Waiting Queue" and "Serving Queue"
+(`variant="waiting"` / `variant="serving"`). Per explicit request, it does
+**not** break the board down by individual queue name (Sales/Support/
+Billing) — each panel shows one aggregated set of all nine required
+parameters (Inbound, Handled, In Queue, Abandons, CWD, MAD, ACT, Ready
+Agents, SLA) across every queue, as a single-column list of nine
+label/value rows.
 
-- **Waiting Queue** — caller-experience/queue-health columns: what's
-  happening to a call *before* an agent picks it up (Inbound, In Queue,
-  Abandons, CWD, MAD, SLA).
-- **Serving Queue** — agent-capacity/throughput columns: what's happening
-  *after* an agent picks it up (Handled, ACT, Ready Agents).
+Aggregating nine differently-shaped metrics correctly matters — a naive
+"sum everything" or "average everything" would quietly misreport several
+of them:
+
+- **Counts** (Inbound, Handled, In Queue, Abandons, Ready Agents) are
+  **summed** across queues — genuinely additive.
+- **CWD, MAD** (the longest current wait / longest historical wait before
+  an abandon) are the **max** across queues, not summed or averaged — a
+  "total wait time across three queues" is meaningless; what the board
+  needs is the single longest one, wherever it's currently happening.
+- **ACT, SLA** (an average handle time and a percentage) use a
+  **call-volume-weighted average**, not a plain average of the three
+  queues' numbers — a queue with 900 calls and a queue with 100 calls
+  shouldn't count equally toward the org-wide figure. (Verified with a
+  weighted-average test: two queues at 100 and 500 seconds ACT, weighted
+  9:1 by volume, aggregate to 140s — not the 300s a plain average would
+  give.)
+
+This replaced an earlier per-queue design (`QueueDisplayComponent`, one
+card per CSQ) and, before that, a per-queue table row, and briefly a 3x3
+stat grid. All were retired for the same underlying reason: a wallboard
+fitting a fixed viewport with no scrolling can't keep growing taller as
+queues are added, and a single-row table wide enough for all 9 columns
+overflowed its panel at realistic widths (reproduced and confirmed at
+1512px, where a 7-column version needed 371px but only had 225px
+available — the truncated SLA column and horizontal scrollbar in the
+original bug report). The current layout is a single vertical column of
+nine full-width rows (per explicit request, replacing the grid) — each
+row spans the panel's full width, so there is no horizontal packing to
+overflow at all; a value can still wrap if it's unusually long, but the
+row itself never spills past its panel, at any width. Re-verified after
+this layout change at 1512px/HD/4K: zero horizontal overflow, zero page
+scroll.
 
 This is a presentation-layer change only — the `Queue` domain model,
 `CsqDto`, and `queue.mapper.ts` are exactly as described in §11.1;
-`QueueListComponent` just renders the same data as a table instead of a
-card.
+`QueueListComponent` computes the aggregate client-side from the same
+per-queue data the API already returns.
+
+## 13. Changelog — UI refinement pass
+
+1. **"Resets every 24h" caption removed** from the Top Inbound/Outbound
+   Agent cards. The underlying 24-hour reset logic in `TopAgentTracker`
+   (§6) is unchanged — this only removed the on-screen caption.
+2. **Queue Displays redesigned** per §12.1 above: both panels now show
+   the full 9-parameter set, using a single-column list of rows instead of
+   a table row or multi-column grid,
+   fixing a real horizontal-overflow bug reproduced at 1512px width.
+3. **Icons added to Call Summary Displays.** `MetricTileComponent` gained
+   an optional `icon` input (a Tabler webfont class, e.g.
+   `ti-phone-incoming`) — additive and backward-compatible, existing call
+   sites that don't pass it are unaffected. Wired into all four Call
+   Summary tiles: Incoming (`ti-phone-incoming`), Outbound
+   (`ti-phone-outgoing`), Answered (`ti-phone-check`), Abandoned
+   (`ti-phone-x`). Confirmed these are real Tabler icon names before using
+   them. The icon webfont is loaded from a CDN in `index.html` (already
+   present before this pass) — rendering the actual glyphs couldn't be
+   visually verified in the sandbox this was built in, since that CDN
+   domain is outside the sandbox's network allowlist (confirmed via a
+   failed network request, not a code defect); the same CDN reference was
+   already used successfully elsewhere in this codebase before this pass.
+
+## 14. Changelog — queue aggregation and icon styling pass
+
+1. **Queue Displays no longer broken down by queue name.** Both "Waiting
+   Queue" and "Serving Queue" now show one aggregated set of all nine
+   parameters instead of a block per queue (Sales/Support/Billing no
+   longer appear on the board at all) — see §12.1 for the aggregation
+   rules (sum vs. max vs. weighted-average) and why they differ per
+   parameter.
+2. **Call Summary icons restyled**: moved from a small glyph beside the
+   label to a large (`clamp(1.75rem, 1.3rem + 1.6vw, 2.75rem)`), colorful
+   icon underneath the value — `MetricTileComponent` gained an
+   `iconColorVar` input (defaults to the accent token) so each of the four
+   tiles gets a distinct color drawn from the existing token set, not a
+   new hardcoded hex: Incoming → `--color-status-accent` (blue), Outbound
+   → `--color-status-warning` (amber), Answered → `--color-status-normal`
+   (green), Abandoned → `--color-status-critical` (red). Verified via
+   computed style in a headless browser: 44px at 1920px width, four
+   distinct colors matching the token values exactly, positioned after
+   (below) the value in DOM order.
+
+## 15. Changelog — queue stat layout: column, not grid
+
+1. **Queue Displays changed from a 3×3 grid to a single-column list.**
+   Per explicit request, the nine aggregated parameters in both "Waiting
+   Queue" and "Serving Queue" now render as nine full-width rows stacked
+   vertically (label on the left, value on the right, `.stat-list` in
+   `queue-list.component.scss`), not a 3-column grid. This is a pure
+   layout change — the aggregation math from §12.1/§14 is unaffected, and
+   it further reduces horizontal-overflow risk versus the grid version
+   (a single-column row has no horizontal packing to overflow at all).
+   Re-verified at 1512px/HD/4K: zero horizontal overflow, zero page
+   scroll.

@@ -35,66 +35,53 @@
   color: var(--color-text-muted);
 }
 
-.table {
-  display: flex;
-  flex-direction: column;
+// A single aggregated stat block now (no more per-queue rows to stack),
+// so it's vertically centered in whatever room the panel has rather than
+// pinned to the top with empty space below it. Rendered as one column —
+// a stacked list of rows, not a multi-column grid.
+.stat-list {
   flex: 1 1 auto;
   min-height: 0;
-  // Rows are allowed to scroll internally as a last resort if the queue
-  // list ever grows past what the panel can show — the page itself never
-  // scrolls (see dashboard.component.scss), only this one region would.
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-2);
   overflow-y: auto;
 }
 
-.head-row,
-.row {
-  display: grid;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) 0;
-}
-
-.table--waiting .head-row,
-.table--waiting .row {
-  grid-template-columns: 1.4fr repeat(6, 1fr);
-}
-
-.table--serving .head-row,
-.table--serving .row {
-  grid-template-columns: 1.4fr repeat(3, 1fr);
-}
-
-.head-row {
+.stat {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-1) 0;
   border-bottom: 1px solid var(--color-border);
-  font-size: var(--font-size-label);
-  color: var(--color-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-}
-
-.row {
-  border-bottom: 1px solid var(--color-border);
-  font-family: var(--font-family-mono);
-  font-size: var(--font-size-body);
+  min-width: 0;
 
   &:last-child {
     border-bottom: none;
   }
 }
 
-.cell {
-  text-align: end;
-  font-variant-numeric: tabular-nums;
+.stat-label {
+  font-size: var(--font-size-label);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  flex: 0 0 auto;
 }
 
-.cell--name {
-  text-align: start;
-  font-family: var(--font-family-base);
+.stat-value {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-body);
   font-weight: 600;
   color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+  text-align: end;
 }
 
-.cell--warn {
+.stat-value--warn {
   color: var(--color-status-critical);
-  font-weight: 600;
 }

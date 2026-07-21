@@ -1,44 +1,16 @@
 <div class="queue-list">
   <p class="title">{{ title() }}</p>
 
-  @if (queues().length === 0) {
-    <p class="empty">No queues</p>
+  @if (!hasData()) {
+    <p class="empty">No data</p>
   } @else {
-    <div class="table" [class.table--waiting]="variant() === 'waiting'" [class.table--serving]="variant() === 'serving'">
-      <div class="head-row">
-        <span class="cell cell--name">Queue</span>
-        @if (variant() === 'waiting') {
-          <span class="cell">Inbound</span>
-          <span class="cell">In queue</span>
-          <span class="cell">Abandons</span>
-          <span class="cell">CWD</span>
-          <span class="cell">MAD</span>
-          <span class="cell">SLA</span>
-        } @else {
-          <span class="cell">Handled</span>
-          <span class="cell">ACT</span>
-          <span class="cell">Ready</span>
-        }
-      </div>
-
-      @for (queue of queues(); track trackByQueueName($index, queue)) {
-        @let sev = severityFor(queue);
-        <div class="row">
-          <span class="cell cell--name">{{ queue.name }}</span>
-          @if (variant() === 'waiting') {
-            <span class="cell">{{ queue.totalCalls }}</span>
-            <span class="cell">{{ queue.callsWaiting }}</span>
-            <span class="cell" [class.cell--warn]="sev.abandoned !== 'normal'">{{ queue.abandonedCalls }}</span>
-            <span class="cell" [class.cell--warn]="sev.currentWait !== 'normal'">
-              {{ queue.currentWaitSeconds | formatDuration }}
-            </span>
-            <span class="cell">{{ queue.maxAbandonSeconds | formatDuration }}</span>
-            <span class="cell" [class.cell--warn]="sev.sla !== 'normal'">{{ queue.slaPercent }}%</span>
-          } @else {
-            <span class="cell">{{ queue.handledCalls }}</span>
-            <span class="cell">{{ queue.avgHandleSeconds | formatDuration }}</span>
-            <span class="cell">{{ queue.agentStates.ready }}</span>
-          }
+    <div class="stat-list">
+      @for (stat of stats(); track stat.label) {
+        <div class="stat">
+          <span class="stat-label">{{ stat.label }}</span>
+          <span class="stat-value" [class.stat-value--warn]="stat.severity !== 'normal'">
+            {{ stat.value }}
+          </span>
         </div>
       }
     </div>

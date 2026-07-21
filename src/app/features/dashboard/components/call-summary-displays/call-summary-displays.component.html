@@ -1,8 +1,25 @@
 <div class="panel">
-  <app-metric-tile label="Incoming calls" [value]="inboundStats()?.count ?? '—'" />
-  <app-metric-tile label="Outbound calls" [value]="outboundStats()?.count ?? '—'" />
-  <app-metric-tile label="Answered calls" [value]="summary()?.handledCalls ?? '—'" />
   <app-metric-tile
+    icon="ti-phone-incoming"
+    iconColorVar="var(--color-status-accent)"
+    label="Incoming calls"
+    [value]="inboundStats()?.count ?? '—'"
+  />
+  <app-metric-tile
+    icon="ti-phone-outgoing"
+    iconColorVar="var(--color-status-warning)"
+    label="Outbound calls"
+    [value]="outboundStats()?.count ?? '—'"
+  />
+  <app-metric-tile
+    icon="ti-phone-check"
+    iconColorVar="var(--color-status-normal)"
+    label="Answered calls"
+    [value]="summary()?.handledCalls ?? '—'"
+  />
+  <app-metric-tile
+    icon="ti-phone-x"
+    iconColorVar="var(--color-status-critical)"
     label="Abandoned calls"
     [value]="summary()?.abandonedCalls ?? '—'"
     [severity]="abandonedSeverity()"
