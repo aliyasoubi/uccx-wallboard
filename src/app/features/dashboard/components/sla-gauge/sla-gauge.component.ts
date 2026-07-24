@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { ServiceMetrics } from '../../../../core/models/domain';
-import { getInverseSeverity, STATUS_THRESHOLDS } from '../../../../core/policies/status-thresholds.policy';
+import { getInverseSeverity } from '../../../../core/policies/status-thresholds.policy';
+import { AppConfigService } from '../../../../core/config/app-config.service';
 import { MeterComponent } from '../../../../shared/components';
 
 // Module 7, "SLA Gauge". Split out of the old ServiceMetricsPanelComponent,
@@ -17,12 +18,17 @@ import { MeterComponent } from '../../../../shared/components';
   styleUrl: './sla-gauge.component.scss',
 })
 export class SlaGaugeComponent {
+  private readonly appConfig = inject(AppConfigService);
+
   readonly metrics = input<ServiceMetrics | null>(null);
 
   private static readonly MAX_PERCENT = 100;
 
   readonly slaSeverity = computed(() =>
-    getInverseSeverity(this.metrics()?.slaPercent ?? SlaGaugeComponent.MAX_PERCENT, STATUS_THRESHOLDS.slaPercent),
+    getInverseSeverity(
+      this.metrics()?.slaPercent ?? SlaGaugeComponent.MAX_PERCENT,
+      this.appConfig.config().thresholds.slaPercent,
+    ),
   );
 
   readonly slaColor = computed(() => {

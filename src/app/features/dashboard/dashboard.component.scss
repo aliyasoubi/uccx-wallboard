@@ -1,17 +1,21 @@
 // ----------------------------------------------------------------------
-// Wallboard shell: fills exactly one viewport (HD, 4K, anything between),
-// never scrolls the page, and scales fluidly rather than jumping between
-// fixed breakpoints. Two techniques do the work:
+// Wallboard shell: fills exactly one viewport (HD, 4K, anything between).
+// Nothing on the board scrolls — not the page, and not any individual
+// component — and it scales fluidly rather than jumping between fixed
+// breakpoints. Three techniques do the work:
 //   1. `height: 100dvh` + `overflow: hidden` on the shell — the page can
 //      never grow taller than the screen, so there is nothing to scroll.
-//   2. Every row/column is sized with `fr` units (proportional shares of
-//      whatever height/width is available) instead of fixed pixels, so
-//      the same layout re-flows correctly on a 1920x1080 display and a
-//      3840x2160 one without a separate "4K version".
-// The one deliberate exception is Agent Summary (column 3): an agent
-// roster is inherently unbounded, so that single card scrolls internally
-// if the roster is long — see agent-summary.component.scss. That is a
-// contained scroll region, not a page scrollbar.
+//   2. Every row/column is sized with `fr`/`flex` units (proportional
+//      shares of whatever height/width is available) instead of fixed
+//      pixels, so the same layout re-flows correctly on a 1920x1080
+//      display and a 3840x2160 one without a separate "4K version".
+//   3. Agent Summary (column 3) is the one panel with inherently unbounded
+//      content (the agent roster). Rather than scrolling internally, its
+//      rows each take an equal share of the available height (flex: 1 on
+//      every row) — N agents always exactly fill the space, shrinking
+//      together as the roster grows, instead of a scrollbar hiding the
+//      rows that don't fit. See agent-summary.component.scss for the
+//      trade-off that implies at very large roster sizes.
 // ----------------------------------------------------------------------
 
 .dashboard {
@@ -109,9 +113,10 @@
   }
 
   .band--fill {
-    // Agent Summary's internal scroll only makes sense when it's
-    // constrained to a fixed-height column; stacked on mobile it can just
-    // grow with the page like everything else.
+    // Agent Summary's rows shrink-to-fit whatever height this panel gets
+    // (see agent-summary.component.scss) — capping it at 70vh on a
+    // stacked mobile layout keeps rows a sane minimum size instead of
+    // stretching to fill an entire unbounded, scrolling page.
     max-height: 70vh;
   }
 

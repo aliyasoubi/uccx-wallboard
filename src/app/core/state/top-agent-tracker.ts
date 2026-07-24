@@ -27,7 +27,8 @@ interface PersistedState {
  *
  * Deliberately a plain class, not an Angular service/DI singleton: each
  * "Top Inbound Agent" / "Top Outbound Agent" widget constructs its own
- * instance (see TopAgentComponent), so there is no shared mutable state
+ * instance (see TopInboundAgentComponent / TopOutboundAgentComponent, both
+ * built on TopAgentBase), so there is no shared mutable state
  * between dashboard modules — each tracker only knows about the one metric
  * it was built for.
  *

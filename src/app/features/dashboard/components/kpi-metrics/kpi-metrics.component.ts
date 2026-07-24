@@ -1,10 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { CallSummary, ServiceMetrics } from '../../../../core/models/domain';
-import {
-  getInverseSeverity,
-  getSeverity,
-  STATUS_THRESHOLDS,
-} from '../../../../core/policies/status-thresholds.policy';
+import { getInverseSeverity, getSeverity } from '../../../../core/policies/status-thresholds.policy';
+import { AppConfigService } from '../../../../core/config/app-config.service';
 import { FormatDurationPipe } from '../../../../shared/pipes/format-duration.pipe';
 import { MetricTileComponent } from '../../../../shared/components';
 
@@ -25,22 +22,24 @@ import { MetricTileComponent } from '../../../../shared/components';
   styleUrl: './kpi-metrics.component.scss',
 })
 export class KpiMetricsComponent {
+  private readonly appConfig = inject(AppConfigService);
+
   readonly summary = input<CallSummary | null>(null);
   readonly serviceMetrics = input<ServiceMetrics | null>(null);
 
   readonly fcrSeverity = computed(() =>
-    getInverseSeverity(this.serviceMetrics()?.fcrPercent ?? 100, STATUS_THRESHOLDS.fcrPercent),
+    getInverseSeverity(this.serviceMetrics()?.fcrPercent ?? 100, this.appConfig.config().thresholds.fcrPercent),
   );
 
   readonly awdSeverity = computed(() =>
-    getSeverity(this.summary()?.avgWaitSeconds ?? 0, STATUS_THRESHOLDS.avgWaitSeconds),
+    getSeverity(this.summary()?.avgWaitSeconds ?? 0, this.appConfig.config().thresholds.avgWaitSeconds),
   );
 
   readonly ahtSeverity = computed(() =>
-    getSeverity(this.summary()?.avgTalkSeconds ?? 0, STATUS_THRESHOLDS.avgTalkSeconds),
+    getSeverity(this.summary()?.avgTalkSeconds ?? 0, this.appConfig.config().thresholds.avgTalkSeconds),
   );
 
   readonly callsWaitingSeverity = computed(() =>
-    getSeverity(this.summary()?.callsWaiting ?? 0, STATUS_THRESHOLDS.callsWaiting),
+    getSeverity(this.summary()?.callsWaiting ?? 0, this.appConfig.config().thresholds.callsWaiting),
   );
 }

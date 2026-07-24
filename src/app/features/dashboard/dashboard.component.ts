@@ -8,11 +8,12 @@ import { CallSummaryDisplaysComponent } from './components/call-summary-displays
 import { KpiMetricsComponent } from './components/kpi-metrics/kpi-metrics.component';
 import { SlaGaugeComponent } from './components/sla-gauge/sla-gauge.component';
 import { CustomerSatisfactionGaugeComponent } from './components/customer-satisfaction-gauge/customer-satisfaction-gauge.component';
-import { TopAgentComponent } from './components/top-agent/top-agent.component';
 import { AgentOfMonthComponent } from './components/agent-of-month/agent-of-month.component';
 import { AgentStateComponent } from './components/agent-state/agent-state.component';
 import { AgentSummaryComponent } from './components/agent-summary/agent-summary.component';
 import { QueueListComponent } from './components/queue-list/queue-list.component';
+import { TopInboundAgentComponent } from './components/top-inbound-agent/top-inbound-agent.component';
+import { TopOutboundAgentComponent } from './components/top-outbound-agent/top-outbound-agent.component';
 
 // The dashboard shell: reads the store, renders every required module, and
 // owns no business logic of its own (no HTTP, no thresholds, no
@@ -32,7 +33,8 @@ import { QueueListComponent } from './components/queue-list/queue-list.component
     KpiMetricsComponent,
     SlaGaugeComponent,
     CustomerSatisfactionGaugeComponent,
-    TopAgentComponent,
+    TopInboundAgentComponent,
+    TopOutboundAgentComponent,
     AgentOfMonthComponent,
     AgentStateComponent,
     AgentSummaryComponent,

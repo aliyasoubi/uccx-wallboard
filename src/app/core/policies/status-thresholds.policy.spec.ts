@@ -1,4 +1,4 @@
-import { getInverseSeverity, getRatioSeverity, getSeverity, STATUS_THRESHOLDS } from './status-thresholds.policy';
+import { getInverseSeverity, getRatioSeverity, getSeverity, DEFAULT_STATUS_THRESHOLDS } from './status-thresholds.policy';
 
 describe('status-thresholds.policy', () => {
   describe('getSeverity (higher is worse)', () => {
@@ -26,7 +26,7 @@ describe('status-thresholds.policy', () => {
   });
 
   describe('getInverseSeverity (lower is worse, e.g. SLA%)', () => {
-    const thresholds = STATUS_THRESHOLDS.slaPercent; // { warning: 80, critical: 50 }
+    const thresholds = DEFAULT_STATUS_THRESHOLDS.slaPercent; // { warning: 80, critical: 50 }
 
     it('returns normal above the warning floor', () => {
       expect(getInverseSeverity(95, thresholds)).toBe('normal');
@@ -50,7 +50,7 @@ describe('status-thresholds.policy', () => {
   });
 
   describe('getRatioSeverity', () => {
-    const thresholds = STATUS_THRESHOLDS.abandonedRatio; // { warning: 0.05, critical: 0.10 }
+    const thresholds = DEFAULT_STATUS_THRESHOLDS.abandonedRatio; // { warning: 0.05, critical: 0.10 }
 
     it('computes severity from numerator/denominator', () => {
       expect(getRatioSeverity(17, 500, thresholds)).toBe('normal'); // 3.4%

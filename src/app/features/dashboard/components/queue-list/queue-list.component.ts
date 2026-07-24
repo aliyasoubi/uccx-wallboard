@@ -1,11 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { Queue, Severity } from '../../../../core/models/domain';
 import {
   getInverseSeverity,
   getRatioSeverity,
   getSeverity,
-  STATUS_THRESHOLDS,
+  StatusThresholds,
 } from '../../../../core/policies/status-thresholds.policy';
+import { AppConfigService } from '../../../../core/config/app-config.service';
 
 export type QueueListVariant = 'waiting' | 'serving';
 
@@ -53,6 +54,8 @@ interface QueueStat {
   styleUrl: './queue-list.component.scss',
 })
 export class QueueListComponent {
+  private readonly appConfig = inject(AppConfigService);
+
   readonly variant = input.required<QueueListVariant>();
   readonly queues = input<Queue[]>([]);
 
@@ -63,7 +66,7 @@ export class QueueListComponent {
   // All nine required parameters, aggregated across every queue into one
   // fixed reading order: call volume, then queue health/wait, then
   // agent capacity & outcome.
-  readonly stats = computed<QueueStat[]>(() => this.aggregate(this.queues()));
+  readonly stats = computed<QueueStat[]>(() => this.aggregate(this.queues(), this.appConfig.config().thresholds));
 
   private formatDuration(totalSeconds: number): string {
     const seconds = Math.max(0, Math.floor(totalSeconds));
@@ -74,7 +77,7 @@ export class QueueListComponent {
     return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
   }
 
-  private aggregate(queues: Queue[]): QueueStat[] {
+  private aggregate(queues: Queue[], thresholds: StatusThresholds): QueueStat[] {
     const sum = (pick: (q: Queue) => number) => queues.reduce((total, q) => total + pick(q), 0);
     const max = (pick: (q: Queue) => number) => queues.reduce((best, q) => Math.max(best, pick(q)), 0);
     // Call-volume-weighted average: each queue's number counts in
@@ -95,9 +98,9 @@ export class QueueListComponent {
     const avgHandleSeconds = weightedAverage((q) => q.avgHandleSeconds, (q) => q.handledCalls);
     const slaPercent = weightedAverage((q) => q.slaPercent, (q) => q.totalCalls);
 
-    const abandonedSeverity = getRatioSeverity(abandonedCalls, totalCalls, STATUS_THRESHOLDS.abandonedRatio);
-    const currentWaitSeverity = getSeverity(currentWaitSeconds, STATUS_THRESHOLDS.currentWaitSeconds);
-    const slaSeverity = getInverseSeverity(slaPercent, STATUS_THRESHOLDS.slaPercent);
+    const abandonedSeverity = getRatioSeverity(abandonedCalls, totalCalls, thresholds.abandonedRatio);
+    const currentWaitSeverity = getSeverity(currentWaitSeconds, thresholds.currentWaitSeconds);
+    const slaSeverity = getInverseSeverity(slaPercent, thresholds.slaPercent);
 
     return [
       { label: 'Inbound', value: `${totalCalls}`, severity: 'normal' },

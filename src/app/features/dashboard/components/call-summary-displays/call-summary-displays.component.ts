@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { getRatioSeverity, STATUS_THRESHOLDS } from '../../../../core/policies/status-thresholds.policy';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { getRatioSeverity } from '../../../../core/policies/status-thresholds.policy';
+import { AppConfigService } from '../../../../core/config/app-config.service';
 import { CallDirectionStats, CallSummary } from '../../../../core/models/domain';
 import { MetricTileComponent } from '../../../../shared/components';
 
@@ -21,6 +22,8 @@ import { MetricTileComponent } from '../../../../shared/components';
   styleUrl: './call-summary-displays.component.scss',
 })
 export class CallSummaryDisplaysComponent {
+  private readonly appConfig = inject(AppConfigService);
+
   readonly summary = input<CallSummary | null>(null);
   readonly inboundStats = input<CallDirectionStats | null>(null);
   readonly outboundStats = input<CallDirectionStats | null>(null);
@@ -28,6 +31,6 @@ export class CallSummaryDisplaysComponent {
   readonly abandonedSeverity = computed(() => {
     const s = this.summary();
     if (!s) return 'normal' as const;
-    return getRatioSeverity(s.abandonedCalls, s.totalCalls, STATUS_THRESHOLDS.abandonedRatio);
+    return getRatioSeverity(s.abandonedCalls, s.totalCalls, this.appConfig.config().thresholds.abandonedRatio);
   });
 }

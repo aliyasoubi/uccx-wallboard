@@ -1,6 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { QueueListComponent } from './queue-list.component';
 import { Queue } from '../../../../core/models/domain';
+import { AppConfigService } from '../../../../core/config/app-config.service';
+import { DEFAULT_STATUS_THRESHOLDS } from '../../../../core/policies/status-thresholds.policy';
 
 function buildQueue(overrides: Partial<Queue> = {}): Queue {
   return {
@@ -26,7 +30,10 @@ describe('QueueListComponent', () => {
   let component: QueueListComponent;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({ imports: [QueueListComponent] }).compileComponents();
+    await TestBed.configureTestingModule({
+      imports: [QueueListComponent],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
+    }).compileComponents();
     fixture = TestBed.createComponent(QueueListComponent);
     component = fixture.componentInstance;
   });
@@ -149,5 +156,33 @@ describe('QueueListComponent', () => {
     fixture.componentRef.setInput('queues', []);
     fixture.detectChanges();
     expect(() => component.stats()).not.toThrow();
+  });
+
+  it('uses a runtime-configured threshold instead of the compiled-in default', async () => {
+    TestBed.resetTestingModule();
+    const customThresholds = {
+      ...DEFAULT_STATUS_THRESHOLDS,
+      slaPercent: { warning: 99, critical: 97 },
+    };
+    await TestBed.configureTestingModule({
+      imports: [QueueListComponent],
+      providers: [
+        {
+          provide: AppConfigService,
+          useValue: { config: () => ({ apiBaseUrl: 'x', pollIntervalMs: 3000, thresholds: customThresholds }) },
+        },
+      ],
+    }).compileComponents();
+    const customFixture = TestBed.createComponent(QueueListComponent);
+    customFixture.componentRef.setInput('variant', 'waiting');
+    // 96.1% SLA is "normal" under the default (warning 80/critical 50) but
+    // "critical" under the tighter custom override (warning 99/critical 97).
+    customFixture.componentRef.setInput('queues', [buildQueue({ slaPercent: 96.1, totalCalls: 100 })]);
+    customFixture.detectChanges();
+
+    const byLabel = Object.fromEntries(
+      customFixture.componentInstance.stats().map((s) => [s.label, s.severity]),
+    );
+    expect(byLabel['SLA']).toBe('critical');
   });
 });

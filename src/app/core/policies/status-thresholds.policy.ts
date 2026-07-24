@@ -1,24 +1,47 @@
 import { Severity } from '../models/domain';
 
-// The ONLY place threshold numbers are allowed to live. Components must call
-// getSeverity() rather than writing their own `value > 30 ? 'orange' : ...` checks.
-export const STATUS_THRESHOLDS = {
+export interface Thresholds {
+  warning: number;
+  critical: number;
+}
+
+// The shape of the configurable threshold set — every metric on the board
+// that gets a normal/warning/critical color has an entry here. Components
+// never hardcode a number; they read the live value from AppConfigService
+// (see core/config/app-config.service.ts) and call getSeverity() /
+// getInverseSeverity() / getRatioSeverity() below.
+export interface StatusThresholds {
+  abandonedRatio: Thresholds;
+  avgWaitSeconds: Thresholds;
+  avgTalkSeconds: Thresholds;
+  callsWaiting: Thresholds;
+  notReadyRatio: Thresholds;
+  // Lower is worse for SLA/FCR, so these are floors, checked by getInverseSeverity.
+  slaPercent: Thresholds;
+  fcrPercent: Thresholds;
+  // CWD — Current Wait Duration, the longest a caller is waiting right now.
+  currentWaitSeconds: Thresholds;
+}
+
+// Defaults, used two ways: (1) as AppConfigService's fallback if
+// assets/config.json is missing/unreachable, and (2) merged underneath
+// whatever assets/config.json does specify, so a config file only needs
+// to list the thresholds it wants to override — see AppConfigService.load().
+//
+// These are NOT read directly by components — that would bring back a
+// compile-time constant that can't be changed without a rebuild, which is
+// exactly what runtime configurability is meant to avoid. Components read
+// `appConfig.config().thresholds` instead.
+export const DEFAULT_STATUS_THRESHOLDS: StatusThresholds = {
   abandonedRatio: { warning: 0.05, critical: 0.1 },
   avgWaitSeconds: { warning: 30, critical: 60 },
   avgTalkSeconds: { warning: 120, critical: 180 },
   callsWaiting: { warning: 3, critical: 6 },
   notReadyRatio: { warning: 0.3, critical: 0.5 },
-  // Lower is worse for SLA/FCR, so these are floors, checked by getInverseSeverity.
   slaPercent: { warning: 80, critical: 50 },
   fcrPercent: { warning: 75, critical: 60 },
-  // CWD — Current Wait Duration, the longest a caller is waiting right now.
   currentWaitSeconds: { warning: 45, critical: 90 },
-} as const;
-
-export interface Thresholds {
-  warning: number;
-  critical: number;
-}
+};
 
 export function getSeverity(value: number, thresholds: Thresholds): Severity {
   if (value >= thresholds.critical) return 'critical';

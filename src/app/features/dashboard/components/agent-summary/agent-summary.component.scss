@@ -30,24 +30,36 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
-  // flex:1 + min-height:0 is what lets this list actually shrink to fit
-  // inside .roster's fixed (100%) height instead of pushing the card (and
-  // the whole no-scroll page) taller than the viewport — overflow-y:auto
-  // only ever kicks in once the element is prevented from growing past
-  // its container, which the flex default (min-height:auto) does not do.
+  gap: var(--space-1);
   flex: 1 1 auto;
   min-height: 0;
-  overflow-y: auto;
 }
 
 .row {
+  // Every row shares the list's available height equally — with N rows,
+  // flexbox automatically gives each one 1/N of the space, so the list
+  // never needs to scroll or clip: it always fits exactly, whether there
+  // are 3 agents or 30. min-height: 0 is what lets a row shrink below its
+  // own content's natural size instead of forcing the list taller than
+  // its container (the same fix documented on .list historically, now
+  // applied per-row so growth is distributed rather than accumulated).
+  //
+  // Trade-off, stated plainly: this guarantees zero scrolling
+  // unconditionally, but rows do get shorter as the roster grows — at
+  // some roster size the per-row content (avatar, name, duration, status
+  // badge) will be tighter than at a small roster size. Realistic
+  // wallboard rosters (dozens of agents) stay comfortably legible; if a
+  // deployment regularly has a much larger roster, an auto-rotating
+  // paged view would be a better fit than either scrolling or shrinking
+  // indefinitely — worth a conversation if that turns out to be the case.
+  flex: 1 1 0;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
-  padding: var(--space-2) 0;
   border-bottom: 1px solid var(--color-border);
+  overflow: hidden;
 }
 
 .duration {

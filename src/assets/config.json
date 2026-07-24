@@ -1,4 +1,14 @@
 {
   "apiBaseUrl": "assets/fixtures",
-  "pollIntervalMs": 3000
+  "pollIntervalMs": 3000,
+  "thresholds": {
+    "abandonedRatio": { "warning": 0.05, "critical": 0.1 },
+    "avgWaitSeconds": { "warning": 30, "critical": 60 },
+    "avgTalkSeconds": { "warning": 120, "critical": 180 },
+    "callsWaiting": { "warning": 3, "critical": 6 },
+    "notReadyRatio": { "warning": 0.3, "critical": 0.5 },
+    "slaPercent": { "warning": 80, "critical": 50 },
+    "fcrPercent": { "warning": 75, "critical": 60 },
+    "currentWaitSeconds": { "warning": 45, "critical": 90 }
+  }
 }
