@@ -24,14 +24,21 @@ export class SlaGaugeComponent {
 
   private static readonly MAX_PERCENT = 100;
 
-  readonly slaSeverity = computed(() =>
-    getInverseSeverity(
-      this.metrics()?.slaPercent ?? SlaGaugeComponent.MAX_PERCENT,
-      this.appConfig.config().thresholds.slaPercent,
-    ),
-  );
+  // Previously defaulted to MAX_PERCENT (100) when metrics was null, which
+  // made slaColor() resolve to "normal" (green) — so on every fresh page
+  // load, and for the duration of any real backend outage, the ring showed
+  // a green "0%" as if SLA were perfect. hasData() now gates severity so a
+  // missing reading renders as neutral, not as a false "all clear".
+  readonly hasData = computed(() => this.metrics() !== null);
+
+  readonly slaSeverity = computed(() => {
+    const metrics = this.metrics();
+    if (!metrics) return 'normal' as const;
+    return getInverseSeverity(metrics.slaPercent, this.appConfig.config().thresholds.slaPercent);
+  });
 
   readonly slaColor = computed(() => {
+    if (!this.hasData()) return 'var(--color-text-muted)';
     switch (this.slaSeverity()) {
       case 'critical':
         return 'var(--color-status-critical)';

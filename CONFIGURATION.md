@@ -6,12 +6,6 @@ renamed, and how often the dashboard polls. See README.md §3 for *why* the
 app is shaped this way (the BFF architecture); this is the practical "how
 do I actually change it" reference.
 
-## 1. Is there a `.env` file?
-
-No, and there won't be one — Angular doesn't support `.env` files the way a
-Node/React app does, because Angular apps are compiled to static files
-ahead of time; there's no server process at runtime to read a `.env` from.
-
 There are two layers of config instead:
 
 ```

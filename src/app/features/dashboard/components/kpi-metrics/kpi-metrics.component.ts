@@ -27,9 +27,13 @@ export class KpiMetricsComponent {
   readonly summary = input<CallSummary | null>(null);
   readonly serviceMetrics = input<ServiceMetrics | null>(null);
 
-  readonly fcrSeverity = computed(() =>
-    getInverseSeverity(this.serviceMetrics()?.fcrPercent ?? 100, this.appConfig.config().thresholds.fcrPercent),
-  );
+  readonly hasFcrData = computed(() => this.serviceMetrics() !== null);
+
+  readonly fcrSeverity = computed(() => {
+    const serviceMetrics = this.serviceMetrics();
+    if (!serviceMetrics) return 'normal' as const;
+    return getInverseSeverity(serviceMetrics.fcrPercent, this.appConfig.config().thresholds.fcrPercent);
+  });
 
   readonly awdSeverity = computed(() =>
     getSeverity(this.summary()?.avgWaitSeconds ?? 0, this.appConfig.config().thresholds.avgWaitSeconds),

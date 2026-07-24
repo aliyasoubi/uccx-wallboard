@@ -3,7 +3,7 @@
     label="SLA"
     [value]="metrics()?.slaPercent ?? 0"
     [max]="maxPercent"
-    [displayValue]="(metrics()?.slaPercent ?? 0) + '%'"
+    [displayValue]="hasData() ? metrics()!.slaPercent + '%' : '—'"
     [colorVar]="slaColor()"
   />
 </div>

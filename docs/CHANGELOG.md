@@ -95,3 +95,42 @@ type-checking** — now documented as gotchas in
    (`.stat-list` in `queue-list.component.scss`), not a 3-column grid —
    a pure layout change, aggregation math unaffected. Reduces
    horizontal-overflow risk further versus the grid version.
+
+## Pass 5 — UI audit: correctness bug fixes
+
+Full-project UI review; these four were confirmed as bugs (misleading
+or missing rendered output, not style/a11y polish) and fixed. A11y and
+best-practice findings from the same audit were logged but intentionally
+left unfixed this pass, per request.
+
+1. **SLA Gauge and KPI FCR tile no longer show a false "all clear" on
+   load.** Both previously defaulted severity to "100%/best-case" when
+   `metrics`/`serviceMetrics` was `null`, while the *displayed* value
+   defaulted to `0`. Net effect: on every fresh page load, and for the
+   duration of any real backend outage, the SLA ring showed a green
+   `0%` and the FCR tile an uncolored `0%` — both looking like readings,
+   not like "no data yet". `SlaGaugeComponent` and `KpiMetricsComponent`
+   now gate severity behind an explicit `hasData()`/`hasFcrData()` check
+   and render `—` instead of a fabricated `0`/`0%` until real data
+   arrives, matching the empty-state convention already used by Call
+   Summary Displays and Queue Displays.
+2. **KPI Metrics' "Calls in queue" tile restored.** It was commented
+   out in the template while still being computed
+   (`callsWaitingSeverity`) and still documented in this component's own
+   header comment and covered by its spec (`kpi-metrics.component.spec.ts`
+   asserts the text `'Calls in queue'` is present) — the spec should
+   have been failing. Uncommented; no logic changes.
+3. **AgentStateDonutComponent now renders the center total it already
+   computes.** `total` (the literal sum of ready + talking + notReady)
+   was computed and covered by a dedicated spec assertion, but the
+   template never placed it in the ring — the donut rendered with an
+   empty hollow center. Added a `.ring-total` element, absolutely
+   positioned over the (now wrapped) SVG ring.
+4. **Queue Displays: warning and critical severities are visually
+   distinct again.** `.stat-value--warn` applied to any
+   non-normal severity and was hardcoded to the critical/red token, so
+   a merely-elevated stat (e.g. abandon ratio past its warning floor but
+   not its critical one) looked identical to an actually-critical one.
+   Split into `.stat-value--warning` (amber) and `.stat-value--critical`
+   (red), matching the three-tier severity treatment already used
+   correctly by `MetricTileComponent` elsewhere on the board.

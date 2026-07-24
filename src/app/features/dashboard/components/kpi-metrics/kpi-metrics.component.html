@@ -1,7 +1,7 @@
 <div class="panel">
   <app-metric-tile
     label="FCR"
-    [value]="(serviceMetrics()?.fcrPercent ?? 0) + '%'"
+    [value]="hasFcrData() ? serviceMetrics()!.fcrPercent + '%' : '—'"
     [severity]="fcrSeverity()"
   />
   <app-metric-tile

@@ -1,18 +1,21 @@
 <div class="donut">
-  <svg viewBox="0 0 42 42" class="ring">
-    <circle cx="21" cy="21" r="15.9" class="track" />
-    @for (seg of segments(); track seg.key) {
-      <circle
-        cx="21"
-        cy="21"
-        r="15.9"
-        class="segment"
-        [style.stroke]="seg.colorVar"
-        [style.strokeDasharray]="seg.dashArray"
-        [style.strokeDashoffset]="seg.dashOffset"
-      />
-    }
-  </svg>
+  <div class="ring-wrap">
+    <svg viewBox="0 0 42 42" class="ring">
+      <circle cx="21" cy="21" r="15.9" class="track" />
+      @for (seg of segments(); track seg.key) {
+        <circle
+          cx="21"
+          cy="21"
+          r="15.9"
+          class="segment"
+          [style.stroke]="seg.colorVar"
+          [style.strokeDasharray]="seg.dashArray"
+          [style.strokeDashoffset]="seg.dashOffset"
+        />
+      }
+    </svg>
+    <span class="ring-total">{{ total() }}</span>
+  </div>
   <div class="legend">
     <span class="legend-item" style="color: var(--color-status-normal)">
       Ready {{ summary()?.ready ?? 0 }}

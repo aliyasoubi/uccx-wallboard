@@ -83,6 +83,10 @@
   text-align: end;
 }
 
-.stat-value--warn {
+.stat-value--warning {
+  color: var(--color-status-warning);
+}
+
+.stat-value--critical {
   color: var(--color-status-critical);
 }
