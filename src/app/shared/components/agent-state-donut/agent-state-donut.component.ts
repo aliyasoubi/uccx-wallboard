@@ -18,7 +18,7 @@ const CIRCUMFERENCE = 2 * Math.PI * 15.9;
   selector: 'app-agent-state-donut',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-    templateUrl: './agent-state-donut.component.html',
+  templateUrl: './agent-state-donut.component.html',
   styleUrl: './agent-state-donut.component.scss',
 })
 export class AgentStateDonutComponent {

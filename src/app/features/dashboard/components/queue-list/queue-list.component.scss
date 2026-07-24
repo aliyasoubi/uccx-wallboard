@@ -18,11 +18,13 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+  overflow: hidden;
 }
 
 .title {
-  margin: 0 0 var(--space-3);
+  margin: 0 0 var(--space-4);
   font-size: var(--font-size-heading);
+  line-height: 1.3;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.02em;
@@ -36,17 +38,22 @@
 }
 
 // A single aggregated stat block now (no more per-queue rows to stack),
-// so it's vertically centered in whatever room the panel has rather than
-// pinned to the top with empty space below it. Rendered as one column —
-// a stacked list of rows, not a multi-column grid. Always exactly 9 rows
-// (the fixed parameter set), so unlike Agent Summary's roster this never
-// needs a shrink-to-fit or scroll strategy — it fits by construction.
+// so it fills whatever room the panel has rather than being pinned to
+// the top with empty space below it. justify-content: space-between (not
+// center) is deliberate: if content is ever taller than the available
+// height, the rows should only overflow downward — clipped by
+// overflow:hidden on .queue-list — never upward into .title above them.
+// Rendered as one column — a stacked list of rows, not a multi-column
+// grid. Always exactly 9 rows (the fixed parameter set), so unlike Agent
+// Summary's roster this never needs a shrink-to-fit or scroll strategy —
+// it fits by construction as long as its band has adequate height (see
+// band--queues in dashboard.component.scss).
 .stat-list {
   flex: 1 1 auto;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   gap: var(--space-2);
 }
 

@@ -1,3 +1,10 @@
+// Custom elements default to display:inline — explicit here rather than
+// relying on the parent's flex context to auto-blockify it, matching the
+// convention used by every other component in this app.
+:host {
+  display: block;
+}
+
 .donut {
   display: flex;
   align-items: center;

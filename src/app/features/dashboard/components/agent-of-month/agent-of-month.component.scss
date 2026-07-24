@@ -38,6 +38,10 @@
   font-size: var(--font-size-body);
 }
 
+.info {
+  min-width: 0;
+}
+
 .eyebrow {
   margin: 0;
   font-size: var(--font-size-label);
@@ -46,7 +50,10 @@
 }
 
 .name {
-  margin: 2px 0 0;
+  margin: var(--space-1) 0 0;
   font-size: var(--font-size-body);
   font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

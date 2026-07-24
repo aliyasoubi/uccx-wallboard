@@ -73,10 +73,26 @@
   min-height: 0;
 }
 
-// Queue content used to need extra room here (three stacked per-queue
-// blocks); now it's one compact, centered aggregate block per panel, so
-// this band shares column 2 evenly with agent-state/agent-of-month
-// instead of taking a larger cut.
+// Queue Displays (title + nine dense stat rows, x2 panels) need far more
+// vertical room than Agent State (title + an 84px donut) or Agent of the
+// Month (one avatar row), which are inherently short. A fixed 2:1 split
+// still wasn't enough room for Queue Displays at shorter viewport heights
+// — its rows would overflow upward into the panel title (see the
+// justify-content note in queue-list.component.scss) — while Agent
+// State/Agent of the Month stretched into a tall box of mostly empty
+// space around their content either way. Sizing Agent State/Agent of the
+// Month to their own content (flex: 0 0 auto, the same pattern already
+// used for band--summary/band--kpi above) and letting Queue Displays take
+// every remaining pixel fixes both problems at once, and stays correct
+// across HD-4K since it's driven by actual content height, not a ratio
+// guess.
+.band--queues {
+  flex: 1 1 auto;
+}
+
+.band--agent-highlights {
+  flex: 0 0 auto;
+}
 
 .band--fill {
   flex: 1 1 auto;

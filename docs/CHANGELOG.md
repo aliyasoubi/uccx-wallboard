@@ -134,3 +134,46 @@ left unfixed this pass, per request.
    Split into `.stat-value--warning` (amber) and `.stat-value--critical`
    (red), matching the three-tier severity treatment already used
    correctly by `MetricTileComponent` elsewhere on the board.
+
+## Pass 6 — Column 2 height rebalance (Queue Displays vs. Agent State/Agent of the Month)
+
+Reported with a screenshot: Waiting/Serving Queue titles visually
+overlapping "Inbound" (the first stat row), and Agent State/Agent of the
+Month sitting in a much taller box than their content needs.
+
+1. **Root cause.** `queue-list.component.scss`'s `.stat-list` centered
+   its nine rows (`justify-content: center`) inside a panel with
+   `overflow: hidden`. Once the panel is shorter than the nine rows need,
+   centering overflows symmetrically — up and down — so the excess
+   painted over `.title` above it. The prior pass's 2:1 height ratio
+   between `.band--queues` and `.band--agent-highlights` reduced this but
+   didn't eliminate it at shorter viewport heights, since Agent State/
+   Agent of the Month were still being stretched well past their content
+   needs on the other side of that ratio.
+2. **`dashboard.component.scss`: `.band--queues`/`.band--agent-highlights`
+   changed from a fixed 2:1 flex ratio to content-sized.** Agent State/
+   Agent of the Month now use `flex: 0 0 auto` (grow only to their own
+   content, the same pattern already used for `.band--summary`/
+   `.band--kpi` in column 1) and Queue Displays takes `flex: 1 1 auto` —
+   every remaining pixel in the column. Driven by actual content height
+   rather than a ratio, so it stays correct across HD-4K instead of
+   needing another guessed ratio if content changes again.
+3. **`queue-list.component.scss`: `.stat-list` changed from
+   `justify-content: center` to `justify-content: space-between`.**
+   Still fills the available height evenly when there's room, but any
+   remaining overflow is now downward-only (clipped by `overflow: hidden`
+   on `.queue-list`) and can never bleed upward into the title again,
+   regardless of how tight the panel's height ever gets.
+4. **Minor cleanup while in these components:** `agent-of-month`'s
+   hardcoded `2px` name margin replaced with `var(--space-1)` (project
+   convention is to never hardcode spacing); added `min-width: 0` +
+   text-overflow ellipsis so a long agent name truncates instead of
+   overflowing the card now that the panel is compact; added the
+   `:host { display: block; }` rule to `AgentStateDonutComponent` that
+   every other component already has (previously relying on its parent's
+   flex context to auto-blockify it, which happened to work but was
+   inconsistent with the rest of the app).
+
+Verified with `npm run test:ci` (128/128 passing, including the
+previously-failing "Calls in queue" assertion from Pass 5) and a
+production build rendered in real Chrome at 1360×900 and 1920×1080.

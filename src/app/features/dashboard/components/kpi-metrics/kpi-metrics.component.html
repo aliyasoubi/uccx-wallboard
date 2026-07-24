@@ -14,9 +14,9 @@
     [value]="(summary()?.avgTalkSeconds | formatDuration)"
     [severity]="ahtSeverity()"
   />
-  <app-metric-tile
+  <!-- <app-metric-tile
     label="Calls in queue"
     [value]="summary()?.callsWaiting ?? '—'"
     [severity]="callsWaitingSeverity()"
-  />
+  /> -->
 </div>
