@@ -10,6 +10,16 @@
 }
 
 .roster {
+  // One column template shared by .header-row and every .row via this
+  // custom property. Single source of truth: the header and the data
+  // rows can never drift out of alignment with each other, which four
+  // independently-declared column widths would risk over time.
+  // minmax(0, Nfr) (not plain Nfr) is deliberate — it's what lets a long
+  // agent name ellipsize instead of forcing the row wider than the panel,
+  // the same overflow trap agent-of-month/top-agent-base were hardened
+  // against elsewhere.
+  --roster-columns: minmax(0, 2.1fr) minmax(0, 1.15fr) minmax(0, 0.85fr) minmax(0, 0.55fr);
+
   background: var(--color-surface-1);
   border-radius: var(--radius-md);
   padding: var(--space-4);
@@ -24,62 +34,73 @@
   font-weight: 600;
 }
 
+.header-row {
+  display: grid;
+  grid-template-columns: var(--roster-columns);
+  gap: var(--space-3);
+  padding: 0 0 var(--space-2);
+  font-size: var(--font-size-label);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  flex: 0 0 auto;
+}
+
+.header-calls {
+  text-align: end;
+}
+
 .list {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: var(--space-2);
   flex: 1 1 auto;
   min-height: 0;
 }
 
 .row {
-  // Every row shares the list's available height equally — with N rows,
-  // flexbox automatically gives each one 1/N of the space, so the list
-  // never needs to scroll or clip: it always fits exactly, whether there
-  // are 3 agents or 30. min-height: 0 is what lets a row shrink below its
-  // own content's natural size instead of forcing the list taller than
-  // its container (the same fix documented on .list historically, now
-  // applied per-row so growth is distributed rather than accumulated).
+  // flex-grow still lets rows share leftover space, but max-height caps
+  // how far that growth goes — with a small roster (e.g. 5 agents in a
+  // tall column), rows used to stretch to fill 1/N of the *entire* panel
+  // height, leaving a lot of dead space around each avatar. Now they
+  // grow to a comfortable size and stop; any further leftover space just
+  // sits empty below the last row instead of inflating every row.
   //
-  // Trade-off, stated plainly: this guarantees zero scrolling
-  // unconditionally, but rows do get shorter as the roster grows — at
-  // some roster size the per-row content (avatar, name, duration, status
-  // badge) will be tighter than at a small roster size. Realistic
-  // wallboard rosters (dozens of agents) stay comfortably legible; if a
-  // deployment regularly has a much larger roster, an auto-rotating
-  // paged view would be a better fit than either scrolling or shrinking
+  // flex-shrink (via min-height: 0) is still what protects the no-scroll
+  // guarantee at the other end: with a large roster, rows shrink below
+  // max-height, together, down to whatever fits — the same mechanism as
+  // before, just now also bounded on top. Realistic wallboard rosters
+  // (dozens of agents) stay comfortably legible; if a deployment
+  // regularly has a much larger roster, an auto-rotating paged view
+  // would be a better fit than either scrolling or shrinking
   // indefinitely — worth a conversation if that turns out to be the case.
   flex: 1 1 0;
   min-height: 0;
-  display: flex;
+  max-height: 3.75rem;
+  display: grid;
+  grid-template-columns: var(--roster-columns);
   align-items: center;
-  justify-content: space-between;
   gap: var(--space-3);
+  padding-block: var(--space-2);
   border-bottom: 1px solid var(--color-border);
   overflow: hidden;
-}
-
-.duration {
-  font-family: var(--font-family-mono);
-  font-size: var(--font-size-label);
-  color: var(--color-text-muted);
 }
 
 .identity {
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  min-width: 0;
 }
 
 .avatar {
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background: var(--color-status-accent-bg);
-  color: var(--color-status-accent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -90,6 +111,22 @@
 
 .name {
   font-size: var(--font-size-body);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.duration,
+.calls {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-label);
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.calls {
+  text-align: end;
 }
 
 .count {

@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { Agent } from '../../../../core/models/domain';
 import { StatusBadgeComponent } from '../../../../shared/components';
 import { FormatDurationPipe } from '../../../../shared/pipes/format-duration.pipe';
+import { AGENT_STATUS_VISUALS, StatusVisual } from '../../../../shared/status-visuals';
 
 // Module 4, "Agent Summary" (renamed from AgentRosterComponent).
 //
@@ -31,7 +32,27 @@ import { FormatDurationPipe } from '../../../../shared/pipes/format-duration.pip
 export class AgentSummaryComponent {
   readonly agents = input<Agent[]>([]);
 
-  initialOf(name: string): string {
-    return name.trim().charAt(0).toUpperCase() || '?';
+  // Two letters (first + last name) read more distinctly at a glance than
+  // one — "John Smith" and "Jane Sato" both used to collapse to the same
+  // "J" avatar. Guards against blank/single-word names the same way the
+  // original single-letter version did, so a bad record still can't throw
+  // and take down the rest of the list.
+  initialsOf(name: string): string {
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return '?';
+    const first = parts[0].charAt(0);
+    const last = parts.length > 1 ? parts[parts.length - 1].charAt(0) : '';
+    return (first + last).toUpperCase();
+  }
+
+  // Avatar tint reuses the exact same status->color mapping the badge
+  // uses (single source of truth in shared/status-visuals.ts), so an
+  // agent's avatar and their status badge always agree with each other.
+  visualOf(agent: Agent): StatusVisual {
+    return AGENT_STATUS_VISUALS[agent.status];
+  }
+
+  totalCalls(agent: Agent): number {
+    return agent.inboundCalls + agent.outboundCalls;
   }
 }

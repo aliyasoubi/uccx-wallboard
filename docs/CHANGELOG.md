@@ -177,3 +177,97 @@ Month sitting in a much taller box than their content needs.
 Verified with `npm run test:ci` (128/128 passing, including the
 previously-failing "Calls in queue" assertion from Pass 5) and a
 production build rendered in real Chrome at 1360×900 and 1920×1080.
+
+## Pass 7 — Agent Summary: column headers, Calls column, status-tinted avatars, reason-aware badges
+
+Requested improvements after comparing the panel against a reference
+design. Adopted the ideas that held up for a wallboard viewed from a
+few feet away for hours at a stretch; explicitly did not adopt a couple
+that didn't (see rationale below).
+
+1. **New `shared/status-visuals.ts`.** Single source of truth for each
+   status's label/color/background, previously a private const inside
+   `StatusBadgeComponent`. Now also consumed by `AgentSummaryComponent`
+   for avatar tinting, so the badge and the avatar can never drift out
+   of sync with each other. Fixed the Not Ready color pairing while
+   here: `--color-status-neutral` on `--color-surface-2` measured
+   3.19:1 contrast (fails WCAG AA's 4.5:1 floor for normal text);
+   swapped to `--color-text-secondary` on the same background, ~6.4:1.
+2. **`StatusBadgeComponent` gained an optional `reason` input.** When
+   status is Not Ready and a reason string is present, it's shown in
+   place of the generic "Not ready" label (e.g. "Break", "Meeting") —
+   color/background stay tied to the actual status regardless, so an
+   unrecognized reason string never invents an unbacked color. The data
+   was already flowing (`Agent.reason`, sourced from
+   `AgentDto.state.reason`) but no component displayed it before this.
+   Added `status-badge.component.spec.ts` (previously had no test file)
+   covering the default per-status label and this override behavior.
+3. **Agent Summary: added a header row** ("Agent / State / Duration /
+   Calls") and a **Calls column** (`Agent.inboundCalls +
+   Agent.outboundCalls`, already in the domain model, just never
+   displayed). Header and data rows share one `--roster-columns` custom
+   property so the two can't drift out of alignment independently.
+4. **Avatars: two-letter initials, status-tinted, larger (28px → 36px).**
+   "John Smith" and "Jane Sato" no longer collapse to the same "J".
+   Background/foreground reuse the same status-visual mapping as the
+   badge, so an agent's row tells the same story twice (redundant
+   encoding, not competing colors).
+5. **Row/column overflow safety.** `minmax(0, Nfr)` columns (not plain
+   `Nfr`) plus `min-width: 0` + ellipsis on `.name` — the same overflow
+   trap fixed for `agent-of-month`/`top-agent-base` in Pass 6, applied
+   here too; a long agent name now truncates instead of ever being able
+   to push the row wider than the panel.
+6. **Deliberately not adopted from the reference design:** outlined/
+   ghost badge chips (a filled pill reads faster at wallboard viewing
+   distance than a 1px border + colored text), fully saturated
+   per-agent avatar colors unrelated to status (reserving color for
+   status keeps it meaningful instead of decorative), and an unlabeled
+   status dot next to the online count (the board already has a
+   connection-status indicator in the global footer; a second
+   similar-looking dot risked being read as the same thing).
+
+Verified two ways: `npm run test:ci` (133/133 passing, incl. 5 new),
+and a real Chrome render (dev build, so mock fixtures are live) with
+Playwright — confirmed pixel-exact header/row column alignment, exact
+expected avatar background/foreground colors per status
+(`rgba(79,209,165,.12)`/`rgb(79,209,165)` for Ready, etc.), correct
+reason-override text ("Break"/"Meeting") for the two Not Ready agents
+in the fixture data, correct Calls totals (26/34/21/36/16), and no
+horizontal overflow on any row.
+
+## Pass 8 — Agent Summary row-height cap; KPI Metrics "Calls in queue" hidden
+
+Two follow-ups after seeing Pass 7 actually rendered.
+
+1. **Agent Summary rows no longer stretch to fill the whole panel.**
+   With a small roster (e.g. the 5-agent fixture), `.row`'s
+   `flex: 1 1 0` was dividing the *entire* panel height evenly across
+   however many agents there were — 5 agents in a ~950px-tall column
+   meant ~190px per row, most of it dead space around a 36px avatar.
+   Added `max-height: 3.75rem` (60px) as a clamp: rows still grow to
+   fill available space and still shrink below the cap when a large
+   roster genuinely needs it (same flex-shrink/min-height:0 mechanism
+   as before — the "never scrolls, whatever the roster size" guarantee
+   is unchanged), but growth now stops at a comfortable, compact size
+   instead of continuing to inflate every row. Any leftover space with
+   a small roster now sits empty below the last row rather than being
+   distributed into taller rows. Confirmed via Playwright: all 5 rows
+   render at exactly 60px regardless of the 834px available to `.list`.
+2. **KPI Metrics: "Calls in queue" hidden again — deliberately, this
+   time.** Not needed for now, per explicit request. Re-commented the
+   tile in the template, but unlike the Pass 5 case (an accidental
+   regression — dead code contradicting the component's own doc comment
+   and its own spec), this one is clearly dated and explained in the
+   component's header comment so a future pass doesn't mistake it for
+   the same bug and "fix" it back on. `callsWaitingSeverity` is left
+   computed (unused but harmless) so re-enabling is a one-line template
+   change. Updated `kpi-metrics.component.spec.ts` to match: removed
+   the assertion expecting the tile's text, and added an explicit
+   guard test (`does not render Calls in queue while it is deliberately
+   hidden`) so the suite documents the current intended state rather
+   than just going quiet about it.
+
+Verified with `npm run test:ci` (134/134 passing) and a real Chrome
+render confirming both changes objectively: `app-kpi-metrics` text
+content no longer includes "Calls in queue", and every Agent Summary
+row measures exactly 60px tall.

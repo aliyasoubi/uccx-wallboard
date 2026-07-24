@@ -4,15 +4,29 @@
   @if (agents().length === 0) {
     <p class="empty">No activity</p>
   } @else {
+    <div class="header-row">
+      <span>Agent</span>
+      <span>State</span>
+      <span>Duration</span>
+      <span class="header-calls">Calls</span>
+    </div>
+
     <ul class="list">
       @for (agent of agents(); track agent.id) {
         <li class="row" [attr.data-agent-id]="agent.id">
           <div class="identity">
-            <span class="avatar">{{ initialOf(agent.name) }}</span>
+            <span
+              class="avatar"
+              [style.background]="visualOf(agent).bgVar"
+              [style.color]="visualOf(agent).colorVar"
+            >
+              {{ initialsOf(agent.name) }}
+            </span>
             <span class="name">{{ agent.name }}</span>
           </div>
+          <app-status-badge [status]="agent.status" [reason]="agent.reason" />
           <span class="duration">{{ agent.statusDurationSeconds | formatDuration }}</span>
-          <app-status-badge [status]="agent.status" />
+          <span class="calls">{{ totalCalls(agent) }}</span>
         </li>
       }
     </ul>

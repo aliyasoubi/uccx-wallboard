@@ -30,7 +30,7 @@ describe('KpiMetricsComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('renders FCR, AWD, AHT, and calls-in-queue', () => {
+  it('renders FCR, AWD, and AHT', () => {
     fixture.componentRef.setInput('summary', summary);
     fixture.componentRef.setInput('serviceMetrics', serviceMetrics);
     fixture.detectChanges();
@@ -38,7 +38,18 @@ describe('KpiMetricsComponent', () => {
     expect(text).toContain('FCR');
     expect(text).toContain('AWD');
     expect(text).toContain('AHT');
-    expect(text).toContain('Calls in queue');
+  });
+
+  // Guards the current, deliberate state (see the component's header
+  // comment) — the tile is intentionally hidden, not accidentally dead
+  // code. If this test starts failing because the tile is wanted back,
+  // that's a one-line template change (callsWaitingSeverity is still
+  // computed below), not a sign something broke.
+  it('does not render Calls in queue while it is deliberately hidden', () => {
+    fixture.componentRef.setInput('summary', summary);
+    fixture.componentRef.setInput('serviceMetrics', serviceMetrics);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).not.toContain('Calls in queue');
   });
 
   it('flags AWD/AHT/calls-waiting severity using the default thresholds when no summary is set', () => {

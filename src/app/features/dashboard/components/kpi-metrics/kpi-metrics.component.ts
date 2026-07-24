@@ -10,9 +10,16 @@ import { MetricTileComponent } from '../../../../shared/components';
 // values that used to live on the old calls-summary panel — relocated here
 // to match the KPI grouping in the spec, not dropped. FCR is new; see
 // CustomerServiceMetricsDto for the "mocked, unconfirmed field" caveat.
-// "Calls in queue" is kept here too (previously on service-metrics-panel)
-// since there's no other required module it obviously belongs to and this
-// panel is the closest fit.
+//
+// "Calls in queue" (callsWaitingSeverity below, tile in the template) is
+// DELIBERATELY HIDDEN as of 2026-07-24 — not needed for now, per explicit
+// product decision (see CHANGELOG Pass 8). This is not the same as the
+// earlier accidental-dead-code bug fixed in Pass 5, where the tile was
+// commented out despite the component's own doc comment and spec both
+// still expecting it — that was a regression; this is an intentional,
+// documented, easily-reversible toggle. callsWaitingSeverity is left
+// computed (cheap, harmless) so re-enabling later is a one-line template
+// change, not a rebuild of the logic.
 @Component({
   selector: 'app-kpi-metrics',
   standalone: true,
