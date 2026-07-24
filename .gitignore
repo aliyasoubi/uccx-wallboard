@@ -58,3 +58,9 @@ src/environments/environment.local.ts
 /cypress/screenshots/
 /playwright-report/
 /test-results/
+
+# Claude Code
+# CLAUDE.md itself is NOT ignored — it's committed, team-shared project
+# instructions, same as this file. Only personal/local state is ignored:
+CLAUDE.local.md
+.claude/settings.local.json
