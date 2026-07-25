@@ -2,21 +2,18 @@
   <p class="title">{{ title() }}</p>
 
   @if (!hasData()) {
-    <p class="empty">No data</p>
+  <p class="empty">No data</p>
   } @else {
-    <div class="stat-list">
-      @for (stat of stats(); track stat.label) {
-        <div class="stat">
-          <span class="stat-label">{{ stat.label }}</span>
-          <span
-            class="stat-value"
-            [class.stat-value--warning]="stat.severity === 'warning'"
-            [class.stat-value--critical]="stat.severity === 'critical'"
-          >
-            {{ stat.value }}
-          </span>
-        </div>
-      }
+  <div class="stat-list">
+    @for (stat of stats(); track stat.label) {
+    <div class="stat">
+      <span class="stat-label">{{ stat.label }}</span>
+      <span class="stat-value" [class.stat-value--warning]="stat.severity === 'warning'"
+        [class.stat-value--critical]="stat.severity === 'critical'">
+        {{ stat.value }}
+      </span>
     </div>
+    }
+  </div>
   }
 </div>

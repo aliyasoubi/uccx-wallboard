@@ -56,17 +56,22 @@ interface QueueStat {
 export class QueueListComponent {
   private readonly appConfig = inject(AppConfigService);
 
-  readonly variant = input.required<QueueListVariant>();
-  readonly queues = input<Queue[]>([]);
+  readonly queue = input<Queue | undefined>(undefined);
 
-  readonly title = computed(() => (this.variant() === 'waiting' ? 'Waiting Queue' : 'Serving Queue'));
-
-  readonly hasData = computed(() => this.queues().length > 0);
+  readonly title = computed(() => this.queue()?.name ?? "");
+  
+  readonly hasData = computed(() => this.queue !== undefined);
 
   // All nine required parameters, aggregated across every queue into one
   // fixed reading order: call volume, then queue health/wait, then
   // agent capacity & outcome.
-  readonly stats = computed<QueueStat[]>(() => this.aggregate(this.queues(), this.appConfig.config().thresholds));
+  readonly stats = computed<QueueStat[]>(() => {
+    const q = this.queue();
+    if (q){
+      return this.aggregate(q, this.appConfig.config().thresholds)
+    }
+    return []
+  });
 
   private formatDuration(totalSeconds: number): string {
     const seconds = Math.max(0, Math.floor(totalSeconds));
@@ -77,41 +82,21 @@ export class QueueListComponent {
     return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
   }
 
-  private aggregate(queues: Queue[], thresholds: StatusThresholds): QueueStat[] {
-    const sum = (pick: (q: Queue) => number) => queues.reduce((total, q) => total + pick(q), 0);
-    const max = (pick: (q: Queue) => number) => queues.reduce((best, q) => Math.max(best, pick(q)), 0);
-    // Call-volume-weighted average: each queue's number counts in
-    // proportion to how many calls it actually handled, not equally.
-    const weightedAverage = (pick: (q: Queue) => number, weightPick: (q: Queue) => number) => {
-      const totalWeight = sum(weightPick);
-      if (totalWeight <= 0) return 0;
-      return queues.reduce((total, q) => total + pick(q) * weightPick(q), 0) / totalWeight;
-    };
-
-    const totalCalls = sum((q) => q.totalCalls);
-    const handledCalls = sum((q) => q.handledCalls);
-    const abandonedCalls = sum((q) => q.abandonedCalls);
-    const callsWaiting = sum((q) => q.callsWaiting);
-    const readyAgents = sum((q) => q.agentStates.ready);
-    const currentWaitSeconds = max((q) => q.currentWaitSeconds);
-    const maxAbandonSeconds = max((q) => q.maxWaitSeconds);
-    const avgHandleSeconds = weightedAverage((q) => q.avgTalkSeconds, (q) => q.handledCalls);
-    const slaPercent = weightedAverage((q) => q.slaPercent, (q) => q.totalCalls);
-
-    const abandonedSeverity = getRatioSeverity(abandonedCalls, totalCalls, thresholds.abandonedRatio);
-    const currentWaitSeverity = getSeverity(currentWaitSeconds, thresholds.currentWaitSeconds);
-    const slaSeverity = getInverseSeverity(slaPercent, thresholds.slaPercent);
+  private aggregate(q: Queue, thresholds: StatusThresholds): QueueStat[] {
+    const abandonedSeverity = getRatioSeverity(q.abandonedCalls, q.totalCalls, thresholds.abandonedRatio);
+    const currentWaitSeverity = getSeverity(q.currentWaitSeconds, thresholds.currentWaitSeconds);
+    const slaSeverity = getInverseSeverity(q.slaPercent, thresholds.slaPercent);
 
     return [
-      { label: 'Inbound', value: `${totalCalls}`, severity: 'normal' },
-      { label: 'Handled', value: `${handledCalls} (${Math.round(100*handledCalls/totalCalls)}%)` , severity: 'normal' },
-      { label: 'In queue', value: `${callsWaiting}`, severity: 'normal' },
-      { label: 'Abandons', value: `${abandonedCalls}`, severity: abandonedSeverity },
-      { label: 'Current WD', value: this.formatDuration(currentWaitSeconds), severity: currentWaitSeverity },
-      { label: 'Max WD', value: this.formatDuration(maxAbandonSeconds), severity: 'normal' },
-      { label: 'AVG Talk Time', value: this.formatDuration(avgHandleSeconds), severity: 'normal' },
-      { label: 'Ready', value: `${readyAgents}`, severity: 'normal' },
-      { label: 'SLA', value: `${slaPercent.toFixed(1)}%`, severity: slaSeverity },
+      { label: 'Inbound', value: `${q.totalCalls}`, severity: 'normal' },
+      { label: 'Handled', value: `${q.handledCalls} (${Math.round(100 * q.handledCalls / q.totalCalls)}%)`, severity: 'normal' },
+      { label: 'In queue', value: `${q.callsWaiting}`, severity: 'normal' },
+      { label: 'Abandons', value: `${q.abandonedCalls}`, severity: abandonedSeverity },
+      { label: 'Current WD', value: this.formatDuration(q.currentWaitSeconds), severity: currentWaitSeverity },
+      { label: 'Max WD', value: this.formatDuration(q.maxWaitSeconds), severity: 'normal' },
+      { label: 'AVG Talk Time', value: this.formatDuration(q.avgTalkSeconds), severity: 'normal' },
+      { label: 'Ready', value: `${q.agentStates.ready}`, severity: 'normal' },
+      { label: 'SLA', value: `${q.slaPercent.toFixed(1)}%`, severity: slaSeverity },
     ];
   }
 }
