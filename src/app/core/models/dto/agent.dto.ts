@@ -8,7 +8,7 @@ export interface AgentDto {
 }
 
 export interface AgentStateDto {
-    state: 'READY' | 'TALKING' | 'NOT_READY';
+    state: 'Ready' | 'Talking' | 'Not Ready';
     duration: number; // seconds
     reason: string;
 }

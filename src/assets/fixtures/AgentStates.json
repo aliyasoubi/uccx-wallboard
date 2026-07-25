@@ -2,7 +2,11 @@
   {
     "id": "A1001",
     "name": "John Smith",
-    "state": { "state": "READY", "duration": 1240, "reason": "" },
+    "state": {
+      "state": "Ready",
+      "duration": 1240,
+      "reason": ""
+    },
     "stateStats": {
       "logonDuration": 14400,
       "totalReadyDuration": 9600,
@@ -26,12 +30,21 @@
       "handledCalls": 19,
       "abandonedCalls": 1
     },
-    "outboundCallStats": { "totalTalkDuration": 1800, "avgTalkDuration": 300, "maxTalkDuration": 540, "totalCalls": 6 }
+    "outboundCallStats": {
+      "totalTalkDuration": 1800,
+      "avgTalkDuration": 300,
+      "maxTalkDuration": 540,
+      "totalCalls": 6
+    }
   },
   {
     "id": "A1002",
     "name": "Sarah Johnson",
-    "state": { "state": "TALKING", "duration": 187, "reason": "" },
+    "state": {
+      "state": "Talking",
+      "duration": 187,
+      "reason": ""
+    },
     "stateStats": {
       "logonDuration": 15000,
       "totalReadyDuration": 8800,
@@ -55,12 +68,21 @@
       "handledCalls": 25,
       "abandonedCalls": 1
     },
-    "outboundCallStats": { "totalTalkDuration": 2100, "avgTalkDuration": 262, "maxTalkDuration": 480, "totalCalls": 8 }
+    "outboundCallStats": {
+      "totalTalkDuration": 2100,
+      "avgTalkDuration": 262,
+      "maxTalkDuration": 480,
+      "totalCalls": 8
+    }
   },
   {
     "id": "A1003",
     "name": "Michael Brown",
-    "state": { "state": "NOT_READY", "duration": 965, "reason": "Break" },
+    "state": {
+      "state": "Not Ready",
+      "duration": 965,
+      "reason": "Break"
+    },
     "stateStats": {
       "logonDuration": 13200,
       "totalReadyDuration": 7200,
@@ -84,12 +106,21 @@
       "handledCalls": 14,
       "abandonedCalls": 2
     },
-    "outboundCallStats": { "totalTalkDuration": 1200, "avgTalkDuration": 240, "maxTalkDuration": 420, "totalCalls": 5 }
+    "outboundCallStats": {
+      "totalTalkDuration": 1200,
+      "avgTalkDuration": 240,
+      "maxTalkDuration": 420,
+      "totalCalls": 5
+    }
   },
   {
     "id": "A1004",
     "name": "Emily Davis",
-    "state": { "state": "READY", "duration": 453, "reason": "" },
+    "state": {
+      "state": "Ready",
+      "duration": 453,
+      "reason": ""
+    },
     "stateStats": {
       "logonDuration": 15600,
       "totalReadyDuration": 10200,
@@ -113,12 +144,21 @@
       "handledCalls": 27,
       "abandonedCalls": 1
     },
-    "outboundCallStats": { "totalTalkDuration": 2400, "avgTalkDuration": 300, "maxTalkDuration": 500, "totalCalls": 8 }
+    "outboundCallStats": {
+      "totalTalkDuration": 2400,
+      "avgTalkDuration": 300,
+      "maxTalkDuration": 500,
+      "totalCalls": 8
+    }
   },
   {
     "id": "A1005",
     "name": "David Wilson",
-    "state": { "state": "NOT_READY", "duration": 3210, "reason": "Meeting" },
+    "state": {
+      "state": "Not Ready",
+      "duration": 3210,
+      "reason": "Meeting"
+    },
     "stateStats": {
       "logonDuration": 12000,
       "totalReadyDuration": 6000,
@@ -142,6 +182,11 @@
       "handledCalls": 10,
       "abandonedCalls": 2
     },
-    "outboundCallStats": { "totalTalkDuration": 900, "avgTalkDuration": 225, "maxTalkDuration": 380, "totalCalls": 4 }
+    "outboundCallStats": {
+      "totalTalkDuration": 900,
+      "avgTalkDuration": 225,
+      "maxTalkDuration": 380,
+      "totalCalls": 4
+    }
   }
 ]

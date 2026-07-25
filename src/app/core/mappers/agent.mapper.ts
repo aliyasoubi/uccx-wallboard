@@ -2,9 +2,9 @@ import { AgentDto, AgentStateDto } from '../models/dto';
 import { Agent, AgentStatus } from '../models/domain';
 
 const STATUS_MAP: Record<AgentStateDto['state'], AgentStatus> = {
-  READY: AgentStatus.Ready,
-  TALKING: AgentStatus.Talking,
-  NOT_READY: AgentStatus.NotReady,
+  "Ready": AgentStatus.Ready,
+  "Talking": AgentStatus.Talking,
+  "Not Ready": AgentStatus.NotReady,
 };
 
 export function mapAgent(dto: AgentDto): Agent {
