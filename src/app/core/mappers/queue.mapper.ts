@@ -19,8 +19,8 @@ export function mapQueue(dto: CsqDto): Queue {
     // the Queue Displays "SLA" field now closes that gap.
     slaPercent: dto.serviceMetrics.sla,
     currentWaitSeconds: dto.timings.currentWaitDuration,
-    maxAbandonSeconds: dto.timings.maxAbandonDuration,
-    avgHandleSeconds: dto.timings.avgHandleDuration,
+    maxWaitSeconds: dto.timings.maxWaitDuration,
+    avgTalkSeconds: dto.timings.avgHandleDuration,
   };
 }
 

@@ -16,7 +16,7 @@ const CLOCK_TICK_MS = 1000;
   styleUrl: './header.component.scss',
 })
 export class HeaderComponent {
-  readonly title = input<string>('CCCX Call Center Wallboard');
+  readonly title = input<string>('DotOne Trip Wallboard');
 
   private readonly destroyRef = inject(DestroyRef);
   private readonly _now = signal(new Date());

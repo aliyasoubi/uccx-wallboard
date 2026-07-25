@@ -4,6 +4,6 @@
 // going live.
 export interface QueueTimingStatsDto {
   currentWaitDuration: number; // seconds — CWD, longest call waiting right now
-  maxAbandonDuration: number; // seconds — MAD, longest wait before an abandon
+  maxWaitDuration: number; // seconds — MWD, longest wait before an abandon
   avgHandleDuration: number; // seconds — ACT, average total handled-call time
 }

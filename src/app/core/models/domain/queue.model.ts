@@ -16,7 +16,7 @@ export interface Queue {
   callsWaiting: number; // "In Queue"
   agentStates: AgentStateSummary; // agentStates.ready -> "Ready Agents"
   currentWaitSeconds: number; // CWD
-  maxAbandonSeconds: number; // MAD
-  avgHandleSeconds: number; // ACT
+  maxWaitSeconds: number; // MWD
+  avgTalkSeconds: number; // ACT
   slaPercent: number; // SLA
 }

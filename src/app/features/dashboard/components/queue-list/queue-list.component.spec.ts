@@ -16,8 +16,8 @@ function buildQueue(overrides: Partial<Queue> = {}): Queue {
     callsWaiting: 2,
     agentStates: { total: 12, ready: 5, talking: 4, notReady: 3 },
     currentWaitSeconds: 28,
-    maxAbandonSeconds: 74,
-    avgHandleSeconds: 292,
+    maxWaitSeconds: 74,
+    avgTalkSeconds: 292,
     slaPercent: 96.1,
     ...overrides,
   };
@@ -105,9 +105,9 @@ describe('QueueListComponent', () => {
   it('takes the MAX (not sum or average) across queues for CWD and MAD', () => {
     fixture.componentRef.setInput('variant', 'waiting');
     fixture.componentRef.setInput('queues', [
-      buildQueue({ currentWaitSeconds: 28, maxAbandonSeconds: 74 }),
-      buildQueue({ currentWaitSeconds: 61, maxAbandonSeconds: 133 }),
-      buildQueue({ currentWaitSeconds: 19, maxAbandonSeconds: 102 }),
+      buildQueue({ currentWaitSeconds: 28, maxWaitSeconds: 74 }),
+      buildQueue({ currentWaitSeconds: 61, maxWaitSeconds: 133 }),
+      buildQueue({ currentWaitSeconds: 19, maxWaitSeconds: 102 }),
     ]);
     fixture.detectChanges();
     const byLabel = Object.fromEntries(component.stats().map((s) => [s.label, s.value]));
@@ -118,8 +118,8 @@ describe('QueueListComponent', () => {
   it('takes a call-volume-weighted average (not a plain average) across queues for ACT and SLA', () => {
     fixture.componentRef.setInput('variant', 'serving');
     fixture.componentRef.setInput('queues', [
-      buildQueue({ handledCalls: 900, avgHandleSeconds: 100, totalCalls: 900, slaPercent: 90 }),
-      buildQueue({ handledCalls: 100, avgHandleSeconds: 500, totalCalls: 100, slaPercent: 50 }),
+      buildQueue({ handledCalls: 900, avgTalkSeconds: 100, totalCalls: 900, slaPercent: 90 }),
+      buildQueue({ handledCalls: 100, avgTalkSeconds: 500, totalCalls: 100, slaPercent: 50 }),
     ]);
     fixture.detectChanges();
     const byLabel = Object.fromEntries(component.stats().map((s) => [s.label, s.value]));

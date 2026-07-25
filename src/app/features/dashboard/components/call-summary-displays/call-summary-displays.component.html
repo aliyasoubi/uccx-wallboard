@@ -3,7 +3,7 @@
     icon="ti-phone-incoming"
     iconColorVar="var(--color-status-accent)"
     label="Incoming calls"
-    [value]="inboundStats()?.count ?? '—'"
+    [value]="summary()?.totalCalls ?? '—'"
   />
   <app-metric-tile
     icon="ti-phone-outgoing"

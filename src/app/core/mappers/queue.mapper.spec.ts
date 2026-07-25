@@ -16,7 +16,7 @@ function buildCsqDto(overrides: Partial<CsqDto> = {}): CsqDto {
     },
     agentStateCounts: { total: 12, ready: 5, talking: 4, notReady: 3 },
     serviceMetrics: { sla: 96.1, csat: 4.7, fcr: 81.2 },
-    timings: { currentWaitDuration: 28, maxAbandonDuration: 74, avgHandleDuration: 292 },
+    timings: { currentWaitDuration: 28, maxWaitDuration: 74, avgHandleDuration: 292 },
     ...overrides,
   };
 }
@@ -46,11 +46,11 @@ describe('queue.mapper', () => {
 
   it('maps the timings block to CWD/MAD/ACT', () => {
     const queue = mapQueue(
-      buildCsqDto({ timings: { currentWaitDuration: 61, maxAbandonDuration: 133, avgHandleDuration: 372 } }),
+      buildCsqDto({ timings: { currentWaitDuration: 61, maxWaitDuration: 133, avgHandleDuration: 372 } }),
     );
     expect(queue.currentWaitSeconds).toBe(61);
-    expect(queue.maxAbandonSeconds).toBe(133);
-    expect(queue.avgHandleSeconds).toBe(372);
+    expect(queue.maxWaitSeconds).toBe(133);
+    expect(queue.avgTalkSeconds).toBe(372);
   });
 
   it('maps an array of queues in order', () => {

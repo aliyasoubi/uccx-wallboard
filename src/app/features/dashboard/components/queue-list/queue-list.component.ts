@@ -94,8 +94,8 @@ export class QueueListComponent {
     const callsWaiting = sum((q) => q.callsWaiting);
     const readyAgents = sum((q) => q.agentStates.ready);
     const currentWaitSeconds = max((q) => q.currentWaitSeconds);
-    const maxAbandonSeconds = max((q) => q.maxAbandonSeconds);
-    const avgHandleSeconds = weightedAverage((q) => q.avgHandleSeconds, (q) => q.handledCalls);
+    const maxAbandonSeconds = max((q) => q.maxWaitSeconds);
+    const avgHandleSeconds = weightedAverage((q) => q.avgTalkSeconds, (q) => q.handledCalls);
     const slaPercent = weightedAverage((q) => q.slaPercent, (q) => q.totalCalls);
 
     const abandonedSeverity = getRatioSeverity(abandonedCalls, totalCalls, thresholds.abandonedRatio);
@@ -104,12 +104,12 @@ export class QueueListComponent {
 
     return [
       { label: 'Inbound', value: `${totalCalls}`, severity: 'normal' },
-      { label: 'Handled', value: `${handledCalls}`, severity: 'normal' },
+      { label: 'Handled', value: `${handledCalls} (${Math.round(100*handledCalls/totalCalls)}%)` , severity: 'normal' },
       { label: 'In queue', value: `${callsWaiting}`, severity: 'normal' },
       { label: 'Abandons', value: `${abandonedCalls}`, severity: abandonedSeverity },
-      { label: 'CWD', value: this.formatDuration(currentWaitSeconds), severity: currentWaitSeverity },
-      { label: 'MAD', value: this.formatDuration(maxAbandonSeconds), severity: 'normal' },
-      { label: 'ACT', value: this.formatDuration(avgHandleSeconds), severity: 'normal' },
+      { label: 'Current WD', value: this.formatDuration(currentWaitSeconds), severity: currentWaitSeverity },
+      { label: 'Max WD', value: this.formatDuration(maxAbandonSeconds), severity: 'normal' },
+      { label: 'AVG Talk Time', value: this.formatDuration(avgHandleSeconds), severity: 'normal' },
       { label: 'Ready', value: `${readyAgents}`, severity: 'normal' },
       { label: 'SLA', value: `${slaPercent.toFixed(1)}%`, severity: slaSeverity },
     ];
