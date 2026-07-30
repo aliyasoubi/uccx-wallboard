@@ -78,9 +78,9 @@ coverage. Covers:
   wasn't reproducible against this codebase — see README.md §11.4).
 - `AppConfigService`, `DashboardStoreService`, and most of the new/changed
   dashboard components (`HeaderComponent`'s clock, `FooterComponent`'s
-  status text, `QueueListComponent`'s cross-queue aggregation (sum/max/
-  weighted-average rules) and full 9-parameter single-column list for
-  both variants, `TopAgentComponent`'s
+  status text, `QueueListComponent`'s per-queue, unaggregated
+  9-parameter single-column list (one panel per queue, no cross-queue
+  math), `TopInboundAgentComponent`/`TopOutboundAgentComponent`'s
   per-direction wiring, `CallSummaryDisplaysComponent`).
 - `MetricTileComponent`'s optional `icon` input — renders when provided,
   stays absent (backward compatible) when not.

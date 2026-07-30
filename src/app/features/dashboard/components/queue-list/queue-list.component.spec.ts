@@ -119,16 +119,10 @@ describe('QueueListComponent', () => {
     expect(component.stats()).toEqual([]);
   });
 
-  // NOTE: `hasData` is implemented as `this.queue !== undefined`, which
-  // compares the input *signal function* to undefined rather than calling
-  // it — that reference is never undefined, so `hasData()` is always true
-  // and the "No data" branch is unreachable even with no queue set. This
-  // test documents the current (likely unintended) behavior rather than
-  // the "No data" empty state described elsewhere; flagged separately.
-  it('never shows the "No data" empty state, even with no queue set (hasData always evaluates true)', () => {
+  it('shows the "No data" empty state when no queue is set', () => {
     fixture.detectChanges();
-    expect(component.hasData()).toBe(true);
-    expect(fixture.nativeElement.textContent).not.toContain('No data');
+    expect(component.hasData()).toBe(false);
+    expect(fixture.nativeElement.textContent).toContain('No data');
   });
 
   it('uses a runtime-configured threshold instead of the compiled-in default', async () => {

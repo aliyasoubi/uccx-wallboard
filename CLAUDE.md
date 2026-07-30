@@ -79,12 +79,15 @@ ARCHITECTURE.md; if a change is significant, add it to
   `getSeverity()` / `getInverseSeverity()` / `getRatioSeverity()`.
   Never inline a threshold number in a component.
 
-## Queue aggregation math (easy to get wrong — check before touching)
-`QueueListComponent` shows ONE aggregated row set across all queues:
-- Inbound, Handled, In Queue, Abandons, Ready Agents → **sum**.
-- CWD, MAD (worst-case durations) → **max** across queues, never
-  average or sum.
-- ACT, SLA (rates/averages) → **call-volume-weighted average**.
+## Queue Displays — per-queue, not aggregated
+`QueueListComponent` takes a single `Queue` via its `queue` input and
+renders that queue's own nine parameters (Inbound, Handled, In Queue,
+Abandons, CWD, MAD, ACT, Ready Agents, SLA) directly — no cross-queue
+sum/max/weighted-average math. `DashboardComponent` renders one
+`app-queue-list` per entry in `store.queues()`, so each queue
+(Sales/Support/Billing) gets its own panel. This replaced an earlier
+aggregated design — see `docs/CHANGELOG.md` Pass 9 if a task references
+cross-queue aggregation math, since that description is now stale.
 
 ## Layout
 - `.dashboard { height: 100dvh; overflow: hidden; }` — no page scroll

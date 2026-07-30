@@ -2,8 +2,7 @@
 
 Angular 18 standalone-component wallboard for a call center: signals-based
 state, a mapper layer that isolates the app from backend contract drift,
-and a runtime-configurable API endpoint. Fills one viewport (HD–4K) with
-no page scroll. Currently backed by mock JSON fixtures pending a real BFF.
+and a runtime-configurable API endpoint.
 
 ## Quick start
 

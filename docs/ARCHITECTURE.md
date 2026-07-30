@@ -5,8 +5,7 @@ describes the **current state only**. For "what changed and when," see
 `docs/CHANGELOG.md` — don't mix history back into this file.
 
 Related docs: `SETUP.md` (run it), `CONFIGURATION.md` (point it at a
-real backend), `docs/CHANGELOG.md` (history), `CLAUDE.md` (rules for
-AI-assisted changes).
+real backend), `docs/CHANGELOG.md` (history).
 
 ## 1. Module mapping
 
@@ -21,7 +20,7 @@ AI-assisted changes).
 | 7 | SLA Gauge | `app-sla-gauge` | `features/dashboard/components/sla-gauge/` |
 | 8 | Customer Satisfaction | `app-customer-satisfaction-gauge` | `features/dashboard/components/customer-satisfaction-gauge/` |
 | 9 | KPI Metrics (FCR/AWD/AHT) | `app-kpi-metrics` | `features/dashboard/components/kpi-metrics/` |
-| 10 | Queue Displays (Inbound/Handled/In Queue/Abandons/CWD/MAD/ACT/Ready Agents/SLA) | `app-queue-list` (`variant="waiting"` / `variant="serving"`) | `features/dashboard/components/queue-list/` |
+| 10 | Queue Displays (Inbound/Handled/In Queue/Abandons/CWD/MAD/ACT/Ready Agents/SLA) | `app-queue-list` (one instance per queue via `[queue]` input) | `features/dashboard/components/queue-list/` |
 | 11 | Header (Title/Clock/Date) | `app-header` | `features/dashboard/components/header/` |
 | 12 | Footer (System Status/Last Update) | `app-footer` | `features/dashboard/components/footer/` |
 
@@ -163,30 +162,26 @@ Column layout:
 
 - **Column 1**: Call Summary Displays → Top Inbound/Outbound Agent →
   SLA/CSAT gauges → KPI Metrics
-- **Column 2**: Waiting Queue / Serving Queue (side by side) → Agent
-  State / Agent of the Month (side by side)
+- **Column 2**: One Queue Displays panel per queue (Sales/Support/
+  Billing) → Agent State / Agent of the Month (side by side)
 - **Column 3**: Agent Summary (full height)
 
-## 10. Queue Displays aggregation
+## 10. Queue Displays — per-queue, not aggregated
 
-`QueueListComponent` shows one aggregated set of all nine required
-parameters (Inbound, Handled, In Queue, Abandons, CWD, MAD, ACT, Ready
-Agents, SLA) across every queue, as a single-column list — not broken
-down by individual queue name. The aggregation rule depends on the
-parameter:
+`QueueListComponent` takes a single `Queue` via its `queue` input and
+renders that one queue's own nine parameters (Inbound, Handled, In
+Queue, Abandons, CWD, MAD, ACT, Ready Agents, SLA) as a single-column
+list, straight off the input — no cross-queue math. `DashboardComponent`
+`@for`-loops `store.queues()` and renders one `app-queue-list` per
+queue, so each queue (Sales/Support/Billing) gets its own panel with its
+own title (`queue.name`).
 
-- **Counts** (Inbound, Handled, In Queue, Abandons, Ready Agents):
-  summed across queues.
-- **CWD, MAD** (worst-case wait/abandon durations): the **max** across
-  queues — summing or averaging a "longest wait" is meaningless; the
-  board should surface the single longest one, wherever it's currently
-  happening.
-- **ACT, SLA** (rates/averages): a **call-volume-weighted average** — a
-  queue with 900 calls shouldn't count equally to one with 100 calls.
-
-This is a presentation-layer aggregation only — `Queue`, `CsqDto`, and
-`queue.mapper.ts` still carry per-queue data; `QueueListComponent`
-computes the aggregate client-side.
+This replaces an earlier aggregated design (sum/max/weighted-average
+across all queues into one "Waiting Queue"/"Serving Queue" pair — see
+`docs/CHANGELOG.md` Pass 3–4 and Pass 9) — confirm with the contributor/
+product owner whether dropping the cross-queue aggregation was
+intentional. `Queue`, `CsqDto`, and `queue.mapper.ts` are unaffected;
+this is a presentation-layer change only.
 
 ## 11. Open items / documented assumptions
 

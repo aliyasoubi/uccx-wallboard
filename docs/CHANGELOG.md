@@ -271,3 +271,45 @@ Verified with `npm run test:ci` (134/134 passing) and a real Chrome
 render confirming both changes objectively: `app-kpi-metrics` text
 content no longer includes "Calls in queue", and every Agent Summary
 row measures exactly 60px tall.
+
+## Pass 9 — Queue Displays: per-queue panels, dropping cross-queue aggregation
+
+External contributor commit (`fix: QueueListComponent`) replaced the
+aggregated Waiting/Serving Queue design from Pass 3–4 with one panel
+per queue, aligned against the real production API rather than the
+fixture-driven aggregated view.
+
+1. **`QueueListComponent` now takes a single `queue` input** (`Queue |
+   undefined`) instead of `queues: Queue[]` plus a `variant: 'waiting' |
+   'serving'` discriminator. All nine stats (Inbound, Handled, In Queue,
+   Abandons, CWD, MAD, ACT, Ready Agents, SLA) are read directly off
+   that one queue — the sum/max/weighted-average aggregation math from
+   Pass 3 is gone. `DashboardComponent` now `@for`-loops
+   `store.queues()` and renders one `app-queue-list` per queue
+   (Sales/Support/Billing), so the per-queue breakdown that Pass 3
+   deliberately removed is back, with each panel titled by `queue.name`.
+2. **Fixed alongside:** `hasData` was implemented as `this.queue !==
+   undefined`, comparing the input *signal function* itself rather than
+   calling it — that reference is never `undefined`, so the "No data"
+   empty state was unreachable even with no queue set. Changed to
+   `this.queue() !== undefined`; `queue-list.component.spec.ts` updated
+   to assert the fixed behavior (the "No data" state now actually
+   renders when no queue is set) instead of documenting the bug as
+   current behavior.
+3. `docs/ARCHITECTURE.md` §1/§9/§10 and `CLAUDE.md`'s queue-aggregation
+   rules updated to describe the current per-queue behavior instead of
+   the removed cross-queue aggregation.
+
+**Flagged, not addressed in this pass:**
+- `dashboard.component.html` passes `variant="waiting"` to every
+  `app-queue-list` instance, but `QueueListComponent` no longer declares
+  a `variant` input — the attribute is now inert, and the old "Serving
+  Queue" panel has no replacement. Needs a decision from the
+  contributor/product owner on whether that's intentional.
+- Whether dropping cross-queue aggregation entirely (vs. the per-queue
+  Pass 3 behavior) is an intentional product decision or an in-progress
+  refactor — this pass treated the contributor's commit as source of
+  truth and did not change that behavior, only fixed the `hasData` bug
+  and brought docs in line with it.
+
+Verified with `npm run test:ci` (131/131 passing).
