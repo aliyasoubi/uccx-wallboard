@@ -6,7 +6,7 @@ function buildAgentDto(overrides: Partial<AgentDto> = {}): AgentDto {
   return {
     id: 'A1001',
     name: 'John Smith',
-    state: { state: 'READY', duration: 1240, reason: '' },
+    state: { state: 'Ready', duration: 1240, reason: '' },
     stateStats: {
       logonDuration: 14400,
       totalReadyDuration: 9600,
@@ -43,25 +43,25 @@ describe('agent.mapper', () => {
   });
 
   it('maps each raw DTO state to the canonical AgentStatus enum', () => {
-    expect(mapAgent(buildAgentDto({ state: { state: 'READY', duration: 1, reason: '' } })).status).toBe(
+    expect(mapAgent(buildAgentDto({ state: { state: 'Ready', duration: 1, reason: '' } })).status).toBe(
       AgentStatus.Ready,
     );
-    expect(mapAgent(buildAgentDto({ state: { state: 'TALKING', duration: 1, reason: '' } })).status).toBe(
+    expect(mapAgent(buildAgentDto({ state: { state: 'Talking', duration: 1, reason: '' } })).status).toBe(
       AgentStatus.Talking,
     );
-    expect(mapAgent(buildAgentDto({ state: { state: 'NOT_READY', duration: 1, reason: '' } })).status).toBe(
+    expect(mapAgent(buildAgentDto({ state: { state: 'Not Ready', duration: 1, reason: '' } })).status).toBe(
       AgentStatus.NotReady,
     );
   });
 
   it('maps the state duration and normalizes an empty reason to null', () => {
-    const agent = mapAgent(buildAgentDto({ state: { state: 'READY', duration: 42, reason: '' } }));
+    const agent = mapAgent(buildAgentDto({ state: { state: 'Ready', duration: 42, reason: '' } }));
     expect(agent.statusDurationSeconds).toBe(42);
     expect(agent.reason).toBeNull();
   });
 
   it('preserves a non-empty reason', () => {
-    const agent = mapAgent(buildAgentDto({ state: { state: 'NOT_READY', duration: 42, reason: 'Break' } }));
+    const agent = mapAgent(buildAgentDto({ state: { state: 'Not Ready', duration: 42, reason: 'Break' } }));
     expect(agent.reason).toBe('Break');
   });
 

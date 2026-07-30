@@ -5,7 +5,7 @@ function buildAgentDto(inboundTotal: number, outboundTotal: number): AgentDto {
   return {
     id: `A-${inboundTotal}-${outboundTotal}`,
     name: 'Agent',
-    state: { state: 'READY', duration: 0, reason: '' },
+    state: { state: 'Ready', duration: 0, reason: '' },
     stateStats: {
       logonDuration: 0,
       totalReadyDuration: 0,

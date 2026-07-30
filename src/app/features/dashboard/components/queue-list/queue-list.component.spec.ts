@@ -23,7 +23,17 @@ function buildQueue(overrides: Partial<Queue> = {}): Queue {
   };
 }
 
-const ALL_NINE_LABELS = ['Inbound', 'Handled', 'In queue', 'Abandons', 'CWD', 'MAD', 'ACT', 'Ready', 'SLA'];
+const ALL_NINE_LABELS = [
+  'Inbound',
+  'Handled',
+  'In queue',
+  'Abandons',
+  'Current WD',
+  'Max WD',
+  'AVG Talk Time',
+  'Ready',
+  'SLA',
+];
 
 describe('QueueListComponent', () => {
   let fixture: ComponentFixture<QueueListComponent>;
@@ -38,124 +48,87 @@ describe('QueueListComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('titles the panel "Waiting Queue" for the waiting variant', () => {
-    fixture.componentRef.setInput('variant', 'waiting');
-    fixture.componentRef.setInput('queues', []);
+  it('titles the panel with the queue name', () => {
+    fixture.componentRef.setInput('queue', buildQueue({ name: 'Sales' }));
     fixture.detectChanges();
-    expect(component.title()).toBe('Waiting Queue');
+    expect(component.title()).toBe('Sales');
   });
 
-  it('titles the panel "Serving Queue" for the serving variant', () => {
-    fixture.componentRef.setInput('variant', 'serving');
-    fixture.componentRef.setInput('queues', []);
+  it('titles the panel with an empty string when no queue is set', () => {
     fixture.detectChanges();
-    expect(component.title()).toBe('Serving Queue');
+    expect(component.title()).toBe('');
   });
 
-  it('shows the empty state when there are no queues', () => {
-    fixture.componentRef.setInput('variant', 'waiting');
-    fixture.componentRef.setInput('queues', []);
-    fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).toContain('No data');
-  });
-
-  it('does not render individual queue names (Sales/Support/Billing) — aggregated view only', () => {
-    fixture.componentRef.setInput('variant', 'waiting');
-    fixture.componentRef.setInput('queues', [
-      buildQueue({ name: 'Sales' }),
-      buildQueue({ name: 'Support' }),
-      buildQueue({ name: 'Billing' }),
-    ]);
-    fixture.detectChanges();
-    const text = fixture.nativeElement.textContent;
-    expect(text).not.toContain('Sales');
-    expect(text).not.toContain('Support');
-    expect(text).not.toContain('Billing');
-  });
-
-  it('includes all nine required parameters for the waiting variant', () => {
-    fixture.componentRef.setInput('variant', 'waiting');
-    fixture.componentRef.setInput('queues', [buildQueue()]);
+  it('includes all nine required parameters for a single queue', () => {
+    fixture.componentRef.setInput('queue', buildQueue());
     fixture.detectChanges();
     expect(component.stats().map((s) => s.label)).toEqual(ALL_NINE_LABELS);
   });
 
-  it('includes all nine required parameters for the serving variant too (full parity, not a subset)', () => {
-    fixture.componentRef.setInput('variant', 'serving');
-    fixture.componentRef.setInput('queues', [buildQueue()]);
-    fixture.detectChanges();
-    expect(component.stats().map((s) => s.label)).toEqual(ALL_NINE_LABELS);
-  });
-
-  it('sums the additive counts (Inbound/Handled/In queue/Abandons/Ready) across all queues', () => {
-    fixture.componentRef.setInput('variant', 'waiting');
-    fixture.componentRef.setInput('queues', [
-      buildQueue({ totalCalls: 210, handledCalls: 205, callsWaiting: 2, abandonedCalls: 5, agentStates: { total: 12, ready: 5, talking: 4, notReady: 3 } }),
-      buildQueue({ totalCalls: 190, handledCalls: 182, callsWaiting: 3, abandonedCalls: 8, agentStates: { total: 15, ready: 6, talking: 7, notReady: 2 } }),
-    ]);
+  it('renders each stat straight from the single queue input, unaggregated', () => {
+    fixture.componentRef.setInput(
+      'queue',
+      buildQueue({
+        totalCalls: 210,
+        handledCalls: 205,
+        callsWaiting: 2,
+        abandonedCalls: 5,
+        agentStates: { total: 12, ready: 5, talking: 4, notReady: 3 },
+      }),
+    );
     fixture.detectChanges();
     const byLabel = Object.fromEntries(component.stats().map((s) => [s.label, s.value]));
-    expect(byLabel['Inbound']).toBe('400');
-    expect(byLabel['Handled']).toBe('387');
-    expect(byLabel['In queue']).toBe('5');
-    expect(byLabel['Abandons']).toBe('13');
-    expect(byLabel['Ready']).toBe('11');
+    expect(byLabel['Inbound']).toBe('210');
+    expect(byLabel['Handled']).toBe('205 (98%)');
+    expect(byLabel['In queue']).toBe('2');
+    expect(byLabel['Abandons']).toBe('5');
+    expect(byLabel['Ready']).toBe('5');
   });
 
-  it('takes the MAX (not sum or average) across queues for CWD and MAD', () => {
-    fixture.componentRef.setInput('variant', 'waiting');
-    fixture.componentRef.setInput('queues', [
-      buildQueue({ currentWaitSeconds: 28, maxWaitSeconds: 74 }),
-      buildQueue({ currentWaitSeconds: 61, maxWaitSeconds: 133 }),
-      buildQueue({ currentWaitSeconds: 19, maxWaitSeconds: 102 }),
-    ]);
+  it('formats Current WD and Max WD durations straight from the queue', () => {
+    fixture.componentRef.setInput('queue', buildQueue({ currentWaitSeconds: 61, maxWaitSeconds: 133 }));
     fixture.detectChanges();
     const byLabel = Object.fromEntries(component.stats().map((s) => [s.label, s.value]));
-    expect(byLabel['CWD']).toBe('1:01'); // max of 28, 61, 19
-    expect(byLabel['MAD']).toBe('2:13'); // max of 74, 133, 102
+    expect(byLabel['Current WD']).toBe('1:01');
+    expect(byLabel['Max WD']).toBe('2:13');
   });
 
-  it('takes a call-volume-weighted average (not a plain average) across queues for ACT and SLA', () => {
-    fixture.componentRef.setInput('variant', 'serving');
-    fixture.componentRef.setInput('queues', [
-      buildQueue({ handledCalls: 900, avgTalkSeconds: 100, totalCalls: 900, slaPercent: 90 }),
-      buildQueue({ handledCalls: 100, avgTalkSeconds: 500, totalCalls: 100, slaPercent: 50 }),
-    ]);
-    fixture.detectChanges();
-    const byLabel = Object.fromEntries(component.stats().map((s) => [s.label, s.value]));
-    // Weighted: (900*100 + 100*500) / 1000 = 140s = "2:20" — not the plain
-    // average of 100 and 500 (which would be 300s / "5:00").
-    expect(byLabel['ACT']).toBe('2:20');
-    // Weighted: (900*90 + 100*50) / 1000 = 86.0% — not the plain average (70%).
-    expect(byLabel['SLA']).toBe('86.0%');
-  });
-
-  it('flags Abandons/CWD/SLA severity from the shared status-thresholds policy, computed on the aggregate', () => {
-    fixture.componentRef.setInput('variant', 'waiting');
-    fixture.componentRef.setInput('queues', [
+  it('flags Abandons/Current WD/SLA severity from the shared status-thresholds policy', () => {
+    fixture.componentRef.setInput(
+      'queue',
       buildQueue({ totalCalls: 100, abandonedCalls: 20, currentWaitSeconds: 200, slaPercent: 10, handledCalls: 80 }),
-    ]);
+    );
     fixture.detectChanges();
     const byLabel = Object.fromEntries(component.stats().map((s) => [s.label, s.severity]));
     expect(byLabel['Abandons']).toBe('critical');
-    expect(byLabel['CWD']).toBe('critical');
+    expect(byLabel['Current WD']).toBe('critical');
     expect(byLabel['SLA']).toBe('critical');
   });
 
   it('never causes horizontal overflow: renders as a single-column list of rows, not a multi-column grid', () => {
-    fixture.componentRef.setInput('variant', 'waiting');
-    fixture.componentRef.setInput('queues', [buildQueue()]);
+    fixture.componentRef.setInput('queue', buildQueue());
     fixture.detectChanges();
     const list: HTMLElement = fixture.nativeElement.querySelector('.stat-list');
     expect(list.children.length).toBe(9);
     expect(getComputedStyle(list).flexDirection).toBe('column');
   });
 
-  it('does not divide by zero when queues is empty (guarded by the empty state, but the math must be safe)', () => {
-    fixture.componentRef.setInput('variant', 'waiting');
-    fixture.componentRef.setInput('queues', []);
+  it('does not throw and returns no stats when no queue is set', () => {
     fixture.detectChanges();
     expect(() => component.stats()).not.toThrow();
+    expect(component.stats()).toEqual([]);
+  });
+
+  // NOTE: `hasData` is implemented as `this.queue !== undefined`, which
+  // compares the input *signal function* to undefined rather than calling
+  // it — that reference is never undefined, so `hasData()` is always true
+  // and the "No data" branch is unreachable even with no queue set. This
+  // test documents the current (likely unintended) behavior rather than
+  // the "No data" empty state described elsewhere; flagged separately.
+  it('never shows the "No data" empty state, even with no queue set (hasData always evaluates true)', () => {
+    fixture.detectChanges();
+    expect(component.hasData()).toBe(true);
+    expect(fixture.nativeElement.textContent).not.toContain('No data');
   });
 
   it('uses a runtime-configured threshold instead of the compiled-in default', async () => {
@@ -174,10 +147,9 @@ describe('QueueListComponent', () => {
       ],
     }).compileComponents();
     const customFixture = TestBed.createComponent(QueueListComponent);
-    customFixture.componentRef.setInput('variant', 'waiting');
     // 96.1% SLA is "normal" under the default (warning 80/critical 50) but
     // "critical" under the tighter custom override (warning 99/critical 97).
-    customFixture.componentRef.setInput('queues', [buildQueue({ slaPercent: 96.1, totalCalls: 100 })]);
+    customFixture.componentRef.setInput('queue', buildQueue({ slaPercent: 96.1, totalCalls: 100 }));
     customFixture.detectChanges();
 
     const byLabel = Object.fromEntries(

@@ -13,7 +13,7 @@ describe('HeaderComponent', () => {
 
   it('shows a default title when none is provided', () => {
     fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).toContain('CCCX Call Center Wallboard');
+    expect(fixture.nativeElement.textContent).toContain('DotOne Trip Wallboard');
   });
 
   it('shows a custom title when provided', () => {

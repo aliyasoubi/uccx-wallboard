@@ -28,13 +28,13 @@ describe('CallSummaryDisplaysComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('renders Incoming/Outbound counts from the direction stats, not the org-wide total', () => {
+  it('renders Incoming from the org-wide summary total and Outbound from the direction stats', () => {
     fixture.componentRef.setInput('summary', summary);
     fixture.componentRef.setInput('inboundStats', { direction: 'inbound', count: 102, topAgentCalls: 28, lowestAgentCalls: 12 });
     fixture.componentRef.setInput('outboundStats', { direction: 'outbound', count: 31, topAgentCalls: 8, lowestAgentCalls: 4 });
     fixture.detectChanges();
     const text = fixture.nativeElement.textContent;
-    expect(text).toContain('102');
+    expect(text).toContain('500');
     expect(text).toContain('31');
   });
 
