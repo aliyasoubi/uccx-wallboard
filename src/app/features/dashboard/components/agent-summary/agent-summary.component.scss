@@ -21,7 +21,9 @@
   --roster-columns: minmax(0, 2.1fr) minmax(0, 1.15fr) minmax(0, 0.85fr) minmax(0, 0.55fr);
 
   background: var(--color-surface-1);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
+  box-shadow: var(--shadow-panel);
   padding: var(--space-4);
   display: flex;
   flex-direction: column;
@@ -30,8 +32,16 @@
 
 .title {
   margin: 0 0 var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   font-size: var(--font-size-heading);
   font-weight: 600;
+}
+
+.title-icon {
+  color: var(--color-status-accent);
+  font-size: 1.05em;
 }
 
 .header-row {

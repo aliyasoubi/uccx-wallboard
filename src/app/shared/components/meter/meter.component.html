@@ -11,6 +11,9 @@
     />
   </svg>
   <div class="meter-text">
+    @if (icon()) {
+      <i class="ti {{ icon() }} meter-icon" [style.color]="iconColorVar()" aria-hidden="true"></i>
+    }
     <span class="meter-value">{{ displayValue() || value() }}</span>
     <span class="meter-label">{{ label() }}</span>
   </div>

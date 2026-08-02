@@ -34,6 +34,11 @@
   justify-content: center;
 }
 
+.meter-icon {
+  font-size: var(--font-size-label);
+  margin-bottom: 2px;
+}
+
 .meter-value {
   font-family: var(--font-family-mono);
   font-size: var(--font-size-heading);

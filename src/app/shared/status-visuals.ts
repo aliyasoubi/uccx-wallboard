@@ -4,6 +4,8 @@ export interface StatusVisual {
   label: string;
   colorVar: string;
   bgVar: string;
+  /** Tabler icon class — a second, non-color signal alongside the label text, same "never color-only" a11y guarantee as before. */
+  icon: string;
 }
 
 // Single source of truth for how each agent status is represented
@@ -24,15 +26,18 @@ export const AGENT_STATUS_VISUALS: Record<AgentStatus, StatusVisual> = {
     label: 'Ready',
     colorVar: 'var(--color-status-normal)',
     bgVar: 'var(--color-status-normal-bg)',
+    icon: 'ti-circle-check',
   },
   [AgentStatus.Talking]: {
     label: 'Talking',
     colorVar: 'var(--color-status-accent)',
     bgVar: 'var(--color-status-accent-bg)',
+    icon: 'ti-phone',
   },
   [AgentStatus.NotReady]: {
     label: 'Not ready',
     colorVar: 'var(--color-text-secondary)',
     bgVar: 'var(--color-surface-2)',
+    icon: 'ti-player-pause',
   },
 };

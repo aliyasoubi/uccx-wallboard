@@ -43,6 +43,8 @@ export type CallDirection = 'inbound' | 'outbound';
 export abstract class TopAgentBase {
   protected abstract readonly direction: CallDirection;
   abstract readonly title: string;
+  abstract readonly icon: string;
+  abstract readonly iconColorVar: string;
 
   readonly agents = input<Agent[]>([]);
 
@@ -77,4 +79,16 @@ export abstract class TopAgentBase {
 export const TOP_AGENT_TITLES: Record<CallDirection, string> = {
   inbound: 'Top Inbound Agent',
   outbound: 'Top Outbound Agent',
+};
+
+// Same rationale as TOP_AGENT_TITLES — kept here so both components' icon
+// choices stay in sync rather than duplicating the Tabler class per file.
+export const TOP_AGENT_ICONS: Record<CallDirection, string> = {
+  inbound: 'ti-phone-incoming',
+  outbound: 'ti-phone-outgoing',
+};
+
+export const TOP_AGENT_ICON_COLOR_VARS: Record<CallDirection, string> = {
+  inbound: 'var(--color-status-accent)',
+  outbound: 'var(--color-status-warning)',
 };

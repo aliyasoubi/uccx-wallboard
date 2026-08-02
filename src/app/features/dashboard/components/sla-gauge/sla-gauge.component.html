@@ -1,6 +1,7 @@
 <div class="panel">
   <app-meter
     label="SLA"
+    icon="ti-shield-check"
     [value]="metrics()?.slaPercent ?? 0"
     [max]="maxPercent"
     [displayValue]="hasData() ? metrics()!.slaPercent + '%' : '—'"

@@ -23,6 +23,9 @@ export class MeterComponent {
   readonly max = input<number>(100);
   readonly displayValue = input<string>('');
   readonly colorVar = input<string>('var(--color-status-normal)');
+  /** Optional Tabler icon class (e.g. 'ti-shield-check'), same convention as MetricTileComponent. Omitted rings render exactly as before. */
+  readonly icon = input<string>('');
+  readonly iconColorVar = input<string>('var(--color-status-accent)');
 
   private readonly radius = 42;
   readonly circumference = 2 * Math.PI * this.radius;

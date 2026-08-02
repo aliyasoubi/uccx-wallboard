@@ -16,10 +16,8 @@
   white-space: nowrap;
 }
 
-.dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
+.badge-icon {
+  font-size: 0.95em;
   flex-shrink: 0;
-  transition: background var(--motion-medium) var(--motion-easing);
+  transition: color var(--motion-medium) var(--motion-easing);
 }

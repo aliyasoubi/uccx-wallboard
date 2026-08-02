@@ -55,4 +55,21 @@ describe('StatusBadgeComponent', () => {
     fixture.detectChanges();
     expect(component.visual().label).toBe('Not ready');
   });
+
+  it('renders a status-specific Tabler icon alongside the label, never color alone', () => {
+    fixture.componentRef.setInput('status', AgentStatus.Ready);
+    fixture.detectChanges();
+    let icon: HTMLElement = fixture.nativeElement.querySelector('.badge-icon');
+    expect(icon.classList).toContain('ti-circle-check');
+
+    fixture.componentRef.setInput('status', AgentStatus.Talking);
+    fixture.detectChanges();
+    icon = fixture.nativeElement.querySelector('.badge-icon');
+    expect(icon.classList).toContain('ti-phone');
+
+    fixture.componentRef.setInput('status', AgentStatus.NotReady);
+    fixture.detectChanges();
+    icon = fixture.nativeElement.querySelector('.badge-icon');
+    expect(icon.classList).toContain('ti-player-pause');
+  });
 });

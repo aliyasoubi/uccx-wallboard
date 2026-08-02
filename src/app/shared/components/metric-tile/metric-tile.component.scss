@@ -1,5 +1,7 @@
 .tile {
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
+  box-shadow: var(--shadow-panel);
   padding: var(--space-4);
   display: flex;
   flex-direction: column;
