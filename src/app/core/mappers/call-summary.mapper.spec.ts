@@ -1,8 +1,8 @@
 import { mapCallSummary } from './call-summary.mapper';
-import { CallStatsDto } from '../models/dto';
+import { InboundCallStatsDto } from '../models/dto';
 
 describe('call-summary.mapper', () => {
-  const dto: CallStatsDto = {
+  const dto: InboundCallStatsDto = {
     maxTalkDuration: 950,
     avgTalkDuration: 312,
     maxWaitDuration: 180,

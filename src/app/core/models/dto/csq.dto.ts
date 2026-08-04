@@ -1,5 +1,5 @@
 import { AgentStateCountsDto } from './agent-state-counts.dto';
-import { CallStatsDto } from './call-stats.dto';
+import { InboundCallStatsDto } from './call-stats.dto';
 import { CustomerServiceMetricsDto } from './service-metrics.dto';
 import { QueueTimingStatsDto } from './queue-timing-stats.dto';
 
@@ -13,7 +13,7 @@ import { QueueTimingStatsDto } from './queue-timing-stats.dto';
 // (see queue.mapper.ts) and the fixture has been corrected to include it.
 export interface CsqDto {
   name: string;
-  callStats: CallStatsDto;
+  callStats: InboundCallStatsDto;
   agentStateCounts: AgentStateCountsDto;
   serviceMetrics: CustomerServiceMetricsDto;
   timings: QueueTimingStatsDto;

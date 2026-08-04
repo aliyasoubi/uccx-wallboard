@@ -1,7 +1,7 @@
-import { CallStatsDto } from '../models/dto';
+import { InboundCallStatsDto } from '../models/dto';
 import { CallSummary } from '../models/domain';
 
-export function mapCallSummary(dto: CallStatsDto): CallSummary {
+export function mapCallSummary(dto: InboundCallStatsDto): CallSummary {
   return {
     totalCalls: dto.totalCalls,
     handledCalls: dto.handledCalls,
