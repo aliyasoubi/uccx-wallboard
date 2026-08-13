@@ -58,6 +58,25 @@ describe('MetricTileComponent', () => {
     expect(iconEl.style.color).toBe('var(--color-status-accent)');
   });
 
+  it('escalates the tile itself at warning/critical severity, not just the value color', () => {
+    fixture.componentRef.setInput('label', 'AHT');
+    fixture.componentRef.setInput('value', '5:12');
+    fixture.componentRef.setInput('severity', 'critical');
+    fixture.detectChanges();
+    const tile: HTMLElement = fixture.nativeElement.querySelector('.tile');
+    expect(tile.classList).toContain('tile--critical');
+
+    fixture.componentRef.setInput('severity', 'warning');
+    fixture.detectChanges();
+    expect(tile.classList).toContain('tile--warning');
+    expect(tile.classList).not.toContain('tile--critical');
+
+    fixture.componentRef.setInput('severity', 'normal');
+    fixture.detectChanges();
+    expect(tile.classList).not.toContain('tile--warning');
+    expect(tile.classList).not.toContain('tile--critical');
+  });
+
   it('applies critical-severity coloring to the value', () => {
     fixture.componentRef.setInput('label', 'Abandoned calls');
     fixture.componentRef.setInput('value', 17);

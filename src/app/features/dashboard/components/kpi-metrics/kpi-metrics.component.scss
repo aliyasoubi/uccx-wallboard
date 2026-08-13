@@ -8,7 +8,30 @@
   display: block;
 }
 
-.panel {
+// Same group-card chrome as Calls Summary — see
+// call-summary-displays.component.scss for why these two bands get an
+// outer card matching every other panel.
+.group-card {
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-panel);
+  padding: var(--space-4);
+}
+
+.section-label {
+  display: inline-block;
+  margin: 0 0 var(--space-3);
+  padding-bottom: var(--space-1);
+  font-size: var(--font-size-label);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  border-bottom: 2px solid var(--color-status-accent);
+}
+
+.grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
   gap: var(--space-3);

@@ -1,5 +1,13 @@
 <div class="roster">
-  <p class="title"><i class="ti ti-users title-icon" aria-hidden="true"></i>Agent summary</p>
+  <p class="title">
+    <i class="ti ti-users title-icon" aria-hidden="true"></i>Agent summary
+    @if (agents().length > 0) {
+      <span class="count-pill">
+        <span class="count-dot"></span>
+        {{ agents().length }} agent{{ agents().length === 1 ? '' : 's' }} online
+      </span>
+    }
+  </p>
 
   @if (agents().length === 0) {
     <p class="empty">No activity</p>
@@ -30,6 +38,5 @@
         </li>
       }
     </ul>
-    <p class="count">{{ agents().length }} agent{{ agents().length === 1 ? '' : 's' }} online</p>
   }
 </div>

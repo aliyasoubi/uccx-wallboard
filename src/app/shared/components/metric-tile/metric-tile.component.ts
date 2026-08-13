@@ -30,6 +30,10 @@ export class MetricTileComponent {
     }
   });
 
+  // surface-2, not surface-1: every metric tile now renders inside a
+  // surface-1 group card (Calls Summary / KPI Metrics), so the tile must
+  // sit one elevation step above its card to read as a cell instead of
+  // vanishing into it.
   readonly bgVar = computed(() => {
     switch (this.severity()) {
       case 'critical':
@@ -37,7 +41,7 @@ export class MetricTileComponent {
       case 'warning':
         return 'var(--color-status-warning-bg)';
       default:
-        return 'var(--color-surface-1)';
+        return 'var(--color-surface-2)';
     }
   });
 }

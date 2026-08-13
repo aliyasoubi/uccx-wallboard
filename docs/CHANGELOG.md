@@ -313,3 +313,48 @@ fixture-driven aggregated view.
   and brought docs in line with it.
 
 Verified with `npm run test:ci` (131/131 passing).
+
+## Pass 10 — Visual hierarchy: group cards, tile-level severity, gauge scale
+
+Design pass driven by a reference wallboard mock-up: the board's weak
+point was hierarchy — every band carried equal visual weight, and the
+two numbers a wallboard exists for (SLA, and any metric in a bad state)
+didn't dominate from across a room.
+
+1. **Calls Summary and KPI Metrics got the standard panel card.** They
+   were the only two bands whose tiles floated directly on the page
+   background with no grouping container. Each now wraps its tile grid
+   in a `.group-card` (surface-1 + border + `--shadow-panel`, same
+   chrome as every other panel) with an accent-underlined uppercase
+   section label ("Calls Summary" / "KPI Metrics").
+2. **`MetricTileComponent` re-tuned for life inside a card.** Default
+   tile background moved surface-1 → surface-2 (one elevation step above
+   its new parent card, so cells read as cells) and the tile's own
+   `box-shadow` was dropped — a shadow nested inside a shadowed card
+   reads as mud, so the card carries elevation and the tile border
+   carries separation.
+3. **Severity now escalates the whole tile, not just the number.**
+   New `tile--warning` / `tile--critical` classes tint the tile border;
+   critical additionally pulses a soft glow (`tile-glow` keyframes on
+   `--motion-pulse`, so `prefers-reduced-motion` zeroes it like every
+   other animation). Spec added asserting the class toggling.
+4. **SLA/CSAT rings scale with the viewport.** `MeterComponent`'s cap
+   went from a fixed 120px to `clamp(140px, 12vw, 240px)` (same clamp()
+   idiom as the typography tokens), and the center value stepped up
+   from heading- to metric-size type. Width-driven, not height-driven,
+   so the ring keeps a content height in the stacked <1000px layout.
+5. **Agent Summary's online count became a title-row pill** (dot +
+   "N agents online" chip, surface-2 on a 999px radius) instead of a
+   muted footer line — a live headcount is a status, and statuses on
+   this board read as chips.
+
+**Flagged, not addressed:** Queue Displays renders "NaN:NaN" for Max WD
+under mock fixtures — pre-existing, likely a fixture/mapper field
+mismatch on the provisional `QueueTimingStatsDto` shape (see CLAUDE.md
+known-provisional fields). Not touched in this pass.
+
+Verified with `npm run test:ci` (133/133 passing) and a fixture-driven
+Chrome render (`useMockFixtures` temporarily true, restored to false):
+group cards, tile severity border/glow (animation confirmed running at
+0.9s), enlarged gauges, and the online-count pill all render as
+described at 1920x1080.

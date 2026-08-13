@@ -1,7 +1,13 @@
+// The cap scales with viewport width (same clamp() idiom as the
+// typography tokens) instead of a fixed 120px: SLA and CSAT are the two
+// numbers a wallboard exists to show, and a ring that stays gauge-sized
+// on a 1080p/4K TV kept them visually junior to ordinary metric tiles.
+// Width-driven (not height-driven) so the ring keeps a content height in
+// the stacked <1000px layout, where its band no longer has a fixed height.
 .meter {
   position: relative;
   width: 100%;
-  max-width: 120px;
+  max-width: clamp(140px, 12vw, 240px);
   aspect-ratio: 1 / 1;
   margin-inline: auto;
 }
@@ -41,9 +47,12 @@
 
 .meter-value {
   font-family: var(--font-family-mono);
-  font-size: var(--font-size-heading);
+  // metric, not heading: the ring is now up to 240px wide, and a
+  // heading-sized number floating in it read as an afterthought.
+  font-size: var(--font-size-metric);
   font-weight: 600;
   color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
 }
 
 .meter-label {

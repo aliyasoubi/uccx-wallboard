@@ -1,14 +1,40 @@
+// No box-shadow here: tiles live inside a shadowed surface-1 group card
+// (Calls Summary / KPI Metrics), and a shadow nested inside a shadow
+// reads as mud rather than depth — the card carries the elevation, the
+// tile's border + surface-2 background carry the cell separation.
 .tile {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-panel);
   padding: var(--space-4);
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
   transition:
     background var(--motion-medium) var(--motion-easing),
-    transform var(--motion-fast) var(--motion-easing);
+    border-color var(--motion-medium) var(--motion-easing);
+}
+
+// Severity escalates the whole tile, not just the number — a wallboard
+// is read from across a room, and a tinted value alone is invisible at
+// that distance. Warning tints the border; critical also pulses a soft
+// glow (same reduced-motion opt-out as every other animation: the
+// keyframes run on --motion-pulse, which _tokens.scss zeroes out).
+.tile--warning {
+  border-color: var(--color-status-warning);
+}
+
+.tile--critical {
+  border-color: var(--color-status-critical);
+  animation: tile-glow var(--motion-pulse) var(--motion-easing) infinite alternate;
+}
+
+@keyframes tile-glow {
+  from {
+    box-shadow: 0 0 0 0 transparent;
+  }
+  to {
+    box-shadow: 0 0 16px 2px var(--color-status-critical-bg);
+  }
 }
 
 .label {

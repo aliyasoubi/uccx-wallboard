@@ -1,4 +1,10 @@
-<div class="tile" [class.tile--lg]="size() === 'lg'" [style.background]="bgVar()">
+<div
+  class="tile"
+  [class.tile--lg]="size() === 'lg'"
+  [class.tile--warning]="severity() === 'warning'"
+  [class.tile--critical]="severity() === 'critical'"
+  [style.background]="bgVar()"
+>
   <p class="label">{{ label() }}</p>
   <p class="value" [style.color]="colorVar()">{{ value() }}</p>
   @if (icon()) {
