@@ -358,3 +358,115 @@ Chrome render (`useMockFixtures` temporarily true, restored to false):
 group cards, tile severity border/glow (animation confirmed running at
 0.9s), enlarged gauges, and the online-count pill all render as
 described at 1920x1080.
+
+## Pass 11 — Queue Displays: one guarded duration formatter, no NaN on the board
+
+Follow-up to the "Max WD NaN:NaN" report. The reported symptom was already
+gone by the time this pass ran — the DTO update (`fix: update dtos`) moved
+`maxWaitDuration`/`avgHandleDuration` out of `CsqDto.timings` and into
+`CsqDto.callStats`, where the fixture supplies them, so Max WD renders real
+values again. What remained was the reason a missing field became `NaN:NaN`
+rather than a graceful placeholder.
+
+1. **`QueueListComponent` no longer carries its own duration formatter.** It
+   had a private `formatDuration()` that was a line-for-line copy of
+   `FormatDurationPipe` *minus* the pipe's `null`/`NaN` guard, so any absent
+   backend field ran through `Math.floor(NaN)` and reached the wallboard as
+   `NaN:NaN`. The formatting logic is now a single exported
+   `formatDurationSeconds()` in `format-duration.pipe.ts`; the pipe delegates
+   to it and the component calls it directly, so the guard can't be dropped
+   in a copy again. Missing durations render `--:--`.
+2. **Handled % no longer divides by zero.** `100 * handled / total` produced
+   `NaN` for a queue with no calls (start of day, or an idle CSQ), rendering
+   `0 (NaN%)`. It now shows `0 (--%)`.
+3. **Specs unblocked.** `npm run test:ci` had stopped compiling entirely
+   after the DTO change — `queue.mapper.spec.ts` and
+   `call-summary.mapper.spec.ts` still built the old DTO shapes, so Karma
+   aborted with a load error and **zero tests ran** while `ng build` kept
+   passing and hid it. Both fixtures updated to the current contract; the
+   "maps the timings block to CWD/MAD/ACT" test became "maps CWD from timings
+   and MWD/ACT from callStats" to match where those fields now live.
+4. **New coverage:** `format-duration.pipe.spec.ts` (the shared formatter had
+   no spec at all), plus two `QueueListComponent` regression tests that assert
+   the board never renders the string "NaN" for missing durations or an idle
+   queue.
+
+**Provisional — unchanged by this pass.** CWD/MWD/ACT still have unconfirmed
+meanings (see `CLAUDE.md` known-provisional fields and the `Queue` domain
+model), and MWD/ACT being sourced from `callStats` instead of `timings` is
+itself an unratified remap. This pass only stopped bad values from rendering
+as `NaN`; it deliberately does not bless either the field semantics or the
+re-sourcing. Comments at both call sites say so.
+
+Verified with `npm run test:ci` (141/141 passing, up from 0 executing) and a
+live fixture-backed render: with `maxWaitDuration`/`avgHandleDuration`
+deleted from the Sales fixture and `totalCalls` forced to 0, the panel shows
+`Max WD --:--`, `AVG Talk Time --:--`, `Handled 0 (--%)` and no "NaN"
+anywhere on the board; with the fixture restored, real values return
+(`Max WD 1:01` / `2:20`).
+
+## Pass 12 — Fixing the Pass 10 layout regression, plus review follow-ups
+
+Pass 10 was verified only at 1920x1080 and shipped a regression that a
+review at 1366x768 caught: the flexible bands in column 1 had collapsed to
+22px, clipping the SLA/CSAT gauges and both Top Agent panels to a sliver.
+This pass fixes that and the rest of the review findings.
+
+**The layout regression, in three parts:**
+
+1. **Calls Summary was claiming 406px of a 659px column.** Its tile grid used
+   `minmax(110px, 1fr)`, wider than a quarter of the 450px column, so four
+   tiles wrapped onto two rows. Dropped to `minmax(72px, 1fr)` — one row,
+   225px. The group-card padding also went from `--space-4` to `--space-3`,
+   since every pixel in a `flex: 0 0 auto` band is taken permanently from the
+   flexible bands below it.
+2. **The gauge ring was sized from the wrong axis.** `max-width` + square
+   `aspect-ratio` let its *height* track viewport *width*, demanding 167px in
+   a band that had far less. It is now sized from height —
+   `height: min(100%, clamp(140px, 12vw, 240px))` — so it shrinks to fit the
+   scarce axis. Two traps found while doing this, both documented in the SCSS:
+   an explicit `width` beats `aspect-ratio` (capping height alone just
+   squashed the ring into an ellipse), and `container-type: size` collapses
+   the element to 0x0 (only `inline-size` is wanted). Ring text now scales in
+   `cqw` so it stays inside a shrunken ring, and the <1000px stacked layout
+   gets width-driven sizing since percentage heights are indefinite there.
+3. **Top Agent panels overflowed by 15px** because "Top Inbound Agent" wrapped
+   to two lines at `--font-size-heading`. The title is now `--font-size-label`,
+   matching Agent of the Month's eyebrow.
+
+Measured after: **zero clipped elements at 1280x720, 1366x768, 1920x1080 and
+2560x1440**, and the <1000px stacked layout still scrolls as intended.
+
+**Other review findings fixed:**
+
+4. **Metric tiles had an invisible border.** Pass 10 set their background to
+   `--color-surface-2`, which is the same hex as `--color-border` — so the
+   border vanished, and Pass 10 had also removed their box-shadow. Added
+   `--color-border-elevated` for anything sitting on surface-2.
+5. **`mapOutboundCallDirectionStats` leaked a sentinel.** It hardcoded
+   `topAgentCalls: 0` and returned `Number.MAX_SAFE_INTEGER` as
+   `lowestAgentCalls`, reintroducing the exact bug an existing test forbids
+   for the inbound mapper. It now delegates to `mapCallDirectionStats` for
+   the per-agent high/low and takes only the total from the outbound endpoint.
+6. **`.toFixed()` crash paths guarded.** `SlaGaugeComponent.hasData` checked
+   only that the metrics object was non-null, so a payload with `sla: null`
+   threw and took the panel down. Both it and the CSQ SLA row now require a
+   finite number; `MeterComponent.ratio` guards non-finite values that would
+   otherwise reach `stroke-dasharray` as `NaN NaN`.
+7. **CSAT no longer fabricates a reading.** It rendered
+   `(csatScore ?? 0).toFixed(1)` in normal accent color, showing "0.0" for a
+   missing score — indistinguishable from a genuine catastrophic CSAT. It now
+   mirrors the SLA gauge's em-dash-and-muted treatment. First spec file for
+   this component.
+8. **Group-card SCSS deduplicated** into `shared/styles/_panels.scss` (the
+   first shared SCSS partial in the repo — components previously shared only
+   CSS custom properties), and the stray `CsqStats copy.json` fixture, which
+   was being copied into the production bundle, is deleted.
+
+**Still open, deliberately not decided here:** `queue.mapper` feeds
+`avgTalkSeconds` from `avgHandleDuration` while `call-summary.mapper` feeds
+the same domain field from `avgTalkDuration`, and the Queue Displays row is
+labelled "AVG Talk Time". Reconciling that changes what the number *means*,
+which needs the backend team — see the provisional-fields note in CLAUDE.md.
+
+Verified with `npm run test:ci` (149/149 passing) and a production build.

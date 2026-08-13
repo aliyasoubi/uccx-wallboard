@@ -29,12 +29,15 @@ export class SlaGaugeComponent {
   // load, and for the duration of any real backend outage, the ring showed
   // a green "0%" as if SLA were perfect. hasData() now gates severity so a
   // missing reading renders as neutral, not as a false "all clear".
-  readonly hasData = computed(() => this.metrics() !== null);
+  // Number.isFinite, not just a null check on the object: the template calls
+  // slaPercent.toFixed(1), which THROWS (not renders badly) if the backend
+  // omits `sla` or sends null, taking the whole panel down. Requiring an
+  // actual finite number here keeps a malformed payload on the "—" path.
+  readonly hasData = computed(() => Number.isFinite(this.metrics()?.slaPercent));
 
   readonly slaSeverity = computed(() => {
-    const metrics = this.metrics();
-    if (!metrics) return 'normal' as const;
-    return getInverseSeverity(metrics.slaPercent, this.appConfig.config().thresholds.slaPercent);
+    if (!this.hasData()) return 'normal' as const;
+    return getInverseSeverity(this.metrics()!.slaPercent, this.appConfig.config().thresholds.slaPercent);
   });
 
   readonly slaColor = computed(() => {

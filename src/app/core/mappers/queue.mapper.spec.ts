@@ -5,10 +5,12 @@ function buildCsqDto(overrides: Partial<CsqDto> = {}): CsqDto {
   return {
     name: 'Sales',
     callStats: {
+      totalTalkDuration: 3400,
       maxTalkDuration: 720,
       avgTalkDuration: 260,
       maxWaitDuration: 95,
       avgWaitDuration: 32,
+      avgHandleDuration: 292,
       totalCalls: 210,
       abandonedCalls: 5,
       handledCalls: 205,
@@ -16,7 +18,7 @@ function buildCsqDto(overrides: Partial<CsqDto> = {}): CsqDto {
     },
     agentStateCounts: { total: 12, ready: 5, talking: 4, notReady: 3 },
     serviceMetrics: { sla: 96.1, csat: 4.7, fcr: 81.2 },
-    timings: { currentWaitDuration: 28, maxWaitDuration: 74, avgHandleDuration: 292 },
+    timings: { currentWaitDuration: 28 },
     ...overrides,
   };
 }
@@ -44,9 +46,17 @@ describe('queue.mapper', () => {
     expect(queue.slaPercent).toBe(88.4);
   });
 
-  it('maps the timings block to CWD/MAD/ACT', () => {
+  // CWD still comes from the timings block, but MWD and ACT are now read off
+  // callStats — QueueTimingStatsDto no longer carries them. All three
+  // acronyms' meanings, and this re-sourcing, remain unconfirmed against the
+  // real backend (see the Queue domain model); this test locks in the current
+  // wiring, not a ratified contract.
+  it('maps CWD from timings and MWD/ACT from callStats', () => {
     const queue = mapQueue(
-      buildCsqDto({ timings: { currentWaitDuration: 61, maxWaitDuration: 133, avgHandleDuration: 372 } }),
+      buildCsqDto({
+        timings: { currentWaitDuration: 61 },
+        callStats: { ...buildCsqDto().callStats, maxWaitDuration: 133, avgHandleDuration: 372 },
+      }),
     );
     expect(queue.currentWaitSeconds).toBe(61);
     expect(queue.maxWaitSeconds).toBe(133);

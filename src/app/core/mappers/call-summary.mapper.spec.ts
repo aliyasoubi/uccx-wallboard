@@ -3,10 +3,12 @@ import { InboundCallStatsDto } from '../models/dto';
 
 describe('call-summary.mapper', () => {
   const dto: InboundCallStatsDto = {
+    totalTalkDuration: 6200,
     maxTalkDuration: 950,
     avgTalkDuration: 312,
     maxWaitDuration: 180,
     avgWaitDuration: 48,
+    avgHandleDuration: 355,
     abandonedCalls: 17,
     handledCalls: 483,
     totalCalls: 500,

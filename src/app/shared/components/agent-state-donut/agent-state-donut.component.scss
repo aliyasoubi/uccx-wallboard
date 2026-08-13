@@ -18,7 +18,10 @@
   flex-shrink: 0;
 }
 
+// display:block removes the inline baseline gap under the SVG, which made
+// the ring's box ~4px taller than the 84px wrapper and overflowed it.
 .ring {
+  display: block;
   width: 100%;
   height: 100%;
   transform: rotate(-90deg);

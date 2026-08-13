@@ -6,6 +6,11 @@
   --color-surface-1: #101f38;
   --color-surface-2: #1c3153;
   --color-border: #1c3153;
+  // Border for anything sitting ON surface-2. --color-border is the same
+  // value as --color-surface-2, so a surface-2 element bordered with it has
+  // no visible edge at all; this is one step lighter so nested cells (metric
+  // tiles inside a group card) keep a readable outline.
+  --color-border-elevated: #2a4672;
 
   // Text
   --color-text-primary: #e8eef7;

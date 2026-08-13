@@ -1,5 +1,5 @@
-import { mapCallDirectionStats } from './call-direction-stats.mapper';
-import { AgentDto } from '../models/dto';
+import { mapCallDirectionStats, mapOutboundCallDirectionStats } from './call-direction-stats.mapper';
+import { AgentDto, OutboundCallStatsDto } from '../models/dto';
 
 function buildAgentDto(inboundTotal: number, outboundTotal: number): AgentDto {
   return {
@@ -57,5 +57,42 @@ describe('call-direction-stats.mapper', () => {
 
   it('echoes back the requested direction', () => {
     expect(mapCallDirectionStats([], 'outbound').direction).toBe('outbound');
+  });
+});
+
+describe('mapOutboundCallDirectionStats', () => {
+  const outboundDto: OutboundCallStatsDto = {
+    totalTalkDuration: 3000,
+    avgTalkDuration: 111,
+    maxTalkDuration: 400,
+    totalCalls: 80,
+  };
+
+  it('takes the total from the outbound endpoint, not from the agent roster', () => {
+    // 6 + 8 = 14 across the roster, but the endpoint is authoritative for
+    // volume (it includes calls by agents who have since logged out).
+    const stats = mapOutboundCallDirectionStats(outboundDto, [buildAgentDto(20, 6), buildAgentDto(26, 8)]);
+    expect(stats.count).toBe(80);
+    expect(stats.direction).toBe('outbound');
+  });
+
+  it('derives top and lowest agent totals from the roster outbound counts', () => {
+    const stats = mapOutboundCallDirectionStats(outboundDto, [
+      buildAgentDto(20, 6),
+      buildAgentDto(26, 8),
+      buildAgentDto(12, 4),
+    ]);
+    expect(stats.topAgentCalls).toBe(8);
+    expect(stats.lowestAgentCalls).toBe(4);
+  });
+
+  // Regression guard: this function used to hardcode topAgentCalls to 0 and
+  // return the Number.MAX_SAFE_INTEGER sentinel as lowestAgentCalls, which is
+  // exactly what the sibling mapper's empty-roster test above forbids.
+  it('never leaks the Number.MAX_SAFE_INTEGER sentinel for an empty roster', () => {
+    const stats = mapOutboundCallDirectionStats(outboundDto, []);
+    expect(stats.lowestAgentCalls).toBe(0);
+    expect(stats.topAgentCalls).toBe(0);
+    expect(stats.count).toBe(80);
   });
 });

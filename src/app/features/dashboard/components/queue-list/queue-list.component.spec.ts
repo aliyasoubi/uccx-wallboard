@@ -93,6 +93,38 @@ describe('QueueListComponent', () => {
     expect(byLabel['Max WD']).toBe('2:13');
   });
 
+  // Regression guard for the "Max WD NaN:NaN" bug: the component used to
+  // carry its own copy of the duration arithmetic without the shared pipe's
+  // null/NaN guard, so any absent backend field rendered as "NaN:NaN" on the
+  // wallboard. Durations now go through formatDurationSeconds, which
+  // degrades to the placeholder instead.
+  it('renders the placeholder, never NaN:NaN, when a duration is missing from the payload', () => {
+    fixture.componentRef.setInput(
+      'queue',
+      // Casts model a backend payload that omits these fields entirely — the
+      // exact shape that produced NaN:NaN before the shared guard was used.
+      buildQueue({
+        currentWaitSeconds: undefined as unknown as number,
+        maxWaitSeconds: undefined as unknown as number,
+        avgTalkSeconds: NaN,
+      }),
+    );
+    fixture.detectChanges();
+    const byLabel = Object.fromEntries(component.stats().map((s) => [s.label, s.value]));
+    expect(byLabel['Current WD']).toBe('--:--');
+    expect(byLabel['Max WD']).toBe('--:--');
+    expect(byLabel['AVG Talk Time']).toBe('--:--');
+    expect(fixture.nativeElement.textContent).not.toContain('NaN');
+  });
+
+  it('shows a placeholder percentage instead of NaN% for a queue that has taken no calls', () => {
+    fixture.componentRef.setInput('queue', buildQueue({ totalCalls: 0, handledCalls: 0 }));
+    fixture.detectChanges();
+    const byLabel = Object.fromEntries(component.stats().map((s) => [s.label, s.value]));
+    expect(byLabel['Handled']).toBe('0 (--%)');
+    expect(fixture.nativeElement.textContent).not.toContain('NaN');
+  });
+
   it('flags Abandons/Current WD/SLA severity from the shared status-thresholds policy', () => {
     fixture.componentRef.setInput(
       'queue',

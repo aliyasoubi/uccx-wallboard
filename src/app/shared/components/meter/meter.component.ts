@@ -32,8 +32,12 @@ export class MeterComponent {
 
   readonly ratio = computed(() => {
     const max = this.max();
-    if (!max || max <= 0) return 0;
-    return Math.min(1, Math.max(0, this.value() / max));
+    const value = this.value();
+    // Non-finite guard: a NaN/undefined reading would otherwise propagate
+    // into stroke-dasharray as "NaN NaN", which SVG rejects silently — the
+    // ring just stops drawing with no error anywhere.
+    if (!max || max <= 0 || !Number.isFinite(value)) return 0;
+    return Math.min(1, Math.max(0, value / max));
   });
 
   readonly dashArray = computed(() => {

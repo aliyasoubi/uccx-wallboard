@@ -2,9 +2,9 @@
   <app-meter
     label="CSAT"
     icon="ti-mood-smile"
-    [value]="metrics()?.csatScore ?? 0"
+    [value]="hasData() ? metrics()!.csatScore : 0"
     [max]="maxScore"
-    [displayValue]="(metrics()?.csatScore ?? 0).toFixed(1)"
-    colorVar="var(--color-status-accent)"
+    [displayValue]="displayValue()"
+    [colorVar]="csatColor()"
   />
 </div>

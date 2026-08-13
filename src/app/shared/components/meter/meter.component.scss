@@ -1,18 +1,74 @@
-// The cap scales with viewport width (same clamp() idiom as the
-// typography tokens) instead of a fixed 120px: SLA and CSAT are the two
-// numbers a wallboard exists to show, and a ring that stays gauge-sized
-// on a 1080p/4K TV kept them visually junior to ordinary metric tiles.
-// Width-driven (not height-driven) so the ring keeps a content height in
-// the stacked <1000px layout, where its band no longer has a fixed height.
+// The cap scales with viewport width (same clamp() idiom as the typography
+// tokens) instead of a fixed 120px: SLA and CSAT are the two numbers a
+// wallboard exists to show, and a ring that stays gauge-sized on a 1080p/4K
+// TV kept them visually junior to ordinary metric tiles.
+//
+// max-height is what keeps that safe. The ring is square, so sizing it from
+// width alone lets its HEIGHT track the viewport's width — on a wide-but-
+// short screen (1366x768) it demanded 167px inside a band that had far less
+// and was clipped. Bounding height too means the ring takes the smaller of
+// the two budgets and always fits its panel.
+// The host must carry a definite height for the ring's `max-height: 100%`
+// below to resolve at all — against an auto-height ancestor a percentage
+// max-height is indefinite and silently ignored, which is exactly how the
+// oversized ring slipped through review.
+:host {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  // Both dimensions must be definite. Width: the host is itself a flex item
+  // in the gauge panel, so without this its width is content-based while the
+  // ring's `width: 100%` is parent-based — a circular dependency that
+  // resolves to 0. Height: see the ring's max-height below.
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+// container-type: inline-size makes the ring a query container so the value
+// and label inside can be sized in cqw (percent of the ring's own width)
+// rather than in viewport units. That matters because the ring now shrinks
+// to fit short panels: viewport-sized text stayed large inside a shrunken
+// ring and overflowed it.
+//
+// inline-size, NOT size: `container-type: size` contains both axes, so the
+// ring's height stops being derivable from its aspect-ratio and the whole
+// element collapses to 0x0. Only the width axis is needed for cqw.
+// Sized from HEIGHT, with width derived from aspect-ratio. Setting an
+// explicit width and merely capping height does not work: an explicit width
+// wins over aspect-ratio, so max-height just squashed the ring into an
+// ellipse (164x93) instead of shrinking it as a square. Driving from the
+// axis that is actually scarce — vertical space in a fixed-height wallboard
+// column — keeps it round at every size.
+//
+// min(100%, ...) takes the smaller of the panel's height and the design cap,
+// so the ring grows on a 4K display and shrinks to fit a 768px-tall one.
 .meter {
   position: relative;
-  width: 100%;
-  max-width: clamp(140px, 12vw, 240px);
+  container-type: inline-size;
+  height: min(100%, clamp(140px, 12vw, 240px));
+  width: auto;
+  max-width: 100%;
   aspect-ratio: 1 / 1;
   margin-inline: auto;
 }
 
+// Below the shell's stacking breakpoint the page scrolls and no panel has a
+// definite height any more, so the percentage height above resolves against
+// an indefinite parent and collapses the ring to 0x0. Size from width here
+// instead — safe in this layout precisely because vertical space is no
+// longer the scarce axis.
+@media (max-width: 1000px) {
+  .meter {
+    height: auto;
+    width: min(100%, 200px);
+  }
+}
+
+// display:block removes the inline baseline gap under the SVG, which was
+// adding ~3px of phantom overflow to the ring's box.
 .ring {
+  display: block;
   width: 100%;
   height: 100%;
   transform: rotate(-90deg);
@@ -40,22 +96,26 @@
   justify-content: center;
 }
 
+// Sizes below are percentages of the ring's own width (see container-type
+// above), each clamped so the text stays legible in a small ring and doesn't
+// become cartoonish in a large one. The upper bounds match what the old
+// --font-size-metric / --font-size-label tokens produced at full size.
 .meter-icon {
-  font-size: var(--font-size-label);
+  font-size: clamp(0.6rem, 9cqw, 1rem);
   margin-bottom: 2px;
 }
 
 .meter-value {
   font-family: var(--font-family-mono);
-  // metric, not heading: the ring is now up to 240px wide, and a
-  // heading-sized number floating in it read as an afterthought.
-  font-size: var(--font-size-metric);
+  font-size: clamp(0.9rem, 21cqw, 2.5rem);
+  line-height: 1.1;
   font-weight: 600;
   color: var(--color-text-primary);
   font-variant-numeric: tabular-nums;
 }
 
 .meter-label {
-  font-size: var(--font-size-label);
+  font-size: clamp(0.55rem, 9cqw, 0.8rem);
+  line-height: 1.2;
   color: var(--color-text-secondary);
 }

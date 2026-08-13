@@ -45,6 +45,27 @@ describe('SlaGaugeComponent', () => {
     expect(component.slaColor()).toBe('var(--color-status-critical)');
   });
 
+  // Regression guard: the template calls slaPercent.toFixed(1), which throws
+  // outright on a malformed payload rather than rendering badly. hasData()
+  // must require a real number, not merely a non-null metrics object.
+  it('falls back to the no-data state instead of throwing when slaPercent is missing or not a number', () => {
+    for (const bad of [undefined, null, NaN]) {
+      fixture.componentRef.setInput('metrics', { ...metrics, slaPercent: bad as unknown as number });
+      expect(() => fixture.detectChanges()).not.toThrow();
+      expect(component.hasData()).toBeFalse();
+      expect(component.slaColor()).toBe('var(--color-text-muted)');
+      expect(fixture.nativeElement.textContent).toContain('—');
+      expect(fixture.nativeElement.textContent).not.toContain('NaN');
+    }
+  });
+
+  it('still treats a genuine 0% SLA as real data, not as missing', () => {
+    fixture.componentRef.setInput('metrics', { ...metrics, slaPercent: 0 });
+    fixture.detectChanges();
+    expect(component.hasData()).toBeTrue();
+    expect(fixture.nativeElement.textContent).toContain('0.0%');
+  });
+
   it('uses a runtime-configured threshold instead of the compiled-in default', async () => {
     TestBed.resetTestingModule();
     const customThresholds = {

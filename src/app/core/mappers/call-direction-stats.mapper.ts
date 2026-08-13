@@ -35,18 +35,23 @@ export function mapCallDirectionStats(
 }
 
 
+/**
+ * Outbound stats, with the total taken from the dedicated outbound endpoint
+ * (authoritative for call volume, including calls by agents who have since
+ * logged out) and the per-agent high/low still derived from the roster.
+ *
+ * Delegating to mapCallDirectionStats rather than re-deriving is deliberate:
+ * an earlier version returned `topAgentCalls: 0` and leaked the
+ * `Number.MAX_SAFE_INTEGER` sentinel as `lowestAgentCalls`, dropping the
+ * empty-roster normalization that function performs and that
+ * call-direction-stats.mapper.spec.ts explicitly guards.
+ */
 export function mapOutboundCallDirectionStats(
   dto: OutboundCallStatsDto,
+  agents: AgentDto[],
 ): CallDirectionStats {
-  let count = dto.totalCalls;
-  let topAgentCalls = 0;
-  let lowestAgentCalls = Number.MAX_SAFE_INTEGER;
-
-
   return {
-    direction: "outbound",
-    count: count,
-    topAgentCalls: topAgentCalls,
-    lowestAgentCalls: lowestAgentCalls,
+    ...mapCallDirectionStats(agents, 'outbound'),
+    count: dto.totalCalls,
   };
 }

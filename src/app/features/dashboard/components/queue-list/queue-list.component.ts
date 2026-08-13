@@ -7,8 +7,12 @@ import {
   StatusThresholds,
 } from '../../../../core/policies/status-thresholds.policy';
 import { AppConfigService } from '../../../../core/config/app-config.service';
+import { formatDurationSeconds } from '../../../../shared/pipes/format-duration.pipe';
 
 export type QueueListVariant = 'waiting' | 'serving';
+
+/** Shown in place of a percentage that has no meaningful value (0 of 0 calls). */
+const PERCENT_PLACEHOLDER = '--%';
 
 interface QueueStat {
   label: string;
@@ -42,13 +46,12 @@ export class QueueListComponent {
     return []
   });
 
-  private formatDuration(totalSeconds: number): string {
-    const seconds = Math.max(0, Math.floor(totalSeconds));
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = seconds % 60;
-    const pad = (n: number) => n.toString().padStart(2, '0');
-    return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
+  // Percentage of handled calls, or the placeholder when the queue has taken
+  // no calls at all — 0/0 is NaN, which used to reach the wallboard as
+  // "0 (NaN%)" for any idle CSQ (start of day, or a queue with no traffic yet).
+  private handledPercent(q: Queue): string {
+    if (!q.totalCalls) return `${q.handledCalls} (${PERCENT_PLACEHOLDER})`;
+    return `${q.handledCalls} (${Math.round((100 * q.handledCalls) / q.totalCalls)}%)`;
   }
 
   private aggregate(q: Queue, thresholds: StatusThresholds): QueueStat[] {
@@ -58,14 +61,26 @@ export class QueueListComponent {
 
     return [
       { label: 'Inbound', value: `${q.totalCalls}`, severity: 'normal' },
-      { label: 'Handled', value: `${q.handledCalls} (${Math.round(100 * q.handledCalls / q.totalCalls)}%)`, severity: 'normal' },
+      { label: 'Handled', value: this.handledPercent(q), severity: 'normal' },
       { label: 'In queue', value: `${q.callsWaiting}`, severity: 'normal' },
       { label: 'Abandons', value: `${q.abandonedCalls}`, severity: abandonedSeverity },
-      { label: 'Current WD', value: this.formatDuration(q.currentWaitSeconds), severity: currentWaitSeverity },
-      { label: 'Max WD', value: this.formatDuration(q.maxWaitSeconds), severity: 'normal' },
-      { label: 'AVG Talk Time', value: this.formatDuration(q.avgTalkSeconds), severity: 'normal' },
+      // CWD / MWD / ACT: see the Queue domain model — these three acronyms'
+      // meanings are still unconfirmed against the real backend, and MWD/ACT
+      // are now read off CsqDto.callStats rather than CsqDto.timings (see
+      // queue.mapper.ts). Both the naming and that re-sourcing stay
+      // provisional; confirm with the backend team before go-live.
+      { label: 'Current WD', value: formatDurationSeconds(q.currentWaitSeconds), severity: currentWaitSeverity },
+      { label: 'Max WD', value: formatDurationSeconds(q.maxWaitSeconds), severity: 'normal' },
+      { label: 'AVG Talk Time', value: formatDurationSeconds(q.avgTalkSeconds), severity: 'normal' },
       { label: 'Ready', value: `${q.agentStates.ready}`, severity: 'normal' },
-      { label: 'SLA', value: `${q.slaPercent.toFixed(1)}%`, severity: slaSeverity },
+      // toFixed on a missing/null slaPercent throws rather than rendering
+      // badly, which would take the whole panel down — same guard as
+      // SlaGaugeComponent.hasData.
+      {
+        label: 'SLA',
+        value: Number.isFinite(q.slaPercent) ? `${q.slaPercent.toFixed(1)}%` : PERCENT_PLACEHOLDER,
+        severity: slaSeverity,
+      },
     ];
   }
 }

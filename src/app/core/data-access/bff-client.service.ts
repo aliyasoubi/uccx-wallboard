@@ -74,7 +74,7 @@ export class BffClientService {
             queues: mapQueues(queues),
             agentOfMonth: mapAgentOfMonth(agentOfMonth, mappedAgents),
             inboundStats: mapCallDirectionStats(agents, 'inbound'),
-            outboundStats: mapOutboundCallDirectionStats(outboundCallStats),
+            outboundStats: mapOutboundCallDirectionStats(outboundCallStats, agents),
             fetchedAt: new Date().toISOString(),
           } satisfies DashboardSnapshot;
         },
