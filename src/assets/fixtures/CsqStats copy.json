@@ -55,5 +55,33 @@
     "timings": {
       "currentWaitDuration": 61
     }
+  },
+  {
+    "name": "Billing",
+    "callStats": {
+      "maxTalkDuration": 640,
+      "avgTalkDuration": 290,
+      "maxWaitDuration": 110,
+      "avgWaitDuration": 41,
+      "avgHandleDuration" : 13,
+      "totalCalls": 100,
+      "abandonedCalls": 4,
+      "handledCalls": 96,
+      "waitingCalls": 1
+    },
+    "agentStateCounts": {
+      "total": 8,
+      "ready": 3,
+      "talking": 2,
+      "notReady": 3
+    },
+    "serviceMetrics": {
+      "sla": 92.7,
+      "csat": 4.5,
+      "fcr": 78.9
+    },
+    "timings": {
+      "currentWaitDuration": 19
+    }
   }
 ]

@@ -1,0 +1,12 @@
+{
+  "totalTalkDuration": 800,
+  "avgTalkDuration": 33,
+  "maxTalkDuration": 230,
+  "avgWaitDuration": 50,
+  "maxWaitDuration": 77,
+  "avgHandleDuration": 61,
+  "totalCalls": 47,
+  "handledCalls": 11,
+  "abandonedCalls": 31,
+  "waitingCalls": 5
+}

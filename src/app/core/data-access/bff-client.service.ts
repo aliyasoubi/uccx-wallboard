@@ -8,6 +8,7 @@ import {
   mapAgents,
   mapCallDirectionStats,
   mapCallSummary,
+  mapOutboundCallDirectionStats,
   mapQueues,
   mapServiceMetrics,
 } from '../mappers';
@@ -15,9 +16,10 @@ import {
   AgentOfMonthDto,
   AgentDto,
   AgentStateCountsDto,
-  CallStatsDto,
+  InboundCallStatsDto,
   CsqDto,
   CustomerServiceMetricsDto,
+  OutboundCallStatsDto,
 } from '../models/dto';
 import { DashboardSnapshot } from '../models/domain';
 
@@ -42,7 +44,8 @@ export class BffClientService {
   fetchSnapshot(): Observable<DashboardSnapshot> {
     return forkJoin({
       agents: this.http.get<AgentDto[]>(this.endpoint('AgentStates.json', '/agents')),
-      callStats: this.http.get<CallStatsDto>(this.endpoint('CallStats.json', '/call-stats')),
+      inboundCallStats: this.http.get<InboundCallStatsDto>(this.endpoint('InboundCallStats.json', '/inbound-call-stats')),
+      outboundCallStats: this.http.get<OutboundCallStatsDto>(this.endpoint('OutboundCallStats.json', '/outbound-call-stats')),
       serviceMetrics: this.http.get<CustomerServiceMetricsDto>(
         this.endpoint('CustomerServiceMetrics.json', '/service-metrics'),
       ),
@@ -55,7 +58,8 @@ export class BffClientService {
       map(
         ({
           agents,
-          callStats,
+          inboundCallStats,
+          outboundCallStats,
           serviceMetrics,
           agentStateCounts,
           queues,
@@ -63,14 +67,14 @@ export class BffClientService {
         }) => {
           const mappedAgents = mapAgents(agents);
           return {
-            callSummary: mapCallSummary(callStats),
+            callSummary: mapCallSummary(inboundCallStats),
             serviceMetrics: mapServiceMetrics(serviceMetrics),
             agentStateSummary: agentStateCounts,
             agents: mappedAgents,
             queues: mapQueues(queues),
             agentOfMonth: mapAgentOfMonth(agentOfMonth, mappedAgents),
             inboundStats: mapCallDirectionStats(agents, 'inbound'),
-            outboundStats: mapCallDirectionStats(agents, 'outbound'),
+            outboundStats: mapOutboundCallDirectionStats(outboundCallStats),
             fetchedAt: new Date().toISOString(),
           } satisfies DashboardSnapshot;
         },

@@ -1,4 +1,4 @@
-import { AgentDto } from '../models/dto';
+import { AgentDto, OutboundCallStatsDto } from '../models/dto';
 import { CallDirectionStats } from '../models/domain';
 
 export function mapCallDirectionStats(
@@ -28,6 +28,23 @@ export function mapCallDirectionStats(
 
   return {
     direction,
+    count: count,
+    topAgentCalls: topAgentCalls,
+    lowestAgentCalls: lowestAgentCalls,
+  };
+}
+
+
+export function mapOutboundCallDirectionStats(
+  dto: OutboundCallStatsDto,
+): CallDirectionStats {
+  let count = dto.totalCalls;
+  let topAgentCalls = 0;
+  let lowestAgentCalls = Number.MAX_SAFE_INTEGER;
+
+
+  return {
+    direction: "outbound",
     count: count,
     topAgentCalls: topAgentCalls,
     lowestAgentCalls: lowestAgentCalls,
