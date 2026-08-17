@@ -22,7 +22,7 @@ export class DashboardStoreService {
   private readonly _agentStateSummary = signal<AgentStateSummary | null>(null);
   private readonly _agents = signal<Agent[]>([]);
   private readonly _queues = signal<Queue[]>([]);
-  private readonly _agentOfMonth = signal<AgentOfMonth | null>(null);
+  private readonly _agentOfMonth = signal<AgentOfMonth[] | null>(null);
   private readonly _inboundStats = signal<CallDirectionStats | null>(null);
   private readonly _outboundStats = signal<CallDirectionStats | null>(null);
   private readonly _lastUpdated = signal<Date | null>(null);
@@ -52,7 +52,7 @@ export class DashboardStoreService {
       this._agentStateSummary.set(snapshot.agentStateSummary);
       this._agents.set(snapshot.agents);
       this._queues.set(snapshot.queues);
-      this._agentOfMonth.set(snapshot.agentOfMonth);
+      this._agentOfMonth.set(snapshot.agentsOfMonth);
       this._inboundStats.set(snapshot.inboundStats);
       this._outboundStats.set(snapshot.outboundStats);
       this._lastUpdated.set(new Date(snapshot.fetchedAt));

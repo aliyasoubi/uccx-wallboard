@@ -14,12 +14,10 @@ import { AgentOfMonth } from '../../../../core/models/domain';
   styleUrl: './agent-of-month.component.scss',
 })
 export class AgentOfMonthComponent {
-  readonly agent = input<AgentOfMonth | null>(null);
+  readonly agents = input<AgentOfMonth[] | null>(null);
 
-  // Defined fallback for the empty photoUrl observed in the sample data,
-  // rather than letting an <img> render broken.
-  readonly initials = computed(() => {
-    const name = this.agent()?.name;
+  readonly fallbackImgs = computed(() => this.agents()?.map((agent) => {
+    const name = agent.name;
     if (!name) return '?';
     return name
       .trim()
@@ -27,5 +25,5 @@ export class AgentOfMonthComponent {
       .slice(0, 2)
       .map((part) => part[0]?.toUpperCase())
       .join('');
-  });
+  }))
 }

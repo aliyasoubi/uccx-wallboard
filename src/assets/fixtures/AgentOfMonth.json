@@ -1,4 +1,17 @@
-{
-    "agentID":"A1002",
-    "photoUrl":""
-}
+[
+    {
+        "agentID": "A1002",
+        "name":"John Smith",
+        "photoUrl": ""
+    },
+    {
+        "agentID": "A1003",
+         "name":"Sarah Johnson",
+        "photoUrl": ""
+    },
+    {
+        "agentID": "A1004",
+         "name":"Emily Davis",
+        "photoUrl": ""
+    }
+]
