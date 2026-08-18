@@ -15,7 +15,15 @@
   // Text
   --color-text-primary: #e8eef7;
   --color-text-secondary: #8fa3c4;
-  --color-text-muted: #6b7f9e;
+  // Was #6b7f9e — measured at 3.19:1 on --color-surface-2 and 4.04:1 on
+  // --color-surface-1, both below WCAG AA's 4.5:1 floor for normal-size
+  // text (this is the same underlying issue status-visuals.ts documents
+  // fixing for the Not Ready badge specifically; --color-text-muted itself
+  // was never corrected and is used far more broadly — footer timestamps,
+  // empty states, queue/KPI secondary labels). #889ab7 measures 4.56:1 on
+  // surface-2 and 5.77:1 on surface-1, passing AA everywhere this token is
+  // actually used while staying visibly dimmer than --color-text-secondary.
+  --color-text-muted: #889ab7;
 
   // Status / severity — the ONLY place severity colors are defined
   --color-status-normal: #4fd1a5;
@@ -26,7 +34,6 @@
   --color-status-critical-bg: rgba(229, 99, 107, 0.12);
   --color-status-accent: #5b8def;
   --color-status-accent-bg: rgba(91, 141, 239, 0.12);
-  --color-status-neutral: #6b7f9e;
 
   // Spacing scale
   --space-1: 0.25rem;

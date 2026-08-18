@@ -9,7 +9,7 @@ import {
   Queue,
   ServiceMetrics,
 } from '../models/domain';
-import { DATA_SOURCE } from '../data-access/data-source.token';
+import { ConnectionState, DATA_SOURCE } from '../data-access/data-source.token';
 
 // Single source of truth for dashboard data. Components read signals from
 // here — no component ever calls HTTP or the DataSource directly.
@@ -26,7 +26,11 @@ export class DashboardStoreService {
   private readonly _inboundStats = signal<CallDirectionStats | null>(null);
   private readonly _outboundStats = signal<CallDirectionStats | null>(null);
   private readonly _lastUpdated = signal<Date | null>(null);
-  private readonly _connectionState = signal<'live' | 'stale' | 'error'>('live');
+  // Typed from the shared ConnectionState union, not a second inline copy of
+  // it — this signal used to redeclare 'live' | 'stale' | 'error' itself,
+  // which meant adding 'connecting' to the real type didn't touch this
+  // literal until it was caught by hand.
+  private readonly _connectionState = signal<ConnectionState>('connecting');
 
   readonly callSummary = this._callSummary.asReadonly();
   readonly serviceMetrics = this._serviceMetrics.asReadonly();

@@ -64,13 +64,15 @@ export class QueueListComponent {
       { label: 'Handled', value: this.handledPercent(q), severity: 'normal' },
       { label: 'In queue', value: `${q.callsWaiting}`, severity: 'normal' },
       { label: 'Abandons', value: `${q.abandonedCalls}`, severity: abandonedSeverity },
-      // CWD / MWD / ACT: see the Queue domain model — these three acronyms'
-      // meanings are still unconfirmed against the real backend, and MWD/ACT
-      // are now read off CsqDto.callStats rather than CsqDto.timings (see
-      // queue.mapper.ts). Both the naming and that re-sourcing stay
-      // provisional; confirm with the backend team before go-live.
-      { label: 'Current WD', value: formatDurationSeconds(q.currentWaitSeconds), severity: currentWaitSeverity },
-      { label: 'Max WD', value: formatDurationSeconds(q.maxWaitSeconds), severity: 'normal' },
+      // Labels are display copy only — "Current wait"/"Longest wait" read
+      // better on a wallboard than the CWD/MWD acronyms did. The underlying
+      // semantics are unchanged and still provisional: see the Queue domain
+      // model. These three fields' real meanings are unconfirmed against the
+      // backend, and MWD/ACT are now read off CsqDto.callStats rather than
+      // CsqDto.timings (see queue.mapper.ts). Confirm with the backend team
+      // before go-live — this pass only renamed the label, not the contract.
+      { label: 'Current wait', value: formatDurationSeconds(q.currentWaitSeconds), severity: currentWaitSeverity },
+      { label: 'Longest wait', value: formatDurationSeconds(q.maxWaitSeconds), severity: 'normal' },
       { label: 'AVG Talk Time', value: formatDurationSeconds(q.avgTalkSeconds), severity: 'normal' },
       { label: 'Ready', value: `${q.agentStates.ready}`, severity: 'normal' },
       // toFixed on a missing/null slaPercent throws rather than rendering

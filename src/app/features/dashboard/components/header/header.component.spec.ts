@@ -3,12 +3,10 @@ import { HeaderComponent } from './header.component';
 
 describe('HeaderComponent', () => {
   let fixture: ComponentFixture<HeaderComponent>;
-  let component: HeaderComponent;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({ imports: [HeaderComponent] }).compileComponents();
     fixture = TestBed.createComponent(HeaderComponent);
-    component = fixture.componentInstance;
   });
 
   it('shows a default title when none is provided', () => {

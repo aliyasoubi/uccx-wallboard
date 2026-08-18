@@ -1,3 +1,14 @@
+// 'Inter' / 'IBM Plex Mono' / 'JetBrains Mono' are the intended brand
+// fonts, but nothing in this app actually loads them (no local files, no
+// webfont link — index.html only ever loaded a Google Fonts *preconnect*,
+// which was removed as dead weight since it never had a matching
+// stylesheet link). Every viewer has always rendered the system-ui /
+// -apple-system fallback instead, silently. Left as the system stack
+// intentionally for now — it's a legitimate, zero-dependency look, and
+// picking it over adding a new font dependency was a scope call, not an
+// oversight. If the brand fonts are wanted for real, self-host them
+// (e.g. @fontsource/inter) rather than a CDN link, consistent with the
+// icon font's offline/CSP concerns noted in index.html.
 :root {
   --font-family-base: 'Inter', system-ui, -apple-system, sans-serif;
   --font-family-mono: 'IBM Plex Mono', 'JetBrains Mono', monospace;

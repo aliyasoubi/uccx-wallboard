@@ -1,13 +1,19 @@
-<footer class="footer">
+<footer
+  class="footer"
+  [class.footer--stale]="connectionState() === 'stale'"
+  [class.footer--error]="connectionState() === 'error'"
+>
   <div class="status">
     <span
       class="dot"
+      [class.dot--connecting]="connectionState() === 'connecting'"
       [class.dot--live]="connectionState() === 'live'"
       [class.dot--stale]="connectionState() === 'stale'"
       [class.dot--error]="connectionState() === 'error'"
     ></span>
-    <span class="status-text">
+    <span class="status-text" aria-live="polite">
       @switch (connectionState()) {
+        @case ('connecting') { System status: Connecting… }
         @case ('live') { System status: Live }
         @case ('stale') { System status: Reconnecting… }
         @case ('error') { System status: Connection lost }
@@ -15,6 +21,9 @@
     </span>
   </div>
   @if (lastUpdated(); as updated) {
-    <span class="updated">Last update {{ updated | date: 'shortTime' }}</span>
+    <span class="updated">
+      Updated {{ ageText() }}
+      <span class="updated-time">({{ updated | date: 'shortTime' }})</span>
+    </span>
   }
 </footer>

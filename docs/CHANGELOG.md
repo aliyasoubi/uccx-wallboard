@@ -470,3 +470,149 @@ labelled "AVG Talk Time". Reconciling that changes what the number *means*,
 which needs the backend team — see the provisional-fields note in CLAUDE.md.
 
 Verified with `npm run test:ci` (149/149 passing) and a production build.
+
+## Pass 13 — Production-hardening pass from an external review
+
+Two external reviews of `main` were received. One inferred a speculative
+"client feature" build-out (four new inbound/outbound total cards, plural
+Agent of Month, removing the Agent State panel, hiding FCR) from context not
+available in this repo — deliberately not implemented; there's no actual
+client spec to build against, and guessing at product scope isn't this
+pass's call to make. The second review's concrete, verifiable, frontend-only
+findings are addressed below. Every claim was independently confirmed by
+reading the actual source (and in two cases turned out to be more/less
+severe than stated) before being fixed. Angular 18 stays as-is — upgrading
+is explicitly deferred to a later pass.
+
+1. **Polling could silently starve on a slow backend.** Confirmed real:
+   `PollingDataSource` used `switchMap` on the outer `interval`, so a
+   `fetchSnapshot()` slower than `pollIntervalMs` (3s) was cancelled and
+   restarted by the next tick — forever, if the backend stayed slow.
+   Cancellation isn't an error, so `consecutiveFailures` never incremented
+   and the board could sit on "Live" indefinitely without receiving new
+   data. Switched to `exhaustMap` (ignores new ticks while one is in
+   flight) plus an 8s `timeout()` (so a truly hung request still frees the
+   next tick). `ConnectionState` gained a `'connecting'` value — it
+   previously defaulted straight to `'live'` with zero data on first paint.
+   Two new regression tests lock in the in-flight-tick and timeout
+   behavior. The failed-tick filter was also rewritten from a `switchMap`
+   trick (`snapshot ? of(snapshot) : timer(0).pipe(switchMap(() => []))`)
+   to a one-line typed `filter()` — same effect, the reviewer was right that
+   the original took real effort to read.
+2. **Config validation was effectively absent.** Confirmed real, and worse
+   than described: the threshold merge was only one level deep (per metric
+   key), not two — `{ thresholds: { slaPercent: { warning: 90 } } }` in
+   `config.json` silently replaced the *entire* `slaPercent` pair, dropping
+   `critical` entirely. Fixed with a genuine two-level merge, plus
+   validation that rejects non-finite/negative poll intervals (with a
+   500ms floor), empty `apiBaseUrl`, and non-finite/negative threshold
+   values — each field independently falls back to its default with a
+   console warning rather than corrupting the whole config or crashing.
+   `assets/config.json`'s checked-in `apiBaseUrl` (`http://127.0.0.1:3000/...`)
+   was left untouched — that's a per-deployment value, not app code, and
+   this repo has no way to know what the real deployed value should be.
+3. **An unrecognized agent state produced `undefined`, not a fallback.**
+   Confirmed real: `AgentStateDto['state']` is a closed TS union at compile
+   time, but nothing enforces that at runtime — a UCCX state this board has
+   no bucket for (Reserved, Work, Logout, ...) made `STATUS_MAP[...]` return
+   `undefined`, which every downstream consumer (severity checks, status
+   badge/visual lookups) assumed could never happen. `agent.mapper.ts` now
+   falls back to Not Ready and — when the DTO didn't already supply a
+   reason — stamps the raw unrecognized string into `reason` so it's
+   visible on the badge instead of silently mislabeled.
+4. **CSAT never had real severity thresholds.** Confirmed real: the gauge
+   was always accent blue regardless of value, unlike SLA next to it. Added
+   `csatScore` to `StatusThresholds` (warning 4.0 / critical 3.5 on the 0-5
+   scale, both configurable) and wired `CustomerSatisfactionGaugeComponent`
+   to `getInverseSeverity`, mirroring `SlaGaugeComponent`. First real spec
+   coverage for the severity logic (a prior pass added the missing-data
+   spec but not this).
+5. **`--color-text-muted` failed WCAG AA.** Confirmed real and still live —
+   not merely a historical issue. Measured (actual sRGB/relative-luminance
+   math, not estimated): 3.19:1 on `--color-surface-2`, 4.04:1 on
+   `--color-surface-1`, both below the 4.5:1 floor for normal-size text.
+   This is the same underlying problem `status-visuals.ts` already documents
+   fixing for the Not Ready badge specifically — `--color-text-muted`
+   itself was never corrected, and is used far more broadly (footer
+   timestamps, empty states, secondary labels across Queue/KPI/Top-Agent
+   panels). Changed to `#889ab7` — 4.56:1 / 5.77:1 — passing AA everywhere
+   it's used while staying visibly dimmer than `--color-text-secondary`.
+   Also removed `--color-status-neutral`: an unused token carrying the same
+   failing color, a landmine for a future dev who might reach for it
+   thinking it's a safe "neutral" text color.
+6. **The critical-tile pulse ran forever.** Fair critique of Pass 12's own
+   work: `animation: tile-glow ... infinite alternate` meant a tile that
+   stayed critical for an hour kept flashing that whole time, which stops
+   registering as a signal and becomes background noise. Changed to a
+   finite, even iteration count (4) — flashes a few times to draw the eye,
+   then settles on the steady red border. The steady border alone already
+   communicates "critical" continuously; only the animation was unbounded.
+7. **Stale/error connection state was a small dot and a line of muted
+   text** — easy to miss on a board meant to be read from across a room.
+   `FooterComponent` now tints its whole bar (not just the dot) on
+   stale/error, gained an `aria-live="polite"` region on the status text,
+   and shows a ticking relative data age ("Updated 12s ago") instead of
+   only a fixed timestamp — addresses "make staleness visible" without
+   building a separate banner component, which felt like more structural
+   change than this pass warranted.
+8. **`npm run lint` was completely broken** — no `eslint.config.js` existed
+   at all (ESLint 9 requires the flat-config format; the repo predates it).
+   Added one built from the `angular-eslint`/`typescript-eslint` versions
+   already in `devDependencies` — no new packages. It immediately found one
+   real issue: an unused `component` variable in
+   `header.component.spec.ts`, fixed.
+9. **No CI, no Node version pin.** Added `.github/workflows/ci.yml`
+   (npm ci → lint → test:ci → build) and `.nvmrc` / `package.json#engines`
+   pinned to Angular 18's actual supported range
+   (`^18.19.1 || ^20.11.1 || >=22.0.0`). This adds checks; it does **not**
+   make them required — branch protection is a GitHub Settings action this
+   environment has no `gh` CLI or admin access to perform.
+10. **Icon CDN pinned.** `index.html` loaded
+    `@tabler/icons-webfont@latest` — an unpinned version means the icon set
+    can change with no deploy and no review. Pinned to `3.46.0` (the
+    version this repo was verified against). Full self-hosting (removes the
+    CDN dependency entirely) is flagged as a follow-up, not done here.
+    Also removed a `<link rel="preconnect" href="fonts.googleapis.com">`
+    that pointed at a resource nothing ever actually fetched, and corrected
+    `_typography.scss`'s comment: Inter/IBM Plex/JetBrains are declared but
+    were never loaded anywhere — every viewer has always silently rendered
+    the system-font fallback. Left as the system stack deliberately (a
+    legitimate zero-dependency choice) rather than adding a new font
+    dependency as a side effect of this pass.
+11. **Small fixes:** `AgentStateStats.json`'s `total: 8` didn't match its
+    own `ready(4) + talking(1) + notReady(4) = 9` — fixture typo, corrected
+    (the donut already recomputes its displayed total from the segments
+    rather than trusting this field, which was already the right defensive
+    call, just built on top of a typo'd fixture). `ARCHITECTURE.md` §9
+    claimed Agent Summary "scrolls internally if long" — the actual,
+    intentional behavior (Pass 8) is shrink-to-fit rows with no internal
+    scroll; doc corrected. Queue Displays row labels "Current WD"/"Max WD"
+    renamed to "Current wait"/"Longest wait" — display copy only, the
+    underlying CWD/MWD provisional-field status is unchanged (see the
+    inline comment and the open item below).
+
+**Reviewed and deliberately not done, with reasons:**
+
+- **Atomic single-endpoint snapshot, BFF-computed rankings, BFF-side UCCX
+  state collapsing, BFF-side data-invariant validation, `Cache-Control`
+  headers.** All real backend/BFF work — this repo has no backend to
+  change. Worth a BFF-side ticket.
+- **`localStorage`-based top-agent tracking** (`top-agent-tracker.ts`) can
+  disagree across two wallboard screens and resets on browser activity
+  rather than a shift boundary — confirmed accurate, but the correct fix
+  (compute rankings in the BFF with a defined window/timezone/tie rule) is
+  backend work, not a frontend patch.
+- **Branch protection, Angular 18→22 upgrade, Transloco's fate, adding a
+  LICENSE file, full icon/font self-hosting, automatic queue/roster page
+  rotation, an "exception-first" structural redesign.** Each is either a
+  business/product decision, explicitly deferred by request, or a
+  meaningfully larger scope than a hardening pass — flagged for a
+  deliberate decision rather than guessed at here.
+
+Verified with `npx tsc --noEmit` (app + spec), `npm run lint` (clean),
+`npm run test:ci` (168/168 passing, up from 149), and a production build.
+The polling/footer changes were also verified against the real app (not
+just unit tests): temporarily breaking a fixture reproduced the
+`'connecting'` → `'stale'` → `'error'` escalation with the footer bar
+visibly tinting red and "Connection lost" displayed, and restoring the
+fixture recovered cleanly back to "Live" with fresh data.

@@ -151,9 +151,14 @@ page-level scrollbar:
   Summary Displays, KPI Metrics) deliberately do **not** get
   `height: 100%` — see `docs/CHANGELOG.md` for the circular-sizing bug
   that taught us this.
-- **Agent Summary** (column 3) is the one exception: an agent roster is
-  unbounded, so that list scrolls internally if long — the page itself
-  still never scrolls.
+- **Agent Summary** (column 3) is the one panel with inherently unbounded
+  content. It does **not** scroll internally — rows instead shrink to fit
+  whatever height the panel has (`flex: 1` per row, capped by a
+  `max-height`), so N agents always exactly fill the space rather than a
+  scrollbar hiding the rows that don't fit. See
+  `agent-summary.component.scss` for the trade-off that implies at very
+  large roster sizes, and `docs/CHANGELOG.md` Pass 8 for why internal
+  scrolling was replaced with shrink-to-fit.
 - Below 1000px width, columns stack to one and page scrolling is
   re-enabled (the no-scroll guarantee is a desktop/kiosk-monitor
   promise, not a mobile one).

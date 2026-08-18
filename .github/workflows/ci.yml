@@ -1,0 +1,31 @@
+name: CI
+
+# Runs on every push and PR. This file only adds checks — it does not turn
+# them into merge requirements. Branch protection ("require these checks to
+# pass before merging into main") is a repo Settings action that has to be
+# done in the GitHub UI (or via `gh`/the API with repo-admin auth), neither
+# of which this change has access to; see docs/CHANGELOG.md for what to
+# require once that's set up.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - run: npm run lint
+
+      - run: npm run test:ci
+
+      - run: npm run build

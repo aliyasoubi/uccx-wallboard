@@ -4,10 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Trip Wallboard</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <!--
+      Pinned to a specific version, not @latest: an unpinned CDN URL means
+      the icon set (and, in principle, the file's content) can change
+      without a deploy or a code review, on a board with no offline
+      fallback for that request failing. 3.46.0 is the version this file
+      was verified against; bump deliberately, not implicitly.
+      TODO: vendor this webfont into src/assets for a fully offline-capable
+      board (no CDN dependency at all) — flagged, not done here.
+    -->
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"
+      href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.46.0/dist/tabler-icons.min.css"
     />
   </head>
   <body>

@@ -28,8 +28,8 @@ const ALL_NINE_LABELS = [
   'Handled',
   'In queue',
   'Abandons',
-  'Current WD',
-  'Max WD',
+  'Current wait',
+  'Longest wait',
   'AVG Talk Time',
   'Ready',
   'SLA',
@@ -85,12 +85,12 @@ describe('QueueListComponent', () => {
     expect(byLabel['Ready']).toBe('5');
   });
 
-  it('formats Current WD and Max WD durations straight from the queue', () => {
+  it('formats Current wait and Longest wait durations straight from the queue', () => {
     fixture.componentRef.setInput('queue', buildQueue({ currentWaitSeconds: 61, maxWaitSeconds: 133 }));
     fixture.detectChanges();
     const byLabel = Object.fromEntries(component.stats().map((s) => [s.label, s.value]));
-    expect(byLabel['Current WD']).toBe('1:01');
-    expect(byLabel['Max WD']).toBe('2:13');
+    expect(byLabel['Current wait']).toBe('1:01');
+    expect(byLabel['Longest wait']).toBe('2:13');
   });
 
   // Regression guard for the "Max WD NaN:NaN" bug: the component used to
@@ -111,8 +111,8 @@ describe('QueueListComponent', () => {
     );
     fixture.detectChanges();
     const byLabel = Object.fromEntries(component.stats().map((s) => [s.label, s.value]));
-    expect(byLabel['Current WD']).toBe('--:--');
-    expect(byLabel['Max WD']).toBe('--:--');
+    expect(byLabel['Current wait']).toBe('--:--');
+    expect(byLabel['Longest wait']).toBe('--:--');
     expect(byLabel['AVG Talk Time']).toBe('--:--');
     expect(fixture.nativeElement.textContent).not.toContain('NaN');
   });
@@ -125,7 +125,7 @@ describe('QueueListComponent', () => {
     expect(fixture.nativeElement.textContent).not.toContain('NaN');
   });
 
-  it('flags Abandons/Current WD/SLA severity from the shared status-thresholds policy', () => {
+  it('flags Abandons/Current wait/SLA severity from the shared status-thresholds policy', () => {
     fixture.componentRef.setInput(
       'queue',
       buildQueue({ totalCalls: 100, abandonedCalls: 20, currentWaitSeconds: 200, slaPercent: 10, handledCalls: 80 }),
@@ -133,7 +133,7 @@ describe('QueueListComponent', () => {
     fixture.detectChanges();
     const byLabel = Object.fromEntries(component.stats().map((s) => [s.label, s.severity]));
     expect(byLabel['Abandons']).toBe('critical');
-    expect(byLabel['Current WD']).toBe('critical');
+    expect(byLabel['Current wait']).toBe('critical');
     expect(byLabel['SLA']).toBe('critical');
   });
 
