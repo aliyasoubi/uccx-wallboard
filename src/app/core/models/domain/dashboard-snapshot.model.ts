@@ -14,7 +14,7 @@ export interface DashboardSnapshot {
   agentStateSummary: AgentStateSummary; // org-wide totals, from AgentStateStats.json
   agents: Agent[];
   queues: Queue[];
-  agentOfMonth: AgentOfMonth;
+  agentsOfMonth: AgentOfMonth[];
   inboundStats: CallDirectionStats;
   outboundStats: CallDirectionStats;
   fetchedAt: string; // ISO timestamp

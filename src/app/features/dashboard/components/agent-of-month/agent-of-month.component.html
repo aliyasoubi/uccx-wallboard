@@ -1,13 +1,12 @@
-<div class="card">
-  @if (agent()?.photoUrl) {
-    <img [src]="agent()!.photoUrl" alt="" class="photo" />
-  } @else {
-    <div class="photo photo--fallback">{{ initials() }}</div>
-  }
-  <div class="info">
-    <p class="eyebrow">
-      <i class="ti ti-trophy title-icon" aria-hidden="true"></i>Agent of the month
-    </p>
-    <p class="name">{{ agent()?.name ?? '—' }}</p>
-  </div>
+<div class="panel-shell">
+  <p class="panel-title"><i class="ti ti-trophy title-icon" aria-hidden="true"></i>Agents of the month</p>
+
+  <ul>
+    @for (agent of agents(); track agent.agentId) {
+    <li>
+     
+      <p class="name">{{ agent.name }}</p>
+    </li>
+    }
+  </ul>
 </div>

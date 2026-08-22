@@ -1,13 +1,14 @@
 import { AgentOfMonthDto } from '../models/dto';
-import { Agent, AgentOfMonth } from '../models/domain';
+import { AgentOfMonth } from '../models/domain';
 
-// Cross-references the roster because AgentOfMonthDto only carries an ID —
-// the display name lives on the agent record, not duplicated in this DTO.
-export function mapAgentOfMonth(dto: AgentOfMonthDto, agents: Agent[]): AgentOfMonth {
-  const matched = agents.find((a) => a.id === dto.agentID);
-  return {
-    agentId: dto.agentID,
-    name: matched?.name ?? null,
-    photoUrl: dto.photoUrl ? dto.photoUrl : null,
-  };
+// AgentOfMonthDto now carries name directly, so no roster cross-reference
+// is needed here (unlike the single-winner version this replaced).
+export function mapAgentsOfMonth(dtos: AgentOfMonthDto[]): AgentOfMonth[] {
+  return dtos.map((d) => ({
+    agentId: d.agentID,
+    name: d.name,
+    // null (not ''), matching the AgentOfMonth domain model's contract so
+    // the UI can render a defined fallback.
+    photoUrl: d.photoUrl ? d.photoUrl : null,
+  }));
 }

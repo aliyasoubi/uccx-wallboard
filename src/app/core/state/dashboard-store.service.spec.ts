@@ -37,7 +37,7 @@ function buildSnapshot(overrides: Partial<DashboardSnapshot> = {}): DashboardSna
       },
     ],
     queues: [],
-    agentOfMonth: { agentId: 'A1', name: 'John', photoUrl: null },
+    agentsOfMonth: [{ agentId: 'A1', name: 'John', photoUrl: null }],
     inboundStats: { direction: 'inbound', count: 13, topAgentCalls: 8, lowestAgentCalls: 5 },
     outboundStats: { direction: 'outbound', count: 3, topAgentCalls: 2, lowestAgentCalls: 1 },
     fetchedAt: '2026-07-21T08:00:00.000Z',
@@ -76,7 +76,7 @@ describe('DashboardStoreService', () => {
     expect(store.agentStateSummary()).toEqual(snapshot.agentStateSummary);
     expect(store.agents()).toEqual(snapshot.agents);
     expect(store.queues()).toEqual(snapshot.queues);
-    expect(store.agentOfMonth()).toEqual(snapshot.agentOfMonth);
+    expect(store.agentOfMonth()).toEqual(snapshot.agentsOfMonth);
     expect(store.inboundStats()).toEqual(snapshot.inboundStats);
     expect(store.outboundStats()).toEqual(snapshot.outboundStats);
     expect(store.lastUpdated()).toEqual(new Date(snapshot.fetchedAt));
