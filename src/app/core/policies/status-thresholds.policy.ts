@@ -61,7 +61,11 @@ export function getInverseSeverity(value: number, thresholds: Thresholds): Sever
   return 'normal';
 }
 
-export function getRatioSeverity(numerator: number, denominator: number, thresholds: Thresholds): Severity {
+export function getRatioSeverity(
+  numerator: number,
+  denominator: number,
+  thresholds: Thresholds,
+): Severity {
   if (denominator <= 0) return 'normal';
   return getSeverity(numerator / denominator, thresholds);
 }

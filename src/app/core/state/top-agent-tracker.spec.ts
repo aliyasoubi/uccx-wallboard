@@ -48,7 +48,10 @@ describe('TopAgentTracker', () => {
   it('switches the tracked leader if a different agent later exceeds the max', () => {
     const tracker = new TopAgentTracker(key, now);
     tracker.evaluate([{ id: 'A1', name: 'John', value: 20 }]);
-    tracker.evaluate([{ id: 'A1', name: 'John', value: 20 }, { id: 'A2', name: 'Sarah', value: 35 }]);
+    tracker.evaluate([
+      { id: 'A1', name: 'John', value: 20 },
+      { id: 'A2', name: 'Sarah', value: 35 },
+    ]);
     expect(tracker.top()).toEqual({ agentId: 'A2', agentName: 'Sarah', value: 35 });
   });
 

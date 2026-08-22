@@ -44,8 +44,12 @@ export class BffClientService {
   fetchSnapshot(): Observable<DashboardSnapshot> {
     return forkJoin({
       agents: this.http.get<AgentDto[]>(this.endpoint('AgentStates.json', '/agents')),
-      inboundCallStats: this.http.get<InboundCallStatsDto>(this.endpoint('InboundCallStats.json', '/inbound-call-stats')),
-      outboundCallStats: this.http.get<OutboundCallStatsDto>(this.endpoint('OutboundCallStats.json', '/outbound-call-stats')),
+      inboundCallStats: this.http.get<InboundCallStatsDto>(
+        this.endpoint('InboundCallStats.json', '/inbound-call-stats'),
+      ),
+      outboundCallStats: this.http.get<OutboundCallStatsDto>(
+        this.endpoint('OutboundCallStats.json', '/outbound-call-stats'),
+      ),
       serviceMetrics: this.http.get<CustomerServiceMetricsDto>(
         this.endpoint('CustomerServiceMetrics.json', '/service-metrics'),
       ),
@@ -53,7 +57,9 @@ export class BffClientService {
         this.endpoint('AgentStateStats.json', '/agent-state-counts'),
       ),
       queues: this.http.get<CsqDto[]>(this.endpoint('CsqStats.json', '/csqs')),
-      agentOfMonth: this.http.get<AgentOfMonthDto>(this.endpoint('AgentOfMonth.json', '/agent-of-month')),
+      agentOfMonth: this.http.get<AgentOfMonthDto>(
+        this.endpoint('AgentOfMonth.json', '/agent-of-month'),
+      ),
     }).pipe(
       map(
         ({

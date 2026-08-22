@@ -25,21 +25,21 @@ export class CustomerSatisfactionGaugeComponent {
   // boundary.
   readonly maxScore = 5;
 
-  // Mirrors SlaGaugeComponent.hasData for the same reason documented there:
-  // this gauge used to render `(csatScore ?? 0).toFixed(1)`, so a missing
-  // reading displayed as "0.0" in normal accent styling — indistinguishable
-  // from a genuine, catastrophic CSAT of zero. A missing reading must look
-  // missing, not invented.
+  // Mirrors SlaGaugeComponent.hasData: a missing reading must render as
+  // missing (not a fabricated "0.0" in normal styling).
   readonly hasData = computed(() => Number.isFinite(this.metrics()?.csatScore));
 
-  readonly displayValue = computed(() => (this.hasData() ? this.metrics()!.csatScore.toFixed(1) : '—'));
+  readonly displayValue = computed(() =>
+    this.hasData() ? this.metrics()!.csatScore.toFixed(1) : '—',
+  );
 
-  // Previously always accent blue regardless of value — a genuinely poor
-  // CSAT score looked identical to a great one. Mirrors
-  // SlaGaugeComponent.slaSeverity: lower is worse, so getInverseSeverity.
+  // Lower is worse for CSAT, so getInverseSeverity (mirrors slaSeverity).
   readonly csatSeverity = computed(() => {
     if (!this.hasData()) return 'normal' as const;
-    return getInverseSeverity(this.metrics()!.csatScore, this.appConfig.config().thresholds.csatScore);
+    return getInverseSeverity(
+      this.metrics()!.csatScore,
+      this.appConfig.config().thresholds.csatScore,
+    );
   });
 
   readonly csatColor = computed(() => {

@@ -1,5 +1,13 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, input, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  computed,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 import { ConnectionState } from '../../../../core/data-access/data-source.token';
 
 const AGE_TICK_MS = 1000;
@@ -23,12 +31,9 @@ export class FooterComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly _now = signal(new Date());
 
-  // Data age wasn't visible anywhere before — only a static "Last update
-  // 3:14 PM" that a viewer would have to mentally diff against the wall
-  // clock. Ticking this every second (same pattern as HeaderComponent's
-  // clock) makes staleness legible at a glance: "Updated 47s ago" during a
-  // backend hiccup reads as a problem immediately, where a fixed timestamp
-  // does not.
+  // Ticks every second so staleness is legible at a glance — "Updated 47s
+  // ago" during a backend hiccup reads as a problem immediately, where a
+  // fixed timestamp doesn't.
   readonly ageSeconds = computed(() => {
     const updated = this.lastUpdated();
     if (!updated) return null;

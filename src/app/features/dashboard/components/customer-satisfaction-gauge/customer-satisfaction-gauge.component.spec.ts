@@ -81,13 +81,18 @@ describe('CustomerSatisfactionGaugeComponent', () => {
 
   it('uses a runtime-configured CSAT threshold instead of the compiled-in default', async () => {
     TestBed.resetTestingModule();
-    const customThresholds = { ...DEFAULT_STATUS_THRESHOLDS, csatScore: { warning: 4.9, critical: 4.7 } };
+    const customThresholds = {
+      ...DEFAULT_STATUS_THRESHOLDS,
+      csatScore: { warning: 4.9, critical: 4.7 },
+    };
     await TestBed.configureTestingModule({
       imports: [CustomerSatisfactionGaugeComponent],
       providers: [
         {
           provide: AppConfigService,
-          useValue: { config: () => ({ apiBaseUrl: 'x', pollIntervalMs: 3000, thresholds: customThresholds }) },
+          useValue: {
+            config: () => ({ apiBaseUrl: 'x', pollIntervalMs: 3000, thresholds: customThresholds }),
+          },
         },
       ],
     }).compileComponents();

@@ -1,4 +1,8 @@
-import { DURATION_PLACEHOLDER, FormatDurationPipe, formatDurationSeconds } from './format-duration.pipe';
+import {
+  DURATION_PLACEHOLDER,
+  FormatDurationPipe,
+  formatDurationSeconds,
+} from './format-duration.pipe';
 
 describe('formatDurationSeconds', () => {
   it('formats under an hour as m:ss', () => {

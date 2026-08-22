@@ -37,28 +37,22 @@ export class PollingDataSource implements DataSource, OnDestroy {
   private readonly appConfig = inject(AppConfigService);
   private readonly destroy$ = new Subject<void>();
   // Starts 'connecting', not 'live' — see the ConnectionState doc comment.
-  // The first tick's own tap()/catchError() moves it to 'live' or
-  // 'stale'/'error' as soon as that request actually resolves.
   private readonly connectionState = new BehaviorSubject<ConnectionState>('connecting');
   private consecutiveFailures = 0;
 
   readonly connectionState$ = this.connectionState.asObservable();
 
-  // pollIntervalMs comes from assets/config.json (via AppConfigService),
-  // loaded once at app start by the APP_INITIALIZER in app.config.ts — see
-  // CONFIGURATION.md for how to change it without a rebuild.
-  //
   // exhaustMap, not switchMap: switchMap cancels the in-flight fetchSnapshot
-  // whenever the next interval tick fires. One snapshot is a forkJoin of
-  // several HTTP requests (see BffClientService) — any response slower than
-  // pollIntervalMs used to be cancelled and re-started forever, never once
+  // whenever the next interval tick fires. A response slower than
+  // pollIntervalMs used to be cancelled and re-started forever, never
   // reaching catchError (a cancelled subscription isn't an error), so
   // consecutiveFailures never incremented and the board could sit on "Live"
-  // indefinitely with genuinely stale data. exhaustMap instead ignores new
-  // ticks while a fetch is still in flight, so every fetch either completes
-  // or errors — paired with the timeout() below so a truly hung request
-  // still frees the next tick instead of blocking forever.
-  readonly updates$: Observable<DashboardSnapshot> = interval(this.appConfig.config().pollIntervalMs).pipe(
+  // with genuinely stale data. exhaustMap ignores new ticks while a fetch is
+  // in flight instead, so every fetch either completes or errors — paired
+  // with timeout() below so a hung request still frees the next tick.
+  readonly updates$: Observable<DashboardSnapshot> = interval(
+    this.appConfig.config().pollIntervalMs,
+  ).pipe(
     startWith(0),
     exhaustMap(() =>
       this.bffClient.fetchSnapshot().pipe(
@@ -69,19 +63,17 @@ export class PollingDataSource implements DataSource, OnDestroy {
         }),
         catchError((err) => {
           this.consecutiveFailures++;
-          this.connectionState.next(this.consecutiveFailures >= FAILURES_BEFORE_ERROR ? 'error' : 'stale');
+          this.connectionState.next(
+            this.consecutiveFailures >= FAILURES_BEFORE_ERROR ? 'error' : 'stale',
+          );
           console.error('[PollingDataSource] fetch failed', err);
           return of(null);
         }),
       ),
     ),
     // Drops failed/timed-out ticks (catchError above turns them into `null`)
-    // without ending the stream — the store simply receives no new snapshot
-    // that tick, so whatever it already has (the last known good data)
-    // stays on screen rather than being cleared. A typed filter() states
-    // that plainly; the previous version did the same thing via
-    // `switchMap(() => snapshot ? of(snapshot) : timer(0).pipe(switchMap(() => [])))`,
-    // which took real effort to read for the same one-line effect.
+    // without ending the stream, so the store simply keeps whatever
+    // last-known-good snapshot it already has instead of it being cleared.
     filter((snapshot): snapshot is DashboardSnapshot => snapshot !== null),
     takeUntil(this.destroy$),
   );

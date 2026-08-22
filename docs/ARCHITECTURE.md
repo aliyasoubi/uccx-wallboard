@@ -9,20 +9,20 @@ real backend), `docs/CHANGELOG.md` (history).
 
 ## 1. Module mapping
 
-| # | Module | Selector(s) | Path |
-|---|---|---|---|
-| 1 | Call Summary Displays (Incoming/Outbound/Answered/Abandoned) | `app-call-summary-displays` | `features/dashboard/components/call-summary-displays/` |
-| 2 | Top Inbound Agent | `app-top-inbound-agent` | `features/dashboard/components/top-inbound-agent/` |
-| 3 | Top Outbound Agent | `app-top-outbound-agent` | `features/dashboard/components/top-outbound-agent/` |
-| 4 | Agent Summary | `app-agent-summary` | `features/dashboard/components/agent-summary/` |
-| 5 | Agent of the Month | `app-agent-of-month` | `features/dashboard/components/agent-of-month/` |
-| 6 | Agent State | `app-agent-state` | `features/dashboard/components/agent-state/` |
-| 7 | SLA Gauge | `app-sla-gauge` | `features/dashboard/components/sla-gauge/` |
-| 8 | Customer Satisfaction | `app-customer-satisfaction-gauge` | `features/dashboard/components/customer-satisfaction-gauge/` |
-| 9 | KPI Metrics (FCR/AWD/AHT) | `app-kpi-metrics` | `features/dashboard/components/kpi-metrics/` |
-| 10 | Queue Displays (Inbound/Handled/In Queue/Abandons/CWD/MAD/ACT/Ready Agents/SLA) | `app-queue-list` (one instance per queue via `[queue]` input) | `features/dashboard/components/queue-list/` |
-| 11 | Header (Title/Clock/Date) | `app-header` | `features/dashboard/components/header/` |
-| 12 | Footer (System Status/Last Update) | `app-footer` | `features/dashboard/components/footer/` |
+| #   | Module                                                                          | Selector(s)                                                   | Path                                                         |
+| --- | ------------------------------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------ |
+| 1   | Call Summary Displays (Incoming/Outbound/Answered/Abandoned)                    | `app-call-summary-displays`                                   | `features/dashboard/components/call-summary-displays/`       |
+| 2   | Top Inbound Agent                                                               | `app-top-inbound-agent`                                       | `features/dashboard/components/top-inbound-agent/`           |
+| 3   | Top Outbound Agent                                                              | `app-top-outbound-agent`                                      | `features/dashboard/components/top-outbound-agent/`          |
+| 4   | Agent Summary                                                                   | `app-agent-summary`                                           | `features/dashboard/components/agent-summary/`               |
+| 5   | Agent of the Month                                                              | `app-agent-of-month`                                          | `features/dashboard/components/agent-of-month/`              |
+| 6   | Agent State                                                                     | `app-agent-state`                                             | `features/dashboard/components/agent-state/`                 |
+| 7   | SLA Gauge                                                                       | `app-sla-gauge`                                               | `features/dashboard/components/sla-gauge/`                   |
+| 8   | Customer Satisfaction                                                           | `app-customer-satisfaction-gauge`                             | `features/dashboard/components/customer-satisfaction-gauge/` |
+| 9   | KPI Metrics (FCR/AWD/AHT)                                                       | `app-kpi-metrics`                                             | `features/dashboard/components/kpi-metrics/`                 |
+| 10  | Queue Displays (Inbound/Handled/In Queue/Abandons/CWD/MAD/ACT/Ready Agents/SLA) | `app-queue-list` (one instance per queue via `[queue]` input) | `features/dashboard/components/queue-list/`                  |
+| 11  | Header (Title/Clock/Date)                                                       | `app-header`                                                  | `features/dashboard/components/header/`                      |
+| 12  | Footer (System Status/Last Update)                                              | `app-footer`                                                  | `features/dashboard/components/footer/`                      |
 
 **Modules 2/3 are two separate components, not one parameterized
 component.** `TopInboundAgentComponent` and `TopOutboundAgentComponent`
@@ -42,17 +42,17 @@ across modules): `MetricTileComponent`, `StatusBadgeComponent`,
 
 ## 2. Tech stack
 
-| Concern | Choice | Rationale |
-|---|---|---|
-| Framework | Angular 18, standalone components, no NgModules | Less ceremony |
-| Language | TypeScript, `strict: true` | Prevents DTO/contract drift |
-| State | Angular Signals in injectable services (no NgRx) | Small set of live resources — signals keep it simple |
-| Live data | Polling behind a swappable `DataSource` interface | A WebSocket upgrade later is a contained, isolated change |
-| Backend | BFF (Backend-for-Frontend) layer | Frontend never talks directly to the raw telephony/reporting system |
+| Concern        | Choice                                             | Rationale                                                                          |
+| -------------- | -------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Framework      | Angular 18, standalone components, no NgModules    | Less ceremony                                                                      |
+| Language       | TypeScript, `strict: true`                         | Prevents DTO/contract drift                                                        |
+| State          | Angular Signals in injectable services (no NgRx)   | Small set of live resources — signals keep it simple                               |
+| Live data      | Polling behind a swappable `DataSource` interface  | A WebSocket upgrade later is a contained, isolated change                          |
+| Backend        | BFF (Backend-for-Frontend) layer                   | Frontend never talks directly to the raw telephony/reporting system                |
 | Runtime config | `assets/config.json`, loaded via `APP_INITIALIZER` | API address / poll interval / thresholds editable on a deployed server, no rebuild |
-| Styling | SCSS + CSS custom properties as design tokens | Single palette/type-scale source of truth |
-| Testing | Jasmine/Karma | See §6 |
-| Tooling | Angular CLI (esbuild), ESLint (`npm run lint`) | Standard, low-maintenance |
+| Styling        | SCSS + CSS custom properties as design tokens      | Single palette/type-scale source of truth                                          |
+| Testing        | Jasmine/Karma                                      | See §6                                                                             |
+| Tooling        | Angular CLI (esbuild), ESLint (`npm run lint`)     | Standard, low-maintenance                                                          |
 
 ## 3. Backend — BFF, not direct-to-source
 
@@ -204,6 +204,7 @@ backend/BFF team before go-live:
   - ACT = Average Call Time (average total handled-call duration)
 
   Confirm these against the real UCCX/BFF contract.
+
 - **Per-queue SLA** (`CsqDto.serviceMetrics`) — shape is unconfirmed
   against a real backend.
 - **Queue list** — still `Sales`, `Support`, `Billing` from the fixture;

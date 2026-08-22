@@ -24,20 +24,18 @@ export class SlaGaugeComponent {
 
   private static readonly MAX_PERCENT = 100;
 
-  // Previously defaulted to MAX_PERCENT (100) when metrics was null, which
-  // made slaColor() resolve to "normal" (green) — so on every fresh page
-  // load, and for the duration of any real backend outage, the ring showed
-  // a green "0%" as if SLA were perfect. hasData() now gates severity so a
-  // missing reading renders as neutral, not as a false "all clear".
-  // Number.isFinite, not just a null check on the object: the template calls
-  // slaPercent.toFixed(1), which THROWS (not renders badly) if the backend
-  // omits `sla` or sends null, taking the whole panel down. Requiring an
-  // actual finite number here keeps a malformed payload on the "—" path.
+  // Number.isFinite, not just a null check: the template calls
+  // slaPercent.toFixed(1), which throws (not renders badly) on a missing or
+  // malformed reading, taking the whole panel down. This keeps that case on
+  // the "—" path instead of a false "all clear" or a crash.
   readonly hasData = computed(() => Number.isFinite(this.metrics()?.slaPercent));
 
   readonly slaSeverity = computed(() => {
     if (!this.hasData()) return 'normal' as const;
-    return getInverseSeverity(this.metrics()!.slaPercent, this.appConfig.config().thresholds.slaPercent);
+    return getInverseSeverity(
+      this.metrics()!.slaPercent,
+      this.appConfig.config().thresholds.slaPercent,
+    );
   });
 
   readonly slaColor = computed(() => {

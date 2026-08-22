@@ -50,7 +50,10 @@ describe('SlaGaugeComponent', () => {
   // must require a real number, not merely a non-null metrics object.
   it('falls back to the no-data state instead of throwing when slaPercent is missing or not a number', () => {
     for (const bad of [undefined, null, NaN]) {
-      fixture.componentRef.setInput('metrics', { ...metrics, slaPercent: bad as unknown as number });
+      fixture.componentRef.setInput('metrics', {
+        ...metrics,
+        slaPercent: bad as unknown as number,
+      });
       expect(() => fixture.detectChanges()).not.toThrow();
       expect(component.hasData()).toBeFalse();
       expect(component.slaColor()).toBe('var(--color-text-muted)');
@@ -77,7 +80,9 @@ describe('SlaGaugeComponent', () => {
       providers: [
         {
           provide: AppConfigService,
-          useValue: { config: () => ({ apiBaseUrl: 'x', pollIntervalMs: 3000, thresholds: customThresholds }) },
+          useValue: {
+            config: () => ({ apiBaseUrl: 'x', pollIntervalMs: 3000, thresholds: customThresholds }),
+          },
         },
       ],
     }).compileComponents();

@@ -153,7 +153,9 @@ describe('AppConfigService', () => {
     req.flush({ thresholds: { avgWaitSeconds: { warning: NaN, critical: -10 } } });
     await loadPromise;
 
-    expect(service.config().thresholds.avgWaitSeconds).toEqual(DEFAULT_STATUS_THRESHOLDS.avgWaitSeconds);
+    expect(service.config().thresholds.avgWaitSeconds).toEqual(
+      DEFAULT_STATUS_THRESHOLDS.avgWaitSeconds,
+    );
   });
 
   it('accepts a valid pollIntervalMs at exactly the minimum boundary', async () => {

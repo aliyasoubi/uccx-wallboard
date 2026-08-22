@@ -86,7 +86,10 @@ describe('QueueListComponent', () => {
   });
 
   it('formats Current wait and Longest wait durations straight from the queue', () => {
-    fixture.componentRef.setInput('queue', buildQueue({ currentWaitSeconds: 61, maxWaitSeconds: 133 }));
+    fixture.componentRef.setInput(
+      'queue',
+      buildQueue({ currentWaitSeconds: 61, maxWaitSeconds: 133 }),
+    );
     fixture.detectChanges();
     const byLabel = Object.fromEntries(component.stats().map((s) => [s.label, s.value]));
     expect(byLabel['Current wait']).toBe('1:01');
@@ -128,7 +131,13 @@ describe('QueueListComponent', () => {
   it('flags Abandons/Current wait/SLA severity from the shared status-thresholds policy', () => {
     fixture.componentRef.setInput(
       'queue',
-      buildQueue({ totalCalls: 100, abandonedCalls: 20, currentWaitSeconds: 200, slaPercent: 10, handledCalls: 80 }),
+      buildQueue({
+        totalCalls: 100,
+        abandonedCalls: 20,
+        currentWaitSeconds: 200,
+        slaPercent: 10,
+        handledCalls: 80,
+      }),
     );
     fixture.detectChanges();
     const byLabel = Object.fromEntries(component.stats().map((s) => [s.label, s.severity]));
@@ -168,7 +177,9 @@ describe('QueueListComponent', () => {
       providers: [
         {
           provide: AppConfigService,
-          useValue: { config: () => ({ apiBaseUrl: 'x', pollIntervalMs: 3000, thresholds: customThresholds }) },
+          useValue: {
+            config: () => ({ apiBaseUrl: 'x', pollIntervalMs: 3000, thresholds: customThresholds }),
+          },
         },
       ],
     }).compileComponents();

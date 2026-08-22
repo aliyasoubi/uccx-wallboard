@@ -65,10 +65,12 @@ describe('KpiMetricsComponent', () => {
   });
 
   it('flags critical severity once a value crosses the default critical threshold', () => {
-    fixture.componentRef.setInput(
-      'summary',
-      { ...summary, avgWaitSeconds: 90, avgTalkSeconds: 200, callsWaiting: 10 },
-    );
+    fixture.componentRef.setInput('summary', {
+      ...summary,
+      avgWaitSeconds: 90,
+      avgTalkSeconds: 200,
+      callsWaiting: 10,
+    });
     fixture.componentRef.setInput('serviceMetrics', { ...serviceMetrics, fcrPercent: 40 });
     fixture.detectChanges();
     expect(component.awdSeverity()).toBe('critical');
@@ -88,7 +90,9 @@ describe('KpiMetricsComponent', () => {
       providers: [
         {
           provide: AppConfigService,
-          useValue: { config: () => ({ apiBaseUrl: 'x', pollIntervalMs: 3000, thresholds: customThresholds }) },
+          useValue: {
+            config: () => ({ apiBaseUrl: 'x', pollIntervalMs: 3000, thresholds: customThresholds }),
+          },
         },
       ],
     }).compileComponents();

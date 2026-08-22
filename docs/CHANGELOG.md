@@ -46,12 +46,13 @@ app. All prior metrics preserved or extended.
 **Two real signal bugs caught by running the suite, not just
 type-checking** — now documented as gotchas in
 `docs/ARCHITECTURE.md` §6.1:
+
 - `TopAgentBase` initially threw `NG0600` (writing to a signal from
   inside a `computed()`), from constructing the tracker lazily inside a
   `computed()` read.
 - After fixing that, the `top` value froze at `null` forever: a
   `computed(() => this.trackerInstance?.top() ?? null)` short-circuits
-  via `?.` on its *first* evaluation, so it records zero reactive
+  via `?.` on its _first_ evaluation, so it records zero reactive
   dependencies that time — Angular then treats it as constant and never
   recomputes it. Fixed by having the effect write into a plain owned
   `signal()` instead.
@@ -105,7 +106,7 @@ left unfixed this pass, per request.
 
 1. **SLA Gauge and KPI FCR tile no longer show a false "all clear" on
    load.** Both previously defaulted severity to "100%/best-case" when
-   `metrics`/`serviceMetrics` was `null`, while the *displayed* value
+   `metrics`/`serviceMetrics` was `null`, while the _displayed_ value
    defaulted to `0`. Net effect: on every fresh page load, and for the
    duration of any real backend outage, the SLA ring showed a green
    `0%` and the FCR tile an uncolored `0%` — both looking like readings,
@@ -204,7 +205,7 @@ that didn't (see rationale below).
    covering the default per-status label and this override behavior.
 3. **Agent Summary: added a header row** ("Agent / State / Duration /
    Calls") and a **Calls column** (`Agent.inboundCalls +
-   Agent.outboundCalls`, already in the domain model, just never
+Agent.outboundCalls`, already in the domain model, just never
    displayed). Header and data rows share one `--roster-columns` custom
    property so the two can't drift out of alignment independently.
 4. **Avatars: two-letter initials, status-tinted, larger (28px → 36px).**
@@ -241,7 +242,7 @@ Two follow-ups after seeing Pass 7 actually rendered.
 
 1. **Agent Summary rows no longer stretch to fill the whole panel.**
    With a small roster (e.g. the 5-agent fixture), `.row`'s
-   `flex: 1 1 0` was dividing the *entire* panel height evenly across
+   `flex: 1 1 0` was dividing the _entire_ panel height evenly across
    however many agents there were — 5 agents in a ~950px-tall column
    meant ~190px per row, most of it dead space around a 36px avatar.
    Added `max-height: 3.75rem` (60px) as a clamp: rows still grow to
@@ -264,7 +265,7 @@ Two follow-ups after seeing Pass 7 actually rendered.
    change. Updated `kpi-metrics.component.spec.ts` to match: removed
    the assertion expecting the tile's text, and added an explicit
    guard test (`does not render Calls in queue while it is deliberately
-   hidden`) so the suite documents the current intended state rather
+hidden`) so the suite documents the current intended state rather
    than just going quiet about it.
 
 Verified with `npm run test:ci` (134/134 passing) and a real Chrome
@@ -280,8 +281,8 @@ per queue, aligned against the real production API rather than the
 fixture-driven aggregated view.
 
 1. **`QueueListComponent` now takes a single `queue` input** (`Queue |
-   undefined`) instead of `queues: Queue[]` plus a `variant: 'waiting' |
-   'serving'` discriminator. All nine stats (Inbound, Handled, In Queue,
+undefined`) instead of `queues: Queue[]` plus a `variant: 'waiting' |
+'serving'` discriminator. All nine stats (Inbound, Handled, In Queue,
    Abandons, CWD, MAD, ACT, Ready Agents, SLA) are read directly off
    that one queue — the sum/max/weighted-average aggregation math from
    Pass 3 is gone. `DashboardComponent` now `@for`-loops
@@ -289,7 +290,7 @@ fixture-driven aggregated view.
    (Sales/Support/Billing), so the per-queue breakdown that Pass 3
    deliberately removed is back, with each panel titled by `queue.name`.
 2. **Fixed alongside:** `hasData` was implemented as `this.queue !==
-   undefined`, comparing the input *signal function* itself rather than
+undefined`, comparing the input _signal function_ itself rather than
    calling it — that reference is never `undefined`, so the "No data"
    empty state was unreachable even with no queue set. Changed to
    `this.queue() !== undefined`; `queue-list.component.spec.ts` updated
@@ -301,6 +302,7 @@ fixture-driven aggregated view.
    the removed cross-queue aggregation.
 
 **Flagged, not addressed in this pass:**
+
 - `dashboard.component.html` passes `variant="waiting"` to every
   `app-queue-list` instance, but `QueueListComponent` no longer declares
   a `variant` input — the attribute is now inert, and the old "Serving
@@ -370,7 +372,7 @@ rather than a graceful placeholder.
 
 1. **`QueueListComponent` no longer carries its own duration formatter.** It
    had a private `formatDuration()` that was a line-for-line copy of
-   `FormatDurationPipe` *minus* the pipe's `null`/`NaN` guard, so any absent
+   `FormatDurationPipe` _minus_ the pipe's `null`/`NaN` guard, so any absent
    backend field ran through `Math.floor(NaN)` and reached the wallboard as
    `NaN:NaN`. The formatting logic is now a single exported
    `formatDurationSeconds()` in `format-duration.pipe.ts`; the pipe delegates
@@ -421,7 +423,7 @@ This pass fixes that and the rest of the review findings.
    since every pixel in a `flex: 0 0 auto` band is taken permanently from the
    flexible bands below it.
 2. **The gauge ring was sized from the wrong axis.** `max-width` + square
-   `aspect-ratio` let its *height* track viewport *width*, demanding 167px in
+   `aspect-ratio` let its _height_ track viewport _width_, demanding 167px in
    a band that had far less. It is now sized from height —
    `height: min(100%, clamp(140px, 12vw, 240px))` — so it shrinks to fit the
    scarce axis. Two traps found while doing this, both documented in the SCSS:
@@ -466,7 +468,7 @@ Measured after: **zero clipped elements at 1280x720, 1366x768, 1920x1080 and
 **Still open, deliberately not decided here:** `queue.mapper` feeds
 `avgTalkSeconds` from `avgHandleDuration` while `call-summary.mapper` feeds
 the same domain field from `avgTalkDuration`, and the Queue Displays row is
-labelled "AVG Talk Time". Reconciling that changes what the number *means*,
+labelled "AVG Talk Time". Reconciling that changes what the number _means_,
 which needs the backend team — see the provisional-fields note in CLAUDE.md.
 
 Verified with `npm run test:ci` (149/149 passing) and a production build.
@@ -502,7 +504,7 @@ is explicitly deferred to a later pass.
 2. **Config validation was effectively absent.** Confirmed real, and worse
    than described: the threshold merge was only one level deep (per metric
    key), not two — `{ thresholds: { slaPercent: { warning: 90 } } }` in
-   `config.json` silently replaced the *entire* `slaPercent` pair, dropping
+   `config.json` silently replaced the _entire_ `slaPercent` pair, dropping
    `critical` entirely. Fixed with a genuine two-level merge, plus
    validation that rejects non-finite/negative poll intervals (with a
    500ms floor), empty `apiBaseUrl`, and non-finite/negative threshold

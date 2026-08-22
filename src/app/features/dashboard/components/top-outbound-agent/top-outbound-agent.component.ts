@@ -7,9 +7,8 @@ import {
   TopAgentBase,
 } from '../top-agent-base/top-agent-base';
 
-// Module 3, "Top Outbound Agent" — a separate component module from
-// TopInboundAgentComponent (own selector/file/spec), sharing only the
-// tracker-wiring logic via TopAgentBase. See top-agent-base.ts for why.
+// Module 3, "Top Outbound Agent" — see TopAgentBase for why this and
+// TopInboundAgentComponent are separate modules sharing tracker logic.
 @Component({
   selector: 'app-top-outbound-agent',
   standalone: true,

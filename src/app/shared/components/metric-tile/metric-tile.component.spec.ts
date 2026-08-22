@@ -30,7 +30,9 @@ describe('MetricTileComponent', () => {
     fixture.componentRef.setInput('value', 102);
     fixture.componentRef.setInput('icon', 'ti-phone-incoming');
     fixture.detectChanges();
-    const iconEl: HTMLElement = fixture.nativeElement.querySelector('i.ti.ti-phone-incoming.tile-icon');
+    const iconEl: HTMLElement = fixture.nativeElement.querySelector(
+      'i.ti.ti-phone-incoming.tile-icon',
+    );
     expect(iconEl).not.toBeNull();
 
     const valueEl: HTMLElement = fixture.nativeElement.querySelector('.value');

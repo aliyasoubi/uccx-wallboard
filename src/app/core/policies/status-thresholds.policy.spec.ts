@@ -1,4 +1,9 @@
-import { getInverseSeverity, getRatioSeverity, getSeverity, DEFAULT_STATUS_THRESHOLDS } from './status-thresholds.policy';
+import {
+  getInverseSeverity,
+  getRatioSeverity,
+  getSeverity,
+  DEFAULT_STATUS_THRESHOLDS,
+} from './status-thresholds.policy';
 
 describe('status-thresholds.policy', () => {
   describe('getSeverity (higher is worse)', () => {

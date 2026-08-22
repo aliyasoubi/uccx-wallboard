@@ -18,21 +18,13 @@
     border-color var(--motion-medium) var(--motion-easing);
 }
 
-// Severity escalates the whole tile, not just the number — a wallboard
-// is read from across a room, and a tinted value alone is invisible at
-// that distance. Warning tints the border; critical also flashes a soft
-// glow a few times to draw the eye, then settles on the steady red border
-// (same reduced-motion opt-out as every other animation: the keyframes run
-// on --motion-pulse, which _tokens.scss zeroes out).
-//
-// Iteration count is finite (4, not infinite) and deliberately even: with
-// `alternate`, an odd count would stop mid-glow, leaving the tile stuck
-// looking half-lit. A tile that STAYS critical for a long stretch (a queue
-// that's been breaching SLA for the last hour, say) doesn't need to keep
-// flashing that whole time to remain readable — the red border alone
-// already says "critical" continuously. Reviewer feedback: a permanently
-// glowing tile becomes background noise a viewer stops registering, which
-// defeats the point of using motion to signal an alert in the first place.
+// Severity escalates the whole tile, not just the number — a tinted value
+// alone is invisible at wallboard viewing distance. Critical also flashes a
+// few times to draw the eye, then settles on the steady red border rather
+// than glowing forever (which becomes background noise a viewer stops
+// registering). Iteration count is finite and deliberately even: with
+// `alternate`, an odd count would stop mid-glow, half-lit. Respects
+// prefers-reduced-motion via --motion-pulse (zeroed in _tokens.scss).
 .tile--warning {
   border-color: var(--color-status-warning);
 }

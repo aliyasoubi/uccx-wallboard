@@ -1,11 +1,8 @@
 @use '../../../../shared/styles/panels';
 
-// Custom elements default to display:inline, which is fragile as a
-// flex/grid item. This component lives in a flex:0 0 auto band (it's
-// meant to size to its own content, not stretch) — display:block is
-// enough here. (height:100% would be wrong: it'd create a circular
-// dependency against the band's own auto-height and starve sibling
-// bands of space — see dashboard.component.scss band--summary/band--kpi.)
+// display:block only, no height:100% — this band is flex:0 0 auto (sized to
+// its own content, not stretched), and height:100% here would create a
+// circular dependency against the band's own auto-height.
 :host {
   display: block;
 }

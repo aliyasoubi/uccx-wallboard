@@ -18,13 +18,12 @@ export function mapCallDirectionStats(
     }
 
     count += total;
-    topAgentCalls = Math.max(topAgentCalls, total)
-    lowestAgentCalls = Math.min(lowestAgentCalls, total)
+    topAgentCalls = Math.max(topAgentCalls, total);
+    lowestAgentCalls = Math.min(lowestAgentCalls, total);
   }
   if (lowestAgentCalls == Number.MAX_SAFE_INTEGER) {
-    lowestAgentCalls = 0
+    lowestAgentCalls = 0;
   }
-
 
   return {
     direction,
@@ -33,7 +32,6 @@ export function mapCallDirectionStats(
     lowestAgentCalls: lowestAgentCalls,
   };
 }
-
 
 /**
  * Outbound stats, with the total taken from the dedicated outbound endpoint

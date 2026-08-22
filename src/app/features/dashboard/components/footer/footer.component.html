@@ -13,10 +13,18 @@
     ></span>
     <span class="status-text" aria-live="polite">
       @switch (connectionState()) {
-        @case ('connecting') { System status: Connecting… }
-        @case ('live') { System status: Live }
-        @case ('stale') { System status: Reconnecting… }
-        @case ('error') { System status: Connection lost }
+        @case ('connecting') {
+          System status: Connecting…
+        }
+        @case ('live') {
+          System status: Live
+        }
+        @case ('stale') {
+          System status: Reconnecting…
+        }
+        @case ('error') {
+          System status: Connection lost
+        }
       }
     </span>
   </div>

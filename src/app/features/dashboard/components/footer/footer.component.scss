@@ -19,10 +19,8 @@
     color var(--motion-medium) var(--motion-easing);
 }
 
-// Stale/error used to be a small dot and a line of muted text — easy to
-// miss from across a room, exactly where a wallboard most needs it to be
-// obvious. Tinting the whole bar (not just the dot) makes a real outage
-// impossible to miss without needing a separate banner component.
+// Tints the whole bar, not just the status dot, so a real outage is hard to
+// miss from across a room.
 .footer--stale {
   background: var(--color-status-warning-bg);
   color: var(--color-status-warning);
@@ -67,8 +65,13 @@
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
 
 .updated {

@@ -2,7 +2,11 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { AppConfig } from './app-config.model';
-import { DEFAULT_STATUS_THRESHOLDS, StatusThresholds, Thresholds } from '../policies/status-thresholds.policy';
+import {
+  DEFAULT_STATUS_THRESHOLDS,
+  StatusThresholds,
+  Thresholds,
+} from '../policies/status-thresholds.policy';
 
 const FALLBACK_CONFIG: AppConfig = {
   apiBaseUrl: 'assets/fixtures',
@@ -51,7 +55,10 @@ export class AppConfigService {
       const loaded = await firstValueFrom(this.http.get<PartialAppConfig>('assets/config.json'));
       this._config.set(validateAndMerge(loaded));
     } catch (err) {
-      console.error('[AppConfigService] Failed to load assets/config.json, using fallback config', err);
+      console.error(
+        '[AppConfigService] Failed to load assets/config.json, using fallback config',
+        err,
+      );
       this._config.set(FALLBACK_CONFIG);
     }
   }
@@ -68,13 +75,16 @@ function validateAndMerge(loaded: PartialAppConfig): AppConfig {
 function validApiBaseUrl(value: unknown): string {
   if (typeof value === 'string' && value.trim().length > 0) return value;
   if (value !== undefined) {
-    console.warn(`[AppConfigService] Ignoring invalid apiBaseUrl (${JSON.stringify(value)}), using fallback`);
+    console.warn(
+      `[AppConfigService] Ignoring invalid apiBaseUrl (${JSON.stringify(value)}), using fallback`,
+    );
   }
   return FALLBACK_CONFIG.apiBaseUrl;
 }
 
 function validPollInterval(value: unknown): number {
-  if (typeof value === 'number' && Number.isFinite(value) && value >= MIN_POLL_INTERVAL_MS) return value;
+  if (typeof value === 'number' && Number.isFinite(value) && value >= MIN_POLL_INTERVAL_MS)
+    return value;
   if (value !== undefined) {
     console.warn(
       `[AppConfigService] Ignoring invalid pollIntervalMs (${JSON.stringify(value)}) — must be a finite number >= ${MIN_POLL_INTERVAL_MS}ms, using fallback`,
@@ -97,14 +107,29 @@ function mergeThresholds(loaded: PartialThresholds | undefined): StatusThreshold
     const override = loaded[key];
     if (!override) continue;
     result[key] = {
-      warning: validThresholdValue(override.warning, DEFAULT_STATUS_THRESHOLDS[key].warning, key, 'warning'),
-      critical: validThresholdValue(override.critical, DEFAULT_STATUS_THRESHOLDS[key].critical, key, 'critical'),
+      warning: validThresholdValue(
+        override.warning,
+        DEFAULT_STATUS_THRESHOLDS[key].warning,
+        key,
+        'warning',
+      ),
+      critical: validThresholdValue(
+        override.critical,
+        DEFAULT_STATUS_THRESHOLDS[key].critical,
+        key,
+        'critical',
+      ),
     };
   }
   return result;
 }
 
-function validThresholdValue(value: unknown, fallback: number, metric: string, side: 'warning' | 'critical'): number {
+function validThresholdValue(
+  value: unknown,
+  fallback: number,
+  metric: string,
+  side: 'warning' | 'critical',
+): number {
   if (value === undefined) return fallback;
   if (typeof value === 'number' && Number.isFinite(value) && value >= 0) return value;
   console.warn(

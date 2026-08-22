@@ -1,8 +1,5 @@
-// Custom elements default to display:inline, which is fragile as a
-// flex/grid item (percentage heights on internal wrappers need a definite
-// height from this host). Every dashboard panel is meant to fill whatever
-// grid/flex cell the shell puts it in, so that's made explicit here rather
-// than relying on grid/flex auto-blockification.
+// display:block + height:100% so this panel fills its grid/flex cell
+// (custom elements default to inline).
 :host {
   display: block;
   height: 100%;
@@ -67,27 +64,15 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  // gap: var(--space-2);
   flex: 1 1 auto;
   min-height: 0;
 }
 
 .row {
-  // flex-grow still lets rows share leftover space, but max-height caps
-  // how far that growth goes — with a small roster (e.g. 5 agents in a
-  // tall column), rows used to stretch to fill 1/N of the *entire* panel
-  // height, leaving a lot of dead space around each avatar. Now they
-  // grow to a comfortable size and stop; any further leftover space just
-  // sits empty below the last row instead of inflating every row.
-  //
-  // flex-shrink (via min-height: 0) is still what protects the no-scroll
-  // guarantee at the other end: with a large roster, rows shrink below
-  // max-height, together, down to whatever fits — the same mechanism as
-  // before, just now also bounded on top. Realistic wallboard rosters
-  // (dozens of agents) stay comfortably legible; if a deployment
-  // regularly has a much larger roster, an auto-rotating paged view
-  // would be a better fit than either scrolling or shrinking
-  // indefinitely — worth a conversation if that turns out to be the case.
+  // max-height caps how far rows grow with a small roster (otherwise they'd
+  // stretch to fill 1/N of the whole panel, leaving dead space around each
+  // avatar). flex-shrink (min-height: 0) still lets a large roster's rows
+  // shrink together below that cap to preserve the no-scroll guarantee.
   flex: 1 1 0;
   min-height: 0;
   max-height: 3.75rem;

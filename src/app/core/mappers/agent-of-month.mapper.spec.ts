@@ -16,7 +16,10 @@ function buildAgent(overrides: Partial<Agent> = {}): Agent {
 
 describe('agent-of-month.mapper', () => {
   it('cross-references the roster by agentID to resolve the display name', () => {
-    const agents = [buildAgent({ id: 'A1001', name: 'John Smith' }), buildAgent({ id: 'A1002', name: 'Sarah Johnson' })];
+    const agents = [
+      buildAgent({ id: 'A1001', name: 'John Smith' }),
+      buildAgent({ id: 'A1002', name: 'Sarah Johnson' }),
+    ];
     const result = mapAgentOfMonth({ agentID: 'A1002', photoUrl: '' }, agents);
     expect(result.agentId).toBe('A1002');
     expect(result.name).toBe('Sarah Johnson');
@@ -33,7 +36,9 @@ describe('agent-of-month.mapper', () => {
   });
 
   it('preserves a non-empty photoUrl', () => {
-    const result = mapAgentOfMonth({ agentID: 'A1002', photoUrl: 'https://example.com/a.jpg' }, [buildAgent()]);
+    const result = mapAgentOfMonth({ agentID: 'A1002', photoUrl: 'https://example.com/a.jpg' }, [
+      buildAgent(),
+    ]);
     expect(result.photoUrl).toBe('https://example.com/a.jpg');
   });
 });

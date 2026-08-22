@@ -1,8 +1,5 @@
-// Custom elements default to display:inline — explicit here rather than
-// relying on the parent's flex context to auto-blockify it, matching the
-// convention used by every other component in this app.
 :host {
-  display: block;
+  display: block; // custom elements default to inline
 }
 
 .donut {
