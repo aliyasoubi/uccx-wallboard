@@ -20,7 +20,9 @@ describe('TopOutboundAgentComponent', () => {
 
   beforeEach(async () => {
     localStorage.clear();
-    await TestBed.configureTestingModule({ imports: [TopOutboundAgentComponent] }).compileComponents();
+    await TestBed.configureTestingModule({
+      imports: [TopOutboundAgentComponent],
+    }).compileComponents();
     fixture = TestBed.createComponent(TopOutboundAgentComponent);
     component = fixture.componentInstance;
   });
@@ -38,7 +40,10 @@ describe('TopOutboundAgentComponent', () => {
   });
 
   it('tracks the agent with the most outbound calls (ignores inbound calls entirely)', () => {
-    fixture.componentRef.setInput('agents', [buildAgent('A1', 'John', 20, 9), buildAgent('A2', 'Sarah', 26, 1)]);
+    fixture.componentRef.setInput('agents', [
+      buildAgent('A1', 'John', 20, 9),
+      buildAgent('A2', 'Sarah', 26, 1),
+    ]);
     fixture.detectChanges();
     expect(component.top()).toEqual({ agentId: 'A1', agentName: 'John', value: 9 });
   });

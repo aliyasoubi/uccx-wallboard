@@ -9,6 +9,7 @@
     "notReadyRatio": { "warning": 0.3, "critical": 0.5 },
     "slaPercent": { "warning": 80, "critical": 50 },
     "fcrPercent": { "warning": 75, "critical": 60 },
+    "csatScore": { "warning": 4, "critical": 3.5 },
     "currentWaitSeconds": { "warning": 45, "critical": 90 }
   }
 }

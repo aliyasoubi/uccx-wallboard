@@ -1,15 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
-// A lightweight SVG ring gauge — no charting library dependency required for
-// something this simple. Swap for the ECharts wrapper from the README if the
-// dashboard later needs richer chart types (trend lines, etc.) elsewhere.
-//
-// Fill technique: stroke-dasharray is set directly to "<filled> <remaining>"
-// rather than a fixed dasharray + computed dashoffset. Both are valid SVG,
-// but this version states the filled arc length explicitly — there's no
-// offset math to double-check, so a wrong ratio is visible immediately in
-// the bound value rather than needing to be reverse-engineered from an
-// offset number.
+// A lightweight SVG ring gauge — no charting library needed for something
+// this simple. stroke-dasharray is set directly to "<filled> <remaining>"
+// rather than a fixed dasharray + computed dashoffset, so a wrong ratio is
+// visible directly in the bound value instead of needing offset math to
+// reverse-engineer.
 @Component({
   selector: 'app-meter',
   standalone: true,

@@ -20,7 +20,6 @@ interface QueueStat {
   severity: Severity;
 }
 
-
 @Component({
   selector: 'app-queue-list',
   standalone: true,
@@ -33,17 +32,16 @@ export class QueueListComponent {
 
   readonly queue = input<Queue | undefined>(undefined);
 
-  readonly title = computed(() => this.queue()?.name ?? "");
-  
-  readonly hasData = computed(() => this.queue() !== undefined);
+  readonly title = computed(() => this.queue()?.name ?? '');
 
+  readonly hasData = computed(() => this.queue() !== undefined);
 
   readonly stats = computed<QueueStat[]>(() => {
     const q = this.queue();
-    if (q){
-      return this.aggregate(q, this.appConfig.config().thresholds)
+    if (q) {
+      return this.aggregate(q, this.appConfig.config().thresholds);
     }
-    return []
+    return [];
   });
 
   // Percentage of handled calls, or the placeholder when the queue has taken
@@ -55,7 +53,11 @@ export class QueueListComponent {
   }
 
   private aggregate(q: Queue, thresholds: StatusThresholds): QueueStat[] {
-    const abandonedSeverity = getRatioSeverity(q.abandonedCalls, q.totalCalls, thresholds.abandonedRatio);
+    const abandonedSeverity = getRatioSeverity(
+      q.abandonedCalls,
+      q.totalCalls,
+      thresholds.abandonedRatio,
+    );
     const currentWaitSeverity = getSeverity(q.currentWaitSeconds, thresholds.currentWaitSeconds);
     const slaSeverity = getInverseSeverity(q.slaPercent, thresholds.slaPercent);
 
@@ -64,14 +66,20 @@ export class QueueListComponent {
       { label: 'Handled', value: this.handledPercent(q), severity: 'normal' },
       { label: 'In queue', value: `${q.callsWaiting}`, severity: 'normal' },
       { label: 'Abandons', value: `${q.abandonedCalls}`, severity: abandonedSeverity },
-      // CWD / MWD / ACT: see the Queue domain model — these three acronyms'
-      // meanings are still unconfirmed against the real backend, and MWD/ACT
-      // are now read off CsqDto.callStats rather than CsqDto.timings (see
-      // queue.mapper.ts). Both the naming and that re-sourcing stay
-      // provisional; confirm with the backend team before go-live.
-      { label: 'Current WD', value: formatDurationSeconds(q.currentWaitSeconds), severity: currentWaitSeverity },
-      { label: 'Max WD', value: formatDurationSeconds(q.maxWaitSeconds), severity: 'normal' },
-      { label: 'AVG Talk Time', value: formatDurationSeconds(q.avgTalkSeconds), severity: 'normal' },
+      // Display labels only, renamed from CWD/MWD for readability — the
+      // underlying field meanings are still provisional (see Queue domain
+      // model / queue.mapper.ts).
+      {
+        label: 'Current wait',
+        value: formatDurationSeconds(q.currentWaitSeconds),
+        severity: currentWaitSeverity,
+      },
+      { label: 'Longest wait', value: formatDurationSeconds(q.maxWaitSeconds), severity: 'normal' },
+      {
+        label: 'AVG Talk Time',
+        value: formatDurationSeconds(q.avgTalkSeconds),
+        severity: 'normal',
+      },
       { label: 'Ready', value: `${q.agentStates.ready}`, severity: 'normal' },
       // toFixed on a missing/null slaPercent throws rather than rendering
       // badly, which would take the whole panel down — same guard as

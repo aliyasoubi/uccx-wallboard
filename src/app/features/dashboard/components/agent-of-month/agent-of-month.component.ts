@@ -1,11 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { AgentOfMonth } from '../../../../core/models/domain';
 
-// Module 5, "Agent of the Month" (renamed from the shared
-// AgentOfMonthCardComponent and moved into features/dashboard/components —
-// it's a dashboard-specific feature panel, not a generic reusable
-// primitive like metric-tile/status-badge/meter, so it belongs alongside
-// the other dashboard modules per the target folder structure).
+// Module 5, "Agent of the Month".
 @Component({
   selector: 'app-agent-of-month',
   standalone: true,

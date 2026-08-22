@@ -30,8 +30,18 @@ describe('CallSummaryDisplaysComponent', () => {
 
   it('renders Incoming from the org-wide summary total and Outbound from the direction stats', () => {
     fixture.componentRef.setInput('summary', summary);
-    fixture.componentRef.setInput('inboundStats', { direction: 'inbound', count: 102, topAgentCalls: 28, lowestAgentCalls: 12 });
-    fixture.componentRef.setInput('outboundStats', { direction: 'outbound', count: 31, topAgentCalls: 8, lowestAgentCalls: 4 });
+    fixture.componentRef.setInput('inboundStats', {
+      direction: 'inbound',
+      count: 102,
+      topAgentCalls: 28,
+      lowestAgentCalls: 12,
+    });
+    fixture.componentRef.setInput('outboundStats', {
+      direction: 'outbound',
+      count: 31,
+      topAgentCalls: 8,
+      lowestAgentCalls: 4,
+    });
     fixture.detectChanges();
     const text = fixture.nativeElement.textContent;
     expect(text).toContain('500');
@@ -75,12 +85,18 @@ describe('CallSummaryDisplaysComponent', () => {
       providers: [
         {
           provide: AppConfigService,
-          useValue: { config: () => ({ apiBaseUrl: 'x', pollIntervalMs: 3000, thresholds: customThresholds }) },
+          useValue: {
+            config: () => ({ apiBaseUrl: 'x', pollIntervalMs: 3000, thresholds: customThresholds }),
+          },
         },
       ],
     }).compileComponents();
     const customFixture = TestBed.createComponent(CallSummaryDisplaysComponent);
-    customFixture.componentRef.setInput('summary', { ...summary, totalCalls: 100, abandonedCalls: 3 }); // 3%
+    customFixture.componentRef.setInput('summary', {
+      ...summary,
+      totalCalls: 100,
+      abandonedCalls: 3,
+    }); // 3%
     customFixture.detectChanges();
 
     // Under DEFAULT_STATUS_THRESHOLDS (warning 5%/critical 10%), 3% is "normal".
@@ -105,7 +121,12 @@ describe('CallSummaryDisplaysComponent', () => {
     expect(answered).not.toBeNull();
     expect(abandoned).not.toBeNull();
 
-    const colors = [incoming.style.color, outgoing.style.color, answered.style.color, abandoned.style.color];
+    const colors = [
+      incoming.style.color,
+      outgoing.style.color,
+      answered.style.color,
+      abandoned.style.color,
+    ];
     expect(new Set(colors).size).toBe(4); // all four distinct
   });
 });

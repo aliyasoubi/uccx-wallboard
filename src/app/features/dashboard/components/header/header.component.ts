@@ -1,12 +1,16 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 
 const CLOCK_TICK_MS = 1000;
 
-// Module 11, "Header": Title, Clock, Date. This is a new module — the
-// original dashboard.component.html header only carried the
-// live-connection indicator (moved to the new FooterComponent, module 12,
-// "System Status" / "Last Update Time" — that's where the spec puts it).
+// Module 11, "Header": Title, Clock, Date.
 @Component({
   selector: 'app-header',
   standalone: true,

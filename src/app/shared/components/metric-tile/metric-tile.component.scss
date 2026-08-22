@@ -18,18 +18,20 @@
     border-color var(--motion-medium) var(--motion-easing);
 }
 
-// Severity escalates the whole tile, not just the number — a wallboard
-// is read from across a room, and a tinted value alone is invisible at
-// that distance. Warning tints the border; critical also pulses a soft
-// glow (same reduced-motion opt-out as every other animation: the
-// keyframes run on --motion-pulse, which _tokens.scss zeroes out).
+// Severity escalates the whole tile, not just the number — a tinted value
+// alone is invisible at wallboard viewing distance. Critical also flashes a
+// few times to draw the eye, then settles on the steady red border rather
+// than glowing forever (which becomes background noise a viewer stops
+// registering). Iteration count is finite and deliberately even: with
+// `alternate`, an odd count would stop mid-glow, half-lit. Respects
+// prefers-reduced-motion via --motion-pulse (zeroed in _tokens.scss).
 .tile--warning {
   border-color: var(--color-status-warning);
 }
 
 .tile--critical {
   border-color: var(--color-status-critical);
-  animation: tile-glow var(--motion-pulse) var(--motion-easing) infinite alternate;
+  animation: tile-glow var(--motion-pulse) var(--motion-easing) 4 alternate;
 }
 
 @keyframes tile-glow {

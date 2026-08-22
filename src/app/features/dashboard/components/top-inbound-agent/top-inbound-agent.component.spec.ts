@@ -22,7 +22,9 @@ describe('TopInboundAgentComponent', () => {
     // Fresh localStorage slate per test so trackers from earlier
     // tests/component instances can't leak into this one.
     localStorage.clear();
-    await TestBed.configureTestingModule({ imports: [TopInboundAgentComponent] }).compileComponents();
+    await TestBed.configureTestingModule({
+      imports: [TopInboundAgentComponent],
+    }).compileComponents();
     fixture = TestBed.createComponent(TopInboundAgentComponent);
     component = fixture.componentInstance;
   });
@@ -40,7 +42,10 @@ describe('TopInboundAgentComponent', () => {
   });
 
   it('tracks the agent with the most inbound calls (ignores outbound calls entirely)', () => {
-    fixture.componentRef.setInput('agents', [buildAgent('A1', 'John', 20, 99), buildAgent('A2', 'Sarah', 26, 1)]);
+    fixture.componentRef.setInput('agents', [
+      buildAgent('A1', 'John', 20, 99),
+      buildAgent('A2', 'Sarah', 26, 1),
+    ]);
     fixture.detectChanges();
     expect(component.top()).toEqual({ agentId: 'A2', agentName: 'Sarah', value: 26 });
   });

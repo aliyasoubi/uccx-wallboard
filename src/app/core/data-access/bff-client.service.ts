@@ -44,8 +44,12 @@ export class BffClientService {
   fetchSnapshot(): Observable<DashboardSnapshot> {
     return forkJoin({
       agents: this.http.get<AgentDto[]>(this.endpoint('AgentStates.json', '/agents')),
-      inboundCallStats: this.http.get<InboundCallStatsDto>(this.endpoint('InboundCallStats.json', '/inbound-call-stats')),
-      outboundCallStats: this.http.get<OutboundCallStatsDto>(this.endpoint('OutboundCallStats.json', '/outbound-call-stats')),
+      inboundCallStats: this.http.get<InboundCallStatsDto>(
+        this.endpoint('InboundCallStats.json', '/inbound-call-stats'),
+      ),
+      outboundCallStats: this.http.get<OutboundCallStatsDto>(
+        this.endpoint('OutboundCallStats.json', '/outbound-call-stats'),
+      ),
       serviceMetrics: this.http.get<CustomerServiceMetricsDto>(
         this.endpoint('CustomerServiceMetrics.json', '/service-metrics'),
       ),

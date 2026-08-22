@@ -35,7 +35,7 @@
       "avgTalkDuration": 340,
       "maxWaitDuration": 140,
       "avgWaitDuration": 55,
-      "avgHandleDuration" : 17,
+      "avgHandleDuration": 17,
       "totalCalls": 190,
       "abandonedCalls": 8,
       "handledCalls": 182,

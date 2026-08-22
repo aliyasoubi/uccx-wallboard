@@ -70,7 +70,11 @@ export class TopAgentTracker {
 
     const previousMax = this._top()?.value ?? -Infinity;
     if (currentTop.value > previousMax) {
-      this._top.set({ agentId: currentTop.id, agentName: currentTop.name, value: currentTop.value });
+      this._top.set({
+        agentId: currentTop.id,
+        agentName: currentTop.name,
+        value: currentTop.value,
+      });
       this.persist();
     }
   }

@@ -1,48 +1,26 @@
-// The cap scales with viewport width (same clamp() idiom as the typography
-// tokens) instead of a fixed 120px: SLA and CSAT are the two numbers a
-// wallboard exists to show, and a ring that stays gauge-sized on a 1080p/4K
-// TV kept them visually junior to ordinary metric tiles.
-//
-// max-height is what keeps that safe. The ring is square, so sizing it from
-// width alone lets its HEIGHT track the viewport's width — on a wide-but-
-// short screen (1366x768) it demanded 167px inside a band that had far less
-// and was clipped. Bounding height too means the ring takes the smaller of
-// the two budgets and always fits its panel.
-// The host must carry a definite height for the ring's `max-height: 100%`
-// below to resolve at all — against an auto-height ancestor a percentage
-// max-height is indefinite and silently ignored, which is exactly how the
-// oversized ring slipped through review.
+// Width and height must both be definite here: this host is a flex item, so
+// without an explicit width its width is content-based while the ring's
+// `width: 100%` is parent-based (circular, resolves to 0); and the ring's
+// `height: min(100%, ...)` below needs a definite ancestor height or a
+// percentage height is indefinite and silently ignored.
 :host {
   display: flex;
   align-items: center;
   justify-content: center;
-  // Both dimensions must be definite. Width: the host is itself a flex item
-  // in the gauge panel, so without this its width is content-based while the
-  // ring's `width: 100%` is parent-based — a circular dependency that
-  // resolves to 0. Height: see the ring's max-height below.
   width: 100%;
   height: 100%;
   min-height: 0;
 }
 
-// container-type: inline-size makes the ring a query container so the value
-// and label inside can be sized in cqw (percent of the ring's own width)
-// rather than in viewport units. That matters because the ring now shrinks
-// to fit short panels: viewport-sized text stayed large inside a shrunken
-// ring and overflowed it.
+// Sized from height (with width derived via aspect-ratio), not the other
+// way around: an explicit width wins over aspect-ratio, so capping height
+// alone would squash the ring into an ellipse instead of shrinking it as a
+// square. Height is also the scarcer axis in a fixed-height wallboard
+// column. min(...) lets it grow up to the design cap on taller screens.
 //
-// inline-size, NOT size: `container-type: size` contains both axes, so the
-// ring's height stops being derivable from its aspect-ratio and the whole
-// element collapses to 0x0. Only the width axis is needed for cqw.
-// Sized from HEIGHT, with width derived from aspect-ratio. Setting an
-// explicit width and merely capping height does not work: an explicit width
-// wins over aspect-ratio, so max-height just squashed the ring into an
-// ellipse (164x93) instead of shrinking it as a square. Driving from the
-// axis that is actually scarce — vertical space in a fixed-height wallboard
-// column — keeps it round at every size.
-//
-// min(100%, ...) takes the smaller of the panel's height and the design cap,
-// so the ring grows on a 4K display and shrinks to fit a 768px-tall one.
+// container-type: inline-size (not `size`, which contains both axes and
+// collapses the element since its height depends on aspect-ratio) makes
+// this a query container so the icon/value/label below can be sized in cqw.
 .meter {
   position: relative;
   container-type: inline-size;
@@ -96,10 +74,9 @@
   justify-content: center;
 }
 
-// Sizes below are percentages of the ring's own width (see container-type
-// above), each clamped so the text stays legible in a small ring and doesn't
-// become cartoonish in a large one. The upper bounds match what the old
-// --font-size-metric / --font-size-label tokens produced at full size.
+// Sized in cqw (percent of the ring's own width, see container-type above),
+// clamped so text stays legible in a small ring without becoming oversized
+// in a large one.
 .meter-icon {
   font-size: clamp(0.6rem, 9cqw, 1rem);
   margin-bottom: 2px;

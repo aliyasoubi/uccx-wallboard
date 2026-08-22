@@ -16,12 +16,12 @@ Then open http://localhost:4200. Full "what's real vs. mocked" detail in
 
 ## Docs map
 
-| Doc | What's in it |
-|---|---|
-| [`SETUP.md`](./SETUP.md) | Run it locally, what's mocked vs. real right now |
+| Doc                                              | What's in it                                                                                              |
+| ------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| [`SETUP.md`](./SETUP.md)                         | Run it locally, what's mocked vs. real right now                                                          |
 | [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) | Module mapping, tech stack, data layer, component rules, layout, open items — the current-state reference |
-| [`CONFIGURATION.md`](./CONFIGURATION.md) | Point it at a real backend, change poll interval/thresholds, env files vs. runtime config |
-| [`docs/CHANGELOG.md`](./docs/CHANGELOG.md) | Implementation history, pass by pass |
+| [`CONFIGURATION.md`](./CONFIGURATION.md)         | Point it at a real backend, change poll interval/thresholds, env files vs. runtime config                 |
+| [`docs/CHANGELOG.md`](./docs/CHANGELOG.md)       | Implementation history, pass by pass                                                                      |
 
 ## Testing
 

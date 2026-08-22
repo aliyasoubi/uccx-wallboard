@@ -16,9 +16,12 @@ export interface StatusThresholds {
   avgTalkSeconds: Thresholds;
   callsWaiting: Thresholds;
   notReadyRatio: Thresholds;
-  // Lower is worse for SLA/FCR, so these are floors, checked by getInverseSeverity.
+  // Lower is worse for SLA/FCR/CSAT, so these are floors, checked by getInverseSeverity.
   slaPercent: Thresholds;
   fcrPercent: Thresholds;
+  // CSAT is a 0-5 scale (see ServiceMetrics.csatScore) — not a percentage,
+  // unlike its neighbors here.
+  csatScore: Thresholds;
   // CWD — Current Wait Duration, the longest a caller is waiting right now.
   currentWaitSeconds: Thresholds;
 }
@@ -40,6 +43,7 @@ export const DEFAULT_STATUS_THRESHOLDS: StatusThresholds = {
   notReadyRatio: { warning: 0.3, critical: 0.5 },
   slaPercent: { warning: 80, critical: 50 },
   fcrPercent: { warning: 75, critical: 60 },
+  csatScore: { warning: 4, critical: 3.5 },
   currentWaitSeconds: { warning: 45, critical: 90 },
 };
 
@@ -57,7 +61,11 @@ export function getInverseSeverity(value: number, thresholds: Thresholds): Sever
   return 'normal';
 }
 
-export function getRatioSeverity(numerator: number, denominator: number, thresholds: Thresholds): Severity {
+export function getRatioSeverity(
+  numerator: number,
+  denominator: number,
+  thresholds: Thresholds,
+): Severity {
   if (denominator <= 0) return 'normal';
   return getSeverity(numerator / denominator, thresholds);
 }

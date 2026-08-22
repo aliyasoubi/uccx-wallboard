@@ -1,8 +1,5 @@
-// Custom elements default to display:inline, which is fragile as a
-// flex/grid item (percentage heights on internal wrappers need a definite
-// height from this host). Every dashboard panel is meant to fill whatever
-// grid/flex cell the shell puts it in, so that's made explicit here rather
-// than relying on grid/flex auto-blockification.
+// display:block + height:100% so this panel fills its grid/flex cell
+// (custom elements default to inline).
 :host {
   display: block;
   height: 100%;

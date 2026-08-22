@@ -7,10 +7,29 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
-  padding-block-start: var(--space-3);
+  padding-block: var(--space-2) var(--space-3);
+  padding-inline: var(--space-3);
+  margin-inline: calc(var(--space-3) * -1);
   border-top: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
   font-size: var(--font-size-label);
   color: var(--color-text-secondary);
+  transition:
+    background var(--motion-medium) var(--motion-easing),
+    color var(--motion-medium) var(--motion-easing);
+}
+
+// Tints the whole bar, not just the status dot, so a real outage is hard to
+// miss from across a room.
+.footer--stale {
+  background: var(--color-status-warning-bg);
+  color: var(--color-status-warning);
+}
+
+.footer--error {
+  background: var(--color-status-critical-bg);
+  color: var(--color-status-critical);
+  font-weight: 600;
 }
 
 .status {
@@ -24,6 +43,12 @@
   height: 8px;
   border-radius: 50%;
   background: var(--color-status-normal);
+  flex-shrink: 0;
+}
+
+.dot--connecting {
+  background: var(--color-text-muted);
+  animation: pulse var(--motion-pulse) var(--motion-easing) infinite;
 }
 
 .dot--live {
@@ -40,10 +65,19 @@
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
 
 .updated {
+  color: inherit;
+}
+
+.updated-time {
   color: var(--color-text-muted);
 }

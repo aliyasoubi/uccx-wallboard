@@ -1,5 +1,5 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { of, throwError } from 'rxjs';
+import { Subject, of, throwError } from 'rxjs';
 import { PollingDataSource } from './polling-data-source';
 import { BffClientService } from './bff-client.service';
 import { AppConfigService } from '../config/app-config.service';
@@ -58,11 +58,11 @@ describe('PollingDataSource', () => {
     sub.unsubscribe();
   }));
 
-  it('starts in the "live" connection state', () => {
+  it('starts in the "connecting" connection state, not "live", before any fetch has resolved', () => {
     setup(1000);
     const states: ConnectionState[] = [];
     const sub = dataSource.connectionState$.subscribe((s) => states.push(s));
-    expect(states).toEqual(['live']);
+    expect(states).toEqual(['connecting']);
     sub.unsubscribe();
   });
 
@@ -77,7 +77,7 @@ describe('PollingDataSource', () => {
     tick(0); // failure #1
     tick(1000); // failure #2
 
-    expect(states).toEqual(['live', 'stale', 'stale']);
+    expect(states).toEqual(['connecting', 'stale', 'stale']);
 
     subState.unsubscribe();
     subUpdates.unsubscribe();
@@ -96,7 +96,7 @@ describe('PollingDataSource', () => {
     tick(1000); // failure #3 -> error
     tick(1000); // failure #4 -> stays error
 
-    expect(states).toEqual(['live', 'stale', 'stale', 'error', 'error']);
+    expect(states).toEqual(['connecting', 'stale', 'stale', 'error', 'error']);
 
     subState.unsubscribe();
     subUpdates.unsubscribe();
@@ -118,11 +118,64 @@ describe('PollingDataSource', () => {
     tick(1000); // failure -> stale
     tick(1000); // success -> live
 
-    expect(states).toEqual(['live', 'stale', 'stale', 'live']);
+    expect(states).toEqual(['connecting', 'stale', 'stale', 'live']);
     // Only the one successful fetch should have produced a snapshot — the
     // two failed ticks must not leak a null/undefined value downstream.
     expect(snapshots.length).toBe(1);
     expect(snapshots[0]).toBe(dummySnapshot);
+
+    subState.unsubscribe();
+    subUpdates.unsubscribe();
+  }));
+
+  // Regression guard for the exact bug fixed by switching switchMap ->
+  // exhaustMap: a fetch slower than the poll interval used to be cancelled
+  // and silently restarted forever by the next tick, never reaching
+  // catchError, so consecutiveFailures never rose and the board could sit on
+  // "Live" indefinitely without ever actually receiving new data.
+  it('does not cancel an in-flight fetch when the next poll tick fires (exhaustMap, not switchMap)', fakeAsync(() => {
+    setup(1000);
+    const slowFetch = new Subject<DashboardSnapshot>();
+    fetchSnapshotSpy.and.callFake(() => slowFetch.asObservable());
+
+    const snapshots: DashboardSnapshot[] = [];
+    const sub = dataSource.updates$.subscribe((s) => snapshots.push(s));
+
+    tick(0); // tick #1 starts the slow fetch
+    tick(1000); // tick #2: a cancel-happy operator would abandon tick #1's fetch here
+    tick(1000); // tick #3: same again
+
+    // Only one fetch should ever have been started — later ticks are
+    // ignored while the first is still outstanding.
+    expect(fetchSnapshotSpy).toHaveBeenCalledTimes(1);
+
+    slowFetch.next(dummySnapshot);
+    slowFetch.complete();
+    tick(0);
+
+    // The original, never-cancelled fetch still delivers its result.
+    expect(snapshots).toEqual([dummySnapshot]);
+
+    sub.unsubscribe();
+  }));
+
+  // A fetch that never resolves at all (not even an HTTP error — just hangs)
+  // must still eventually be treated as failed, or exhaustMap would ignore
+  // every subsequent tick forever and the board would freeze on stale data
+  // with no path back to "error" and no way to recover.
+  it('times out a fetch that never resolves, so it does not block all future ticks forever', fakeAsync(() => {
+    setup(1000);
+    fetchSnapshotSpy.and.callFake(() => new Subject<DashboardSnapshot>().asObservable());
+    spyOn(console, 'error');
+
+    const states: ConnectionState[] = [];
+    const subState = dataSource.connectionState$.subscribe((s) => states.push(s));
+    const subUpdates = dataSource.updates$.subscribe();
+
+    tick(0);
+    tick(8000); // past FETCH_TIMEOUT_MS — the hung fetch should now error out
+
+    expect(states).toEqual(['connecting', 'stale']);
 
     subState.unsubscribe();
     subUpdates.unsubscribe();

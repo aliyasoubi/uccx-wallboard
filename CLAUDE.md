@@ -8,6 +8,7 @@ ARCHITECTURE.md; if a change is significant, add it to
 `docs/CHANGELOG.md` instead.
 
 ## Stack (do not deviate without asking)
+
 - Angular 18, **standalone components only** — no NgModules.
 - TypeScript `strict: true`.
 - State = **Angular Signals in injectable services**. No NgRx. Do not
@@ -29,6 +30,7 @@ ARCHITECTURE.md; if a change is significant, add it to
   (headless). Lint = `npm run lint`.
 
 ## Component rules
+
 - Every dashboard module component: `ChangeDetectionStrategy.OnPush`,
   signal `input()`s, standalone.
 - Only `DashboardComponent` reads the store directly. Every other
@@ -62,6 +64,7 @@ ARCHITECTURE.md; if a change is significant, add it to
   child creates a circular sizing bug — see `docs/CHANGELOG.md` Pass 1).
 
 ## Signals gotchas — read before touching effect()/computed()
+
 1. Never write to a signal from inside `computed()` — Angular throws
    `NG0600`. Do stateful construction/mutation inside `effect()`.
 2. Don't expose derived state as
@@ -73,6 +76,7 @@ ARCHITECTURE.md; if a change is significant, add it to
    of the correct pattern.)
 
 ## Thresholds / severity
+
 - All SLA/CSAT/FCR/abandon/wait thresholds live in
   `core/policies/status-thresholds.policy.ts`, sourced from
   `assets/config.json`'s `thresholds` block. Use
@@ -80,6 +84,7 @@ ARCHITECTURE.md; if a change is significant, add it to
   Never inline a threshold number in a component.
 
 ## Queue Displays — per-queue, not aggregated
+
 `QueueListComponent` takes a single `Queue` via its `queue` input and
 renders that queue's own nine parameters (Inbound, Handled, In Queue,
 Abandons, CWD, MAD, ACT, Ready Agents, SLA) directly — no cross-queue
@@ -90,6 +95,7 @@ aggregated design — see `docs/CHANGELOG.md` Pass 9 if a task references
 cross-queue aggregation math, since that description is now stale.
 
 ## Layout
+
 - `.dashboard { height: 100dvh; overflow: hidden; }` — no page scroll
   above 1000px width. Below 1000px, columns stack and scrolling
   re-enables. Agent Summary (col 3) is the only internally-scrolling
@@ -97,9 +103,11 @@ cross-queue aggregation math, since that description is now stale.
 - Use `fr`/`flex` proportions, never fixed pixel widths for layout.
 
 ## Known-provisional fields — flag, don't assume
+
 These are mocked/guessed pending real backend contract. If a task
 touches them, call it out explicitly instead of silently treating the
 current definition as final:
+
 - `CustomerServiceMetricsDto.fcr` / `ServiceMetrics.fcrPercent` (FCR
   definition unconfirmed)
 - `QueueTimingStatsDto`: CWD, MAD, ACT (assumed meanings, unconfirmed)
@@ -107,6 +115,7 @@ current definition as final:
 - Queue list currently fixed to Sales/Support/Billing fixture data
 
 ## Before you write code
+
 1. State the plan (files to touch, approach) before editing anything
    non-trivial — don't just start editing multi-file changes.
 2. Check `status-thresholds.policy.ts` and `_tokens.scss` before adding
@@ -118,6 +127,7 @@ current definition as final:
 4. If a change touches a provisional field above, say so.
 
 ## After you write code
+
 - Run `npm run test:ci` before calling a task done.
 - New components need specs alongside them (match existing coverage
   style — see `SETUP.md`).

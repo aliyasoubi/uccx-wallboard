@@ -2,7 +2,7 @@
 
 This covers: how to point the app at a real backend/database address, how
 runtime config actually works now, what to do when a backend field gets
-renamed, and how often the dashboard polls. See README.md §3 for *why* the
+renamed, and how often the dashboard polls. See README.md §3 for _why_ the
 app is shaped this way (the BFF architecture); this is the practical "how
 do I actually change it" reference.
 
@@ -64,7 +64,7 @@ To point at a real backend/DB address:
 3. Refresh the page. No rebuild, no redeploy of the JS bundle — just the
    one JSON file.
 4. Check the route paths in `BffClientService` (`src/app/core/
-   data-access/bff-client.service.ts`). Each resource has a placeholder
+data-access/bff-client.service.ts`). Each resource has a placeholder
    real-mode path, e.g. `/agents`, `/call-stats`, `/csqs` — update the
    `realPath` argument in each `this.endpoint(...)` call to match the real
    BFF's actual route names.
@@ -73,7 +73,7 @@ Nothing else changes. The mappers, the store, and every component are
 already decoupled from where the data comes from — that's the entire
 point of the DataSource/BFF layering described in README.md §3–4.
 
-If the real backend *is* a database you're standing up yourself (rather
+If the real backend _is_ a database you're standing up yourself (rather
 than an existing telephony system), that DB sits behind the BFF, not
 behind Angular — the BFF is what should have a real `.env`/config for its
 DB connection string, credentials, etc. That's a separate service from
@@ -136,6 +136,7 @@ interval tuning.
 ## Changelog
 
 ### This pass
+
 - **Runtime config actually wired up.** `AppConfigService` +
   `assets/config.json` existed before but had no effect — now registered
   via `APP_INITIALIZER`, and both `apiBaseUrl` and `pollIntervalMs` are
@@ -147,6 +148,7 @@ interval tuning.
   module — mocked pending a real backend field.
 
 ### Prior pass
+
 - DTOs aligned to the real API contract (`AgentDto` nested `state`/
   `stateStats`/`inboundCallStats`/`outboundCallStats`; `CsqDto` nested
   `callStats`/`agentStateCounts`). Domain models and presentational

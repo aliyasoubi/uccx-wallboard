@@ -1,16 +1,10 @@
-// Shared chrome for the two "group card" bands (Calls Summary, KPI Metrics).
-// These are the only panels built from a grid of child tiles rather than
-// their own content, so they need an outer card to stop reading as loose
-// tiles floating on the page background — but the rules were identical
-// copies in both components, which meant tuning the chrome (and it did need
-// tuning: see the height budget note below) had to be done twice.
+// Shared chrome for the "group card" bands (Calls Summary, KPI Metrics).
 //
 // Height budget: both bands sit in column 1 as `flex: 0 0 auto`, so every
 // pixel of padding here is taken permanently from the flexible bands below
-// them (Top Agents, SLA/CSAT gauges). An earlier version used --space-4
-// padding plus a --space-3 label margin and starved those bands to 22px at
-// 1366x768. Keep this chrome tight, and re-measure column 1 at 1366x768 if
-// you change it.
+// (Top Agents, SLA/CSAT gauges). --space-4 padding + a --space-3 label
+// margin once starved those bands to 22px at 1366x768 — keep this tight,
+// and re-measure column 1 at 1366x768 if you change it.
 
 @mixin group-card {
   background: var(--color-surface-1);

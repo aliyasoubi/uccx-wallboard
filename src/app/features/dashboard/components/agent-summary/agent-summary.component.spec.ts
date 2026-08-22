@@ -42,7 +42,9 @@ describe('AgentSummaryComponent', () => {
     const rows = fixture.debugElement.queryAll(By.css('.row'));
     expect(rows.length).toBe(5);
 
-    const renderedNames = rows.map((row) => row.query(By.css('.name')).nativeElement.textContent.trim());
+    const renderedNames = rows.map((row) =>
+      row.query(By.css('.name')).nativeElement.textContent.trim(),
+    );
     expect(renderedNames).toEqual(['Agent 1', 'Agent 2', 'Agent 3', 'Agent 4', 'Agent 5']);
   });
 

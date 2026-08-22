@@ -15,13 +15,9 @@ import { QueueListComponent } from './components/queue-list/queue-list.component
 import { TopInboundAgentComponent } from './components/top-inbound-agent/top-inbound-agent.component';
 import { TopOutboundAgentComponent } from './components/top-outbound-agent/top-outbound-agent.component';
 
-// The dashboard shell: reads the store, renders every required module, and
-// owns no business logic of its own (no HTTP, no thresholds, no
-// aggregation) — that all lives in core/. Each <app-*> child below is a
-// standalone, independently testable module per the modular-architecture
-// constraint; the shell's only job is composition and a fixed 3-column,
-// no-page-scroll layout — see dashboard.component.scss for how that's
-// enforced across HD/4K/responsive viewports.
+// The dashboard shell: reads the store and composes every module. Owns no
+// business logic of its own (no HTTP, no thresholds, no aggregation) — that
+// all lives in core/. See dashboard.component.scss for the layout.
 @Component({
   selector: 'app-dashboard',
   standalone: true,

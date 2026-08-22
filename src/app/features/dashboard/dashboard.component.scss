@@ -1,22 +1,11 @@
-// ----------------------------------------------------------------------
-// Wallboard shell: fills exactly one viewport (HD, 4K, anything between).
-// Nothing on the board scrolls — not the page, and not any individual
-// component — and it scales fluidly rather than jumping between fixed
-// breakpoints. Three techniques do the work:
-//   1. `height: 100dvh` + `overflow: hidden` on the shell — the page can
-//      never grow taller than the screen, so there is nothing to scroll.
-//   2. Every row/column is sized with `fr`/`flex` units (proportional
-//      shares of whatever height/width is available) instead of fixed
-//      pixels, so the same layout re-flows correctly on a 1920x1080
-//      display and a 3840x2160 one without a separate "4K version".
-//   3. Agent Summary (column 3) is the one panel with inherently unbounded
-//      content (the agent roster). Rather than scrolling internally, its
-//      rows each take an equal share of the available height (flex: 1 on
-//      every row) — N agents always exactly fill the space, shrinking
-//      together as the roster grows, instead of a scrollbar hiding the
-//      rows that don't fit. See agent-summary.component.scss for the
-//      trade-off that implies at very large roster sizes.
-// ----------------------------------------------------------------------
+// Wallboard shell: fills exactly one viewport, nothing scrolls (not the
+// page, not any component), and it scales fluidly instead of jumping
+// between fixed breakpoints. Three techniques: `height: 100dvh` +
+// `overflow: hidden` on the shell so the page can never grow past the
+// screen; every row/column sized with `fr`/`flex` (proportional, not fixed
+// pixels) so 1920x1080 and 3840x2160 both work without a separate "4K
+// version"; and Agent Summary's rows shrink-to-fit rather than scroll (see
+// agent-summary.component.scss for the trade-off that implies at scale).
 
 .dashboard {
   --board-gap: clamp(0.5rem, 0.6vw, 1rem);
@@ -51,10 +40,9 @@
   min-width: 0;
 }
 
-// A "band" is one horizontal slice of a column. Bands default to sharing
-// the column's height equally (flex: 1); band--summary and band--kpi are
-// compact metric-tile grids that don't need as much vertical room as a
-// pair of gauges/cards, so they're sized to their own content instead.
+// A "band" is one horizontal slice of a column, sharing the column's height
+// equally by default. band--summary/band--kpi are compact tile grids that
+// don't need as much room, so they size to their own content instead.
 .band {
   min-height: 0;
   min-width: 0;
@@ -73,19 +61,13 @@
   min-height: 0;
 }
 
-// Queue Displays (title + nine dense stat rows, x2 panels) need far more
-// vertical room than Agent State (title + an 84px donut) or Agent of the
-// Month (one avatar row), which are inherently short. A fixed 2:1 split
-// still wasn't enough room for Queue Displays at shorter viewport heights
-// — its rows would overflow upward into the panel title (see the
-// justify-content note in queue-list.component.scss) — while Agent
-// State/Agent of the Month stretched into a tall box of mostly empty
-// space around their content either way. Sizing Agent State/Agent of the
-// Month to their own content (flex: 0 0 auto, the same pattern already
-// used for band--summary/band--kpi above) and letting Queue Displays take
-// every remaining pixel fixes both problems at once, and stays correct
-// across HD-4K since it's driven by actual content height, not a ratio
-// guess.
+// Queue Displays (title + nine dense stat rows) needs far more vertical
+// room than Agent State/Agent of the Month (both inherently short). A fixed
+// ratio split either overflowed Queue Displays at short viewport heights or
+// left Agent State/Agent of the Month with empty space. Sizing Agent
+// State/Agent of the Month to their own content (flex: 0 0 auto) and
+// letting Queue Displays take the remaining pixels fixes both, driven by
+// actual content height rather than a ratio guess.
 .band--queues {
   flex: 1 1 auto;
 }
@@ -104,13 +86,9 @@
   min-height: 0;
 }
 
-// ----------------------------------------------------------------------
-// Responsive fallback: below this width there isn't room for three
-// columns of a data-dense wallboard to stay legible even at the smallest
-// end of the fluid type scale. Stack columns instead and allow the page
-// to scroll — the no-scroll guarantee is a desktop/kiosk-monitor promise
-// (HD/4K wallboards), not a phone-in-portrait one.
-// ----------------------------------------------------------------------
+// Below this width, three columns can't stay legible — stack them and
+// allow page scroll. The no-scroll guarantee is a desktop/kiosk-monitor
+// promise, not a phone-portrait one.
 @media (max-width: 1000px) {
   .dashboard {
     height: auto;
@@ -129,9 +107,7 @@
   }
 
   .band--fill {
-    // Agent Summary's rows shrink-to-fit whatever height this panel gets
-    // (see agent-summary.component.scss) — capping it at 70vh on a
-    // stacked mobile layout keeps rows a sane minimum size instead of
+    // Caps Agent Summary's shrink-to-fit rows to a sane size instead of
     // stretching to fill an entire unbounded, scrolling page.
     max-height: 70vh;
   }

@@ -1,4 +1,7 @@
-import { mapCallDirectionStats, mapOutboundCallDirectionStats } from './call-direction-stats.mapper';
+import {
+  mapCallDirectionStats,
+  mapOutboundCallDirectionStats,
+} from './call-direction-stats.mapper';
 import { AgentDto, OutboundCallStatsDto } from '../models/dto';
 
 function buildAgentDto(inboundTotal: number, outboundTotal: number): AgentDto {
@@ -29,7 +32,12 @@ function buildAgentDto(inboundTotal: number, outboundTotal: number): AgentDto {
       handledCalls: 0,
       abandonedCalls: 0,
     },
-    outboundCallStats: { totalTalkDuration: 0, avgTalkDuration: 0, maxTalkDuration: 0, totalCalls: outboundTotal },
+    outboundCallStats: {
+      totalTalkDuration: 0,
+      avgTalkDuration: 0,
+      maxTalkDuration: 0,
+      totalCalls: outboundTotal,
+    },
   };
 }
 
@@ -45,14 +53,22 @@ describe('call-direction-stats.mapper', () => {
   });
 
   it('reports the top and lowest agent totals for the requested direction', () => {
-    const stats = mapCallDirectionStats([buildAgentDto(20, 6), buildAgentDto(26, 8), buildAgentDto(12, 4)], 'inbound');
+    const stats = mapCallDirectionStats(
+      [buildAgentDto(20, 6), buildAgentDto(26, 8), buildAgentDto(12, 4)],
+      'inbound',
+    );
     expect(stats.topAgentCalls).toBe(26);
     expect(stats.lowestAgentCalls).toBe(12);
   });
 
   it('returns zeroed stats for an empty roster instead of Number.MAX_SAFE_INTEGER', () => {
     const stats = mapCallDirectionStats([], 'inbound');
-    expect(stats).toEqual({ direction: 'inbound', count: 0, topAgentCalls: 0, lowestAgentCalls: 0 });
+    expect(stats).toEqual({
+      direction: 'inbound',
+      count: 0,
+      topAgentCalls: 0,
+      lowestAgentCalls: 0,
+    });
   });
 
   it('echoes back the requested direction', () => {
@@ -71,7 +87,10 @@ describe('mapOutboundCallDirectionStats', () => {
   it('takes the total from the outbound endpoint, not from the agent roster', () => {
     // 6 + 8 = 14 across the roster, but the endpoint is authoritative for
     // volume (it includes calls by agents who have since logged out).
-    const stats = mapOutboundCallDirectionStats(outboundDto, [buildAgentDto(20, 6), buildAgentDto(26, 8)]);
+    const stats = mapOutboundCallDirectionStats(outboundDto, [
+      buildAgentDto(20, 6),
+      buildAgentDto(26, 8),
+    ]);
     expect(stats.count).toBe(80);
     expect(stats.direction).toBe('outbound');
   });

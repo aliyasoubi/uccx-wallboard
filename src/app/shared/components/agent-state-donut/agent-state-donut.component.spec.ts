@@ -6,7 +6,9 @@ describe('AgentStateDonutComponent', () => {
   let component: AgentStateDonutComponent;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({ imports: [AgentStateDonutComponent] }).compileComponents();
+    await TestBed.configureTestingModule({
+      imports: [AgentStateDonutComponent],
+    }).compileComponents();
     fixture = TestBed.createComponent(AgentStateDonutComponent);
     component = fixture.componentInstance;
   });

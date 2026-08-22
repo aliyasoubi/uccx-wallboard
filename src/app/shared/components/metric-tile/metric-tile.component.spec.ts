@@ -30,7 +30,9 @@ describe('MetricTileComponent', () => {
     fixture.componentRef.setInput('value', 102);
     fixture.componentRef.setInput('icon', 'ti-phone-incoming');
     fixture.detectChanges();
-    const iconEl: HTMLElement = fixture.nativeElement.querySelector('i.ti.ti-phone-incoming.tile-icon');
+    const iconEl: HTMLElement = fixture.nativeElement.querySelector(
+      'i.ti.ti-phone-incoming.tile-icon',
+    );
     expect(iconEl).not.toBeNull();
 
     const valueEl: HTMLElement = fixture.nativeElement.querySelector('.value');
@@ -56,6 +58,22 @@ describe('MetricTileComponent', () => {
     fixture.detectChanges();
     const iconEl: HTMLElement = fixture.nativeElement.querySelector('i.ti-phone-incoming');
     expect(iconEl.style.color).toBe('var(--color-status-accent)');
+  });
+
+  // Regression guard: the critical glow previously ran `infinite`, which
+  // reads as background noise on a tile that stays critical for a long
+  // stretch. It must flash a bounded number of times and stop, not loop
+  // forever — the finite iteration-count is the whole fix, so assert it
+  // directly rather than only the class name.
+  it('flashes the critical glow a finite number of times instead of looping forever', () => {
+    fixture.componentRef.setInput('label', 'Abandoned calls');
+    fixture.componentRef.setInput('value', 40);
+    fixture.componentRef.setInput('severity', 'critical');
+    fixture.detectChanges();
+    const tile: HTMLElement = fixture.nativeElement.querySelector('.tile');
+    const iterationCount = getComputedStyle(tile).animationIterationCount;
+    expect(iterationCount).not.toBe('infinite');
+    expect(Number(iterationCount)).toBeGreaterThan(0);
   });
 
   it('escalates the tile itself at warning/critical severity, not just the value color', () => {

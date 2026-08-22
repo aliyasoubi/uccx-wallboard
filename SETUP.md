@@ -34,7 +34,7 @@ Then open http://localhost:4200.
   matching the `DataSource` interface in
   `src/app/core/data-access/data-source.token.ts`, then change one line in
   `src/app/app.config.ts`: `{ provide: DATA_SOURCE, useClass:
-  WebSocketDataSource }`.
+WebSocketDataSource }`.
 - **Theme**: `src/app/shared/styles/_tokens.scss` is the confirmed
   navy-blue palette. Change it there once and every component picks it up.
 
@@ -59,6 +59,7 @@ didn't work out of the box. That's fixed (`karma.conf.js` +
 
 Current coverage: 109 specs, all passing, ~90% statement / ~89% function
 coverage. Covers:
+
 - Every function in `core/mappers/*`, including the previously-dropped
   `Agent.inboundCalls`/`outboundCalls` mapping and the previously-unmapped
   `CsqDto.serviceMetrics` contract-drift fix.
