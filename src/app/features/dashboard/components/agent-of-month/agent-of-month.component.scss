@@ -1,15 +1,9 @@
-// display:block + height:100% so this panel fills its grid/flex cell
-// (custom elements default to inline).
+// display:block only, NO height:100% — this panel is a flex:0 0 auto band
+// under Agent Summary, so it must size to its own content. With height:100%
+// it resolved against the whole column and squeezed the roster above it down
+// to nothing.
 :host {
   display: block;
-  height: 100%;
-  min-height: 0;
-}
-
-ul {
-  list-style-type: none; 
-  padding: 0 0 0 1.5rem; 
-  margin: 0; 
 }
 
 .panel-shell {
@@ -17,12 +11,11 @@ ul {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-panel);
-  padding: var(--space-4);
+  padding: var(--space-3) var(--space-4);
   display: flex;
   flex-direction: column;
-  // justify-content: center;
-  height: 100%;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 .panel-title {
@@ -34,67 +27,137 @@ ul {
   font-weight: 600;
 }
 
+// Trophy = the one place --color-status-warning reads as gold rather than
+// as a severity warning.
 .title-icon {
-  color: var(--color-status-accent);
+  color: var(--color-status-warning);
   font-size: 1.05em;
 }
 
+// Three equal columns in podium order (2nd | 1st | 3rd — see the component's
+// `podium` computed). minmax(0, 1fr) so a long name ellipsizes inside its
+// column instead of widening the card.
+.podium {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: end;
+  gap: var(--space-2);
+}
 
-.card {
+.place {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: var(--space-3);
-  background: var(--color-surface-1);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-panel);
-  padding: var(--space-3) var(--space-4);
-  height: 100%;
-  box-sizing: border-box;
-}
-
-.photo {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-  flex-shrink: 0;
-}
-
-.photo--fallback {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--color-status-accent-bg);
-  color: var(--color-status-accent);
-  font-weight: 600;
-  font-size: var(--font-size-body);
-}
-
-.info {
+  text-align: center;
   min-width: 0;
 }
 
-.eyebrow {
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--font-size-label);
-  color: var(--color-text-secondary);
-  text-transform: uppercase;
+// First place is raised and scaled up so the winner reads instantly from
+// across the room, which a rank number alone doesn't achieve.
+.place--first {
+  padding-bottom: var(--space-3);
 }
 
-.title-icon {
+.avatar-wrap {
+  position: relative;
+  margin-bottom: var(--space-2);
+}
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--color-surface-2);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body);
+  font-weight: 600;
+  border: 2px solid var(--color-border-elevated);
+  box-sizing: border-box;
+}
+
+.place--first .avatar {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-color: var(--color-status-warning);
+}
+
+.avatar--fallback {
+  background: var(--color-status-accent-bg);
+  color: var(--color-status-accent);
+}
+
+.place--first .avatar--fallback {
+  background: var(--color-status-warning-bg);
   color: var(--color-status-warning);
-  font-size: 1.1em;
+}
+
+// Rank badge sits on the avatar's top edge, like the reference layout.
+.rank-badge {
+  position: absolute;
+  top: -0.35rem;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 var(--space-1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--color-surface-2);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-elevated);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-label-compact);
+  font-weight: 700;
+  box-sizing: border-box;
+}
+
+.place--first .rank-badge {
+  background: var(--color-status-warning);
+  border-color: var(--color-status-warning);
+  color: var(--color-surface-0);
 }
 
 .name {
-  margin: var(--space-1) 0 0;
-  font-size: var(--font-size-body);
+  font-size: var(--font-size-label);
   font-weight: 600;
+  color: var(--color-text-primary);
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.calls {
+  margin-top: var(--space-1);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-body);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.place--first .calls {
+  color: var(--color-status-warning);
+}
+
+.calls-label {
+  font-size: var(--font-size-label-compact);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.empty {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-body);
 }

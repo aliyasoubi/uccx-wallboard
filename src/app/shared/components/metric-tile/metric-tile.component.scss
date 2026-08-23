@@ -13,6 +13,18 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  // Query container so the label and value below can size against THIS
+  // tile's width rather than the viewport's. They are not the same thing: at
+  // 1366x768 the viewport-sized 36px value was still being asked to fit a
+  // 63px tile, because column 1 narrows and holds four tiles. inline-size,
+  // not size — the tile's height must stay content-driven.
+  container-type: inline-size;
+  // Safety net: a value with no spaces (an h:mm:ss duration) cannot wrap, so
+  // an unexpectedly long one would paint straight over the neighbouring tile.
+  // Clips at the tile edge instead. Does not affect the critical-severity
+  // glow, which is a box-shadow on this element rather than a child.
+  min-width: 0;
+  overflow: hidden;
   transition:
     background var(--motion-medium) var(--motion-easing),
     border-color var(--motion-medium) var(--motion-easing);
@@ -43,9 +55,14 @@
   }
 }
 
+// cqw values below are percentages of the tile's own width (see
+// container-type above); the rem bounds keep them legible on a small tile and
+// stop them growing absurdly on a wide one. Each multiplier is measured
+// against the longest string that variant actually renders — "Abandoned" for
+// the label, a 3-digit count for .value, an h:mm:ss duration for .tile--sm.
 .label {
   margin: 0;
-  font-size: var(--font-size-label);
+  font-size: clamp(0.5rem, 15cqw, 0.8rem);
   color: var(--color-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.02em;
@@ -54,14 +71,20 @@
 .value {
   margin: 0;
   font-family: var(--font-family-mono);
-  font-size: var(--font-size-metric);
+  font-size: clamp(1rem, 45cqw, 2.5rem);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   transition: color var(--motion-medium) var(--motion-easing);
 }
 
+// Long string values (h:mm:ss) need roughly half the per-character budget of
+// a 2-3 digit count.
+.tile--sm .value {
+  font-size: clamp(0.65rem, 20cqw, 1.5rem);
+}
+
 .tile--lg .value {
-  font-size: var(--font-size-metric-lg);
+  font-size: clamp(1.25rem, 55cqw, 3.25rem);
 }
 
 // Big, colorful, and placed under the value (not a small inline glyph

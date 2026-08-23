@@ -1,0 +1,14 @@
+@use '../../../../shared/styles/panels';
+
+// display:block only, no height:100% — this band is flex:0 0 auto (sized to
+// its own content, not stretched), matching band--summary/band--kpi.
+:host {
+  display: block;
+}
+
+// Four tiles on one row under the queue panels. Same minimum as the other
+// tile grids so a narrow column doesn't wrap them onto two rows and eat the
+// queue panels' height.
+.grid {
+  @include panels.tile-grid;
+}

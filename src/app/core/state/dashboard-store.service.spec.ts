@@ -38,8 +38,20 @@ function buildSnapshot(overrides: Partial<DashboardSnapshot> = {}): DashboardSna
     ],
     queues: [],
     agentsOfMonth: [{ agentId: 'A1', name: 'John', photoUrl: null }],
-    inboundStats: { direction: 'inbound', count: 13, topAgentCalls: 8, lowestAgentCalls: 5 },
-    outboundStats: { direction: 'outbound', count: 3, topAgentCalls: 2, lowestAgentCalls: 1 },
+    inboundStats: {
+      direction: 'inbound',
+      count: 13,
+      totalTalkSeconds: 900,
+      topAgentCalls: 8,
+      lowestAgentCalls: 5,
+    },
+    outboundStats: {
+      direction: 'outbound',
+      count: 3,
+      totalTalkSeconds: 300,
+      topAgentCalls: 2,
+      lowestAgentCalls: 1,
+    },
     fetchedAt: '2026-07-21T08:00:00.000Z',
     ...overrides,
   };

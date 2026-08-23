@@ -50,6 +50,15 @@ ARCHITECTURE.md; if a change is significant, add it to
   (`features/dashboard/components/top-agent-base/`). If a task
   description says "one `app-top-agent` component with a direction
   input," that's stale — follow the actual two-component structure.
+- **They are rendered inside one shared card**, `TopAgentsComponent`
+  (`app-top-agents`), which owns the card chrome and the "Top Agents
+  (Inbound & Outbound)" title; the two children render as bare columns
+  with a direction-tinted left accent border. This is a presentational
+  wrapper only — it does NOT merge them, and `DashboardComponent`
+  composes `app-top-agents` rather than the two children directly. Both
+  the "one visual card" requirement and the "two separate components"
+  rule above hold at the same time; don't collapse them into one
+  component to satisfy the layout.
 - `@Directive()` on `TopAgentBase` is required, not optional — Angular
   only registers a base class's `input()`s for template binding if it's
   been processed as a Directive/Component. Removing the decorator

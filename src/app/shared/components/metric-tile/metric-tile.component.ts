@@ -13,7 +13,13 @@ export class MetricTileComponent {
   readonly value = input.required<string | number>();
   /** 'normal' | 'warning' | 'critical' — drives color from the shared token set, nothing hardcoded per-call site. */
   readonly severity = input<Severity>('normal');
-  readonly size = input<'md' | 'lg'>('md');
+  /**
+   * Value type size. Use 'sm' for values that are long strings rather than
+   * short numbers (h:mm:ss durations) — at 'md' an 8-character duration
+   * overflows its tile. The call site knows what it is rendering; CSS can
+   * only see the tile's width, not the content's length.
+   */
+  readonly size = input<'sm' | 'md' | 'lg'>('md');
   /** Optional Tabler icon class (e.g. 'ti-phone-incoming'). Omitted tiles render exactly as before. */
   readonly icon = input<string>('');
   /** Optional CSS color (var(...) or any valid color) for the icon. Defaults to the shared accent token — never a one-off hardcoded hex at the call site. */

@@ -11,10 +11,7 @@
         [outboundStats]="store.outboundStats()"
       />
 
-      <div class="band band--pair">
-        <app-top-inbound-agent class="pair-item" [agents]="store.agents()" />
-        <app-top-outbound-agent class="pair-item" [agents]="store.agents()" />
-      </div>
+      <app-top-agents class="band band--top-agents" [agents]="store.agents()" />
 
       <div class="band band--pair">
         <app-sla-gauge class="pair-item" [metrics]="store.serviceMetrics()" />
@@ -28,7 +25,7 @@
       />
     </section>
 
-    <!-- Column 2: queue health (waiting/serving) -> agent state -> agent of the month -->
+    <!-- Column 2: queue health -> org-wide inbound/outbound totals -->
     <section class="column column--2">
       <div class="band band--pair band--queues">
         @for (queue of store.queues(); track queue.name) {
@@ -36,15 +33,30 @@
         }
       </div>
 
-      <div class="band band--pair band--agent-highlights">
+      <!-- Agent State and Agent of the Month used to sit here. At the client's
+           request this slot now shows the four org-wide direction totals, and
+           Agent of the Month moved under Agent Summary in column 3 (below).
+           AgentStateComponent is left in place (imported, tested, still fed by
+           the store) but is no longer rendered — uncomment to bring it back. -->
+      <!-- <div class="band band--pair band--agent-highlights">
         <app-agent-state class="pair-item" [summary]="store.agentStateSummary()" />
-        <app-agent-of-month class="pair-item" [agents]="store.agentOfMonth()" />
-      </div>
+      </div> -->
+
+      <app-call-direction-totals
+        class="band band--direction-totals"
+        [inboundStats]="store.inboundStats()"
+        [outboundStats]="store.outboundStats()"
+      />
     </section>
 
-    <!-- Column 3: agent summary, full height -->
+    <!-- Column 3: agent summary (fills) -> agents of the month -->
     <section class="column column--3">
       <app-agent-summary class="band band--fill" [agents]="store.agents()" />
+      <app-agent-of-month
+        class="band band--agents-of-month"
+        [agents]="store.agentOfMonth()"
+        [roster]="store.agents()"
+      />
     </section>
   </div>
 

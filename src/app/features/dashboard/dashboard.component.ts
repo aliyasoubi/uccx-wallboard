@@ -5,6 +5,7 @@ import { DashboardStoreService } from '../../core/state/dashboard-store.service'
 import { HeaderComponent } from './components/header/header.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { CallSummaryDisplaysComponent } from './components/call-summary-displays/call-summary-displays.component';
+import { CallDirectionTotalsComponent } from './components/call-direction-totals/call-direction-totals.component';
 import { KpiMetricsComponent } from './components/kpi-metrics/kpi-metrics.component';
 import { SlaGaugeComponent } from './components/sla-gauge/sla-gauge.component';
 import { CustomerSatisfactionGaugeComponent } from './components/customer-satisfaction-gauge/customer-satisfaction-gauge.component';
@@ -12,8 +13,7 @@ import { AgentOfMonthComponent } from './components/agent-of-month/agent-of-mont
 import { AgentStateComponent } from './components/agent-state/agent-state.component';
 import { AgentSummaryComponent } from './components/agent-summary/agent-summary.component';
 import { QueueListComponent } from './components/queue-list/queue-list.component';
-import { TopInboundAgentComponent } from './components/top-inbound-agent/top-inbound-agent.component';
-import { TopOutboundAgentComponent } from './components/top-outbound-agent/top-outbound-agent.component';
+import { TopAgentsComponent } from './components/top-agents/top-agents.component';
 
 // The dashboard shell: reads the store and composes every module. Owns no
 // business logic of its own (no HTTP, no thresholds, no aggregation) — that
@@ -26,11 +26,11 @@ import { TopOutboundAgentComponent } from './components/top-outbound-agent/top-o
     HeaderComponent,
     FooterComponent,
     CallSummaryDisplaysComponent,
+    CallDirectionTotalsComponent,
     KpiMetricsComponent,
     SlaGaugeComponent,
     CustomerSatisfactionGaugeComponent,
-    TopInboundAgentComponent,
-    TopOutboundAgentComponent,
+    TopAgentsComponent,
     AgentOfMonthComponent,
     AgentStateComponent,
     AgentSummaryComponent,

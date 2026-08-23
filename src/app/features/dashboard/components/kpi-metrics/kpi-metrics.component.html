@@ -1,11 +1,16 @@
 <div class="group-card">
   <p class="section-label">KPI Metrics</p>
   <div class="grid">
-    <app-metric-tile
+    <!-- FCR hidden at the client's request (temporary — "فعلا حذف بشه").
+         Left commented rather than deleted, and the whole data path behind it
+         (CustomerServiceMetricsDto.fcr, ServiceMetrics.fcrPercent, the fcrPercent
+         threshold, hasFcrData/fcrSeverity) is untouched, so restoring this is a
+         one-line change. Same pattern as "Calls in queue" below. -->
+    <!-- <app-metric-tile
       label="FCR"
       [value]="hasFcrData() ? serviceMetrics()!.fcrPercent + '%' : '—'"
       [severity]="fcrSeverity()"
-    />
+    /> -->
     <app-metric-tile
       label="AWD"
       [value]="summary()?.avgWaitSeconds | formatDuration"

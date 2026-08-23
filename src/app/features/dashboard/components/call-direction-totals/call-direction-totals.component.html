@@ -1,0 +1,28 @@
+<div class="grid">
+  <app-metric-tile
+    icon="ti-phone-incoming"
+    iconColorVar="var(--color-status-accent)"
+    label="Total inbound calls"
+    [value]="inboundStats()?.count ?? '—'"
+  />
+  <app-metric-tile
+    icon="ti-phone-outgoing"
+    iconColorVar="var(--color-status-warning)"
+    label="Total outbound calls"
+    [value]="outboundStats()?.count ?? '—'"
+  />
+  <app-metric-tile
+    icon="ti-clock-play"
+    iconColorVar="var(--color-status-accent)"
+    label="Total inbound talk time"
+    size="sm"
+    [value]="inboundStats()?.totalTalkSeconds | formatDuration"
+  />
+  <app-metric-tile
+    icon="ti-clock-play"
+    iconColorVar="var(--color-status-warning)"
+    label="Total outbound talk time"
+    size="sm"
+    [value]="outboundStats()?.totalTalkSeconds | formatDuration"
+  />
+</div>

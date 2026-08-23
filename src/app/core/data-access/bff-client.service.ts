@@ -6,8 +6,8 @@ import { AppConfigService } from '../config/app-config.service';
 import {
   mapAgentsOfMonth,
   mapAgents,
-  mapCallDirectionStats,
   mapCallSummary,
+  mapInboundCallDirectionStats,
   mapOutboundCallDirectionStats,
   mapQueues,
   mapServiceMetrics,
@@ -57,7 +57,9 @@ export class BffClientService {
         this.endpoint('AgentStateStats.json', '/agent-state-counts'),
       ),
       queues: this.http.get<CsqDto[]>(this.endpoint('CsqStats.json', '/csqs')),
-      agentOfMonth: this.http.get<AgentOfMonthDto[]>(this.endpoint('AgentOfMonth.json', '/agent-of-month')),
+      agentOfMonth: this.http.get<AgentOfMonthDto[]>(
+        this.endpoint('AgentOfMonth.json', '/agent-of-month'),
+      ),
     }).pipe(
       map(
         ({
@@ -77,7 +79,7 @@ export class BffClientService {
             agents: mappedAgents,
             queues: mapQueues(queues),
             agentsOfMonth: mapAgentsOfMonth(agentOfMonth),
-            inboundStats: mapCallDirectionStats(agents, 'inbound'),
+            inboundStats: mapInboundCallDirectionStats(inboundCallStats, agents),
             outboundStats: mapOutboundCallDirectionStats(outboundCallStats, agents),
             fetchedAt: new Date().toISOString(),
           } satisfies DashboardSnapshot;

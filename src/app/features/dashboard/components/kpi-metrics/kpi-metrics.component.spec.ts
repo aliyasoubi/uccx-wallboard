@@ -30,14 +30,24 @@ describe('KpiMetricsComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('renders FCR, AWD, and AHT', () => {
+  it('renders AWD and AHT', () => {
     fixture.componentRef.setInput('summary', summary);
     fixture.componentRef.setInput('serviceMetrics', serviceMetrics);
     fixture.detectChanges();
     const text = fixture.nativeElement.textContent;
-    expect(text).toContain('FCR');
     expect(text).toContain('AWD');
     expect(text).toContain('AHT');
+  });
+
+  // Guards the current, deliberate state: FCR is hidden at the client's
+  // request but its data path is intact, so this documents the intent rather
+  // than letting the tile quietly reappear or its removal go unnoticed. Same
+  // pattern as the "Calls in queue" guard below.
+  it('does not render FCR while it is deliberately hidden', () => {
+    fixture.componentRef.setInput('summary', summary);
+    fixture.componentRef.setInput('serviceMetrics', serviceMetrics);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).not.toContain('FCR');
   });
 
   // Guards the current, deliberate state (see the component's header

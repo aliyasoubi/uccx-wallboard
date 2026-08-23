@@ -77,9 +77,16 @@
 // Sized in cqw (percent of the ring's own width, see container-type above),
 // clamped so text stays legible in a small ring without becoming oversized
 // in a large one.
+//
+// The icon was previously capped at 1rem, which rendered it as an
+// unidentifiable speck inside a 230px ring — the client's specific complaint
+// about the SLA/CSAT gauges. Now it scales with the ring and is tinted with
+// the same severity color as the value, so it reads as a real symbol.
 .meter-icon {
-  font-size: clamp(0.6rem, 9cqw, 1rem);
-  margin-bottom: 2px;
+  font-size: clamp(0.85rem, 15cqw, 2rem);
+  line-height: 1;
+  margin-bottom: calc(var(--space-1) / 2);
+  opacity: 0.9;
 }
 
 .meter-value {

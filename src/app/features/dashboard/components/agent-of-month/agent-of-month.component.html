@@ -1,12 +1,31 @@
 <div class="panel-shell">
-  <p class="panel-title"><i class="ti ti-trophy title-icon" aria-hidden="true"></i>Agents of the month</p>
+  <p class="panel-title">
+    <i class="ti ti-trophy title-icon" aria-hidden="true"></i>Agents of the month
+  </p>
 
-  <ul>
-    @for (agent of agents(); track agent.agentId) {
-    <li>
-     
-      <p class="name">{{ agent.name }}</p>
-    </li>
-    }
-  </ul>
+  @if (podium().length === 0) {
+    <p class="empty">No data</p>
+  } @else {
+    <ol class="podium">
+      @for (entry of podium(); track entry.agentId) {
+        <li class="place" [attr.data-rank]="entry.rank" [class.place--first]="entry.rank === 1">
+          <div class="avatar-wrap">
+            @if (entry.photoUrl) {
+              <img [src]="entry.photoUrl" alt="" class="avatar" />
+            } @else {
+              <span class="avatar avatar--fallback">{{ entry.initials }}</span>
+            }
+            <span class="rank-badge">{{ entry.rank }}</span>
+          </div>
+
+          <span class="name">{{ entry.name }}</span>
+
+          @if (entry.calls !== null) {
+            <span class="calls">{{ entry.calls }}</span>
+            <span class="calls-label">Calls</span>
+          }
+        </li>
+      }
+    </ol>
+  }
 </div>

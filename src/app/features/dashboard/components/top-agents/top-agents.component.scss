@@ -1,0 +1,49 @@
+// display:block only, NO height:100% — this card's content (title + two
+// short stat columns) is compact, so it sizes to itself and leaves the rest
+// of column 1 to the SLA/CSAT gauges, which benefit from the room. With
+// height:100% it filled the column and squashed those gauges to a sliver.
+:host {
+  display: block;
+}
+
+.panel {
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-panel);
+  padding: var(--space-3);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panel-title {
+  margin: 0 0 var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-heading);
+  font-weight: 600;
+  flex: 0 0 auto;
+}
+
+.title-icon {
+  color: var(--color-status-accent);
+  font-size: 1.05em;
+}
+
+// Two equal columns. minmax(0, 1fr), not 1fr: a long agent name must
+// ellipsize inside its column rather than force the column wider than the
+// card, the same overflow trap the roster guards against.
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-3);
+  min-height: 0;
+}
+
+.column-item {
+  min-width: 0;
+  min-height: 0;
+}

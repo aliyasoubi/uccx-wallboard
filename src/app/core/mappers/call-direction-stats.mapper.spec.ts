@@ -1,10 +1,16 @@
 import {
   mapCallDirectionStats,
+  mapInboundCallDirectionStats,
   mapOutboundCallDirectionStats,
 } from './call-direction-stats.mapper';
-import { AgentDto, OutboundCallStatsDto } from '../models/dto';
+import { AgentDto, InboundCallStatsDto, OutboundCallStatsDto } from '../models/dto';
 
-function buildAgentDto(inboundTotal: number, outboundTotal: number): AgentDto {
+function buildAgentDto(
+  inboundTotal: number,
+  outboundTotal: number,
+  inboundTalk = 0,
+  outboundTalk = 0,
+): AgentDto {
   return {
     id: `A-${inboundTotal}-${outboundTotal}`,
     name: 'Agent',
@@ -19,7 +25,7 @@ function buildAgentDto(inboundTotal: number, outboundTotal: number): AgentDto {
       avgNotReadyDuration: 0,
     },
     inboundCallStats: {
-      totalTalkDuration: 0,
+      totalTalkDuration: inboundTalk,
       avgTalkDuration: 0,
       maxTalkDuration: 0,
       totalHoldDuration: 0,
@@ -33,7 +39,7 @@ function buildAgentDto(inboundTotal: number, outboundTotal: number): AgentDto {
       abandonedCalls: 0,
     },
     outboundCallStats: {
-      totalTalkDuration: 0,
+      totalTalkDuration: outboundTalk,
       avgTalkDuration: 0,
       maxTalkDuration: 0,
       totalCalls: outboundTotal,
@@ -66,6 +72,7 @@ describe('call-direction-stats.mapper', () => {
     expect(stats).toEqual({
       direction: 'inbound',
       count: 0,
+      totalTalkSeconds: 0,
       topAgentCalls: 0,
       lowestAgentCalls: 0,
     });
@@ -76,6 +83,51 @@ describe('call-direction-stats.mapper', () => {
   });
 });
 
+describe('mapInboundCallDirectionStats', () => {
+  const inboundDto: InboundCallStatsDto = {
+    totalTalkDuration: 81105,
+    avgTalkDuration: 33,
+    maxTalkDuration: 230,
+    avgWaitDuration: 50,
+    maxWaitDuration: 77,
+    avgHandleDuration: 61,
+    totalCalls: 718,
+    handledCalls: 566,
+    abandonedCalls: 152,
+    waitingCalls: 5,
+  };
+
+  // The whole point of this function: an agent who handled calls earlier and
+  // has since logged out is gone from the roster but still counted by the
+  // endpoint, so a roster sum under-reports the day's real volume.
+  it('takes count and talk time from the inbound endpoint, not from the agent roster', () => {
+    const stats = mapInboundCallDirectionStats(inboundDto, [
+      buildAgentDto(20, 6, 500),
+      buildAgentDto(26, 8, 700),
+    ]);
+    expect(stats.count).toBe(718);
+    expect(stats.totalTalkSeconds).toBe(81105);
+    expect(stats.direction).toBe('inbound');
+  });
+
+  it('still derives top and lowest agent totals from the roster', () => {
+    const stats = mapInboundCallDirectionStats(inboundDto, [
+      buildAgentDto(20, 6),
+      buildAgentDto(26, 8),
+      buildAgentDto(12, 4),
+    ]);
+    expect(stats.topAgentCalls).toBe(26);
+    expect(stats.lowestAgentCalls).toBe(12);
+  });
+
+  it('never leaks the Number.MAX_SAFE_INTEGER sentinel for an empty roster', () => {
+    const stats = mapInboundCallDirectionStats(inboundDto, []);
+    expect(stats.lowestAgentCalls).toBe(0);
+    expect(stats.topAgentCalls).toBe(0);
+    expect(stats.count).toBe(718);
+  });
+});
+
 describe('mapOutboundCallDirectionStats', () => {
   const outboundDto: OutboundCallStatsDto = {
     totalTalkDuration: 3000,
@@ -83,6 +135,14 @@ describe('mapOutboundCallDirectionStats', () => {
     maxTalkDuration: 400,
     totalCalls: 80,
   };
+
+  it('takes talk time from the outbound endpoint, not from the agent roster', () => {
+    const stats = mapOutboundCallDirectionStats(outboundDto, [
+      buildAgentDto(20, 6, 0, 111),
+      buildAgentDto(26, 8, 0, 222),
+    ]);
+    expect(stats.totalTalkSeconds).toBe(3000);
+  });
 
   it('takes the total from the outbound endpoint, not from the agent roster', () => {
     // 6 + 8 = 14 across the roster, but the endpoint is authoritative for

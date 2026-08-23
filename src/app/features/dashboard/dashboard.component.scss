@@ -49,7 +49,8 @@
 }
 
 .band--summary,
-.band--kpi {
+.band--kpi,
+.band--top-agents {
   flex: 0 0 auto;
 }
 
@@ -73,6 +74,20 @@
 }
 
 .band--agent-highlights {
+  flex: 0 0 auto;
+}
+
+// Same content-sized treatment as band--summary/band--kpi: the four totals
+// take the height their tiles need and leave the rest to the queue panels
+// above, which are the ones that actually benefit from extra room.
+.band--direction-totals {
+  flex: 0 0 auto;
+}
+
+// Agents of the Month sits under Agent Summary in column 3. Content-sized so
+// the roster above keeps every pixel it can — three rows plus a title is a
+// known, small height.
+.band--agents-of-month {
   flex: 0 0 auto;
 }
 
