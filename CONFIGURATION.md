@@ -124,14 +124,20 @@ SLA, and FCR were added in this pass — see `queue-timing-stats.dto.ts`,
 To change it, edit that one JSON file on the server and refresh — no
 rebuild needed (see §2).
 
-Worth knowing: this fires 6 parallel `HTTP GET`s every interval (one per
-resource — agents, call stats, queues, service metrics, agent state
-counts, agent of month), via `forkJoin`. At 3s that's manageable for a
-handful of dashboard clients hitting fixtures or a fast BFF, but if this
-scales to many simultaneous wallboards hitting a real BFF, that's the
-moment to prioritize the WebSocket phase from README.md §4/§10 —
-push-based updates remove the polling cost entirely rather than requiring
-interval tuning.
+Worth knowing: this fires 7 parallel `HTTP GET`s every interval (one per
+resource — agents, inbound call stats, outbound call stats, queues,
+service metrics, agent state counts, agent of month), via `forkJoin`. At
+3s that's manageable for a handful of dashboard clients hitting fixtures
+or a fast BFF, but if this scales to many simultaneous wallboards hitting
+a real BFF, that's the moment to prioritize the WebSocket phase from
+README.md §4/§10 — push-based updates remove the polling cost entirely
+rather than requiring interval tuning.
+
+Also worth knowing: `forkJoin` is all-or-nothing — one failing resource
+currently fails the whole snapshot for that tick, including data from the
+other six requests that succeeded. That's a known gap, not a design
+choice; see the P0 items in the codebase review this file's git history
+points to.
 
 ## Changelog
 

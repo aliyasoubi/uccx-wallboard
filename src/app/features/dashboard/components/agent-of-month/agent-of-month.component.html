@@ -11,7 +11,12 @@
         <li class="place" [attr.data-rank]="entry.rank" [class.place--first]="entry.rank === 1">
           <div class="avatar-wrap">
             @if (entry.photoUrl) {
-              <img [src]="entry.photoUrl" alt="" class="avatar" />
+              <img
+                [src]="entry.photoUrl"
+                alt=""
+                class="avatar"
+                (error)="onPhotoError(entry.agentId)"
+              />
             } @else {
               <span class="avatar avatar--fallback">{{ entry.initials }}</span>
             }

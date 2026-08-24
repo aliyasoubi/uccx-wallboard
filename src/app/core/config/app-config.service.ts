@@ -4,6 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { AppConfig } from './app-config.model';
 import {
   DEFAULT_STATUS_THRESHOLDS,
+  INVERSE_SEVERITY_METRICS,
   StatusThresholds,
   Thresholds,
 } from '../policies/status-thresholds.policy';
@@ -106,7 +107,7 @@ function mergeThresholds(loaded: PartialThresholds | undefined): StatusThreshold
   for (const key of Object.keys(DEFAULT_STATUS_THRESHOLDS) as (keyof StatusThresholds)[]) {
     const override = loaded[key];
     if (!override) continue;
-    result[key] = {
+    const candidate: Thresholds = {
       warning: validThresholdValue(
         override.warning,
         DEFAULT_STATUS_THRESHOLDS[key].warning,
@@ -120,8 +121,34 @@ function mergeThresholds(loaded: PartialThresholds | undefined): StatusThreshold
         'critical',
       ),
     };
+    result[key] = validOrdering(candidate, DEFAULT_STATUS_THRESHOLDS[key], key);
   }
   return result;
+}
+
+// Each finite, non-negative number passing validThresholdValue individually
+// doesn't guarantee the PAIR makes sense — e.g. slaPercent (lower is worse,
+// so critical must be <= warning) configured as {warning: 50, critical: 80}
+// is backwards and would silently invert every green/yellow/red on the SLA
+// gauge. Falls back to the whole default pair rather than guessing which
+// side was the mistake.
+function validOrdering(
+  candidate: Thresholds,
+  fallback: Thresholds,
+  metric: keyof StatusThresholds,
+): Thresholds {
+  const isInverse = INVERSE_SEVERITY_METRICS.has(metric);
+  const inOrder = isInverse
+    ? candidate.critical <= candidate.warning
+    : candidate.critical >= candidate.warning;
+  if (inOrder) return candidate;
+
+  console.warn(
+    `[AppConfigService] Ignoring thresholds.${metric} — warning (${candidate.warning}) and ` +
+      `critical (${candidate.critical}) are ordered backwards for a ${isInverse ? 'lower-is-worse' : 'higher-is-worse'} ` +
+      `metric, using the default pair (warning: ${fallback.warning}, critical: ${fallback.critical})`,
+  );
+  return fallback;
 }
 
 function validThresholdValue(

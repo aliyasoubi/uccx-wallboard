@@ -132,4 +132,55 @@ describe('AgentOfMonthComponent', () => {
       expect(fixture.nativeElement.textContent).toContain('No data');
     }
   });
+
+  // Regression guard: the podium grid is a fixed 3 columns. A longer API
+  // response used to keep every extra winner and wrap onto a second row,
+  // breaking the fixed-height layout this whole board depends on.
+  it('caps the podium at 3 winners and logs a warning for a longer response', () => {
+    spyOn(console, 'warn');
+    fixture.componentRef.setInput('agents', [
+      ...winners,
+      { agentId: 'A1005', name: 'Fourth Place', photoUrl: null },
+    ]);
+    fixture.detectChanges();
+    expect(component.podium().length).toBe(3);
+    expect(fixture.debugElement.queryAll(By.css('.place')).length).toBe(3);
+    expect(fixture.nativeElement.textContent).not.toContain('Fourth Place');
+    expect(console.warn).toHaveBeenCalled();
+  });
+
+  // Regression guard: `[photoUrl]` being non-empty only proves a URL was
+  // supplied, not that it loads. A broken URL used to render a broken-image
+  // icon because the fallback only ever checked the data, never whether the
+  // <img> itself actually failed.
+  it('falls back to initials when a supplied photo URL fails to load', () => {
+    fixture.componentRef.setInput('agents', [
+      { agentId: 'A1', name: 'John Smith', photoUrl: 'https://example.com/broken.jpg' },
+    ]);
+    fixture.detectChanges();
+    expect(fixture.debugElement.query(By.css('img.avatar'))).not.toBeNull();
+    expect(fixture.debugElement.query(By.css('.avatar--fallback'))).toBeNull();
+
+    component.onPhotoError('A1');
+    fixture.detectChanges();
+
+    expect(fixture.debugElement.query(By.css('img.avatar'))).toBeNull();
+    const fallback = fixture.debugElement.query(By.css('.avatar--fallback'));
+    expect(fallback).not.toBeNull();
+    expect(fallback.nativeElement.textContent.trim()).toBe('JS');
+  });
+
+  it('only falls back the specific winner whose photo failed, not the whole podium', () => {
+    fixture.componentRef.setInput('agents', [
+      { agentId: 'A1', name: 'John Smith', photoUrl: 'https://example.com/a.jpg' },
+      { agentId: 'A2', name: 'Sarah Johnson', photoUrl: 'https://example.com/b.jpg' },
+    ]);
+    fixture.detectChanges();
+
+    component.onPhotoError('A1');
+    fixture.detectChanges();
+
+    expect(fixture.debugElement.queryAll(By.css('img.avatar')).length).toBe(1);
+    expect(fixture.debugElement.queryAll(By.css('.avatar--fallback')).length).toBe(1);
+  });
 });

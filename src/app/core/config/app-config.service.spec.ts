@@ -166,4 +166,57 @@ describe('AppConfigService', () => {
 
     expect(service.config().pollIntervalMs).toBe(500);
   });
+
+  // Each side of a threshold pair can individually be a valid non-negative
+  // number and still be wrong together: slaPercent is lower-is-worse, so
+  // critical must be <= warning. {warning: 50, critical: 80} passes the
+  // per-value check but silently inverts every green/yellow/red on the SLA
+  // gauge if not caught.
+  it('rejects a lower-is-worse threshold pair (slaPercent) ordered backwards', async () => {
+    spyOn(console, 'warn');
+    const loadPromise = service.load();
+    const req = httpMock.expectOne('assets/config.json');
+    req.flush({ thresholds: { slaPercent: { warning: 50, critical: 80 } } });
+    await loadPromise;
+
+    expect(service.config().thresholds.slaPercent).toEqual(DEFAULT_STATUS_THRESHOLDS.slaPercent);
+    expect(console.warn).toHaveBeenCalled();
+  });
+
+  it('rejects a higher-is-worse threshold pair (avgWaitSeconds) ordered backwards', async () => {
+    spyOn(console, 'warn');
+    const loadPromise = service.load();
+    const req = httpMock.expectOne('assets/config.json');
+    req.flush({ thresholds: { avgWaitSeconds: { warning: 60, critical: 30 } } });
+    await loadPromise;
+
+    expect(service.config().thresholds.avgWaitSeconds).toEqual(
+      DEFAULT_STATUS_THRESHOLDS.avgWaitSeconds,
+    );
+    expect(console.warn).toHaveBeenCalled();
+  });
+
+  it('accepts warning and critical set to the same value (no dead zone required)', async () => {
+    const loadPromise = service.load();
+    const req = httpMock.expectOne('assets/config.json');
+    req.flush({ thresholds: { avgWaitSeconds: { warning: 45, critical: 45 } } });
+    await loadPromise;
+
+    expect(service.config().thresholds.avgWaitSeconds).toEqual({ warning: 45, critical: 45 });
+  });
+
+  it('accepts a correctly-ordered custom pair for both metric directions', async () => {
+    const loadPromise = service.load();
+    const req = httpMock.expectOne('assets/config.json');
+    req.flush({
+      thresholds: {
+        slaPercent: { warning: 90, critical: 70 }, // lower is worse: critical <= warning
+        avgWaitSeconds: { warning: 20, critical: 40 }, // higher is worse: critical >= warning
+      },
+    });
+    await loadPromise;
+
+    expect(service.config().thresholds.slaPercent).toEqual({ warning: 90, critical: 70 });
+    expect(service.config().thresholds.avgWaitSeconds).toEqual({ warning: 20, critical: 40 });
+  });
 });
