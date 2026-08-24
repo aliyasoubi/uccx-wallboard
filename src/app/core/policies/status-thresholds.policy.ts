@@ -47,6 +47,16 @@ export const DEFAULT_STATUS_THRESHOLDS: StatusThresholds = {
   currentWaitSeconds: { warning: 45, critical: 90 },
 };
 
+// Which metrics getInverseSeverity applies to (lower value = worse) — a
+// single source of truth AppConfigService's ordering validation reads from,
+// so it can never drift out of sync with which comparison direction each
+// metric's components actually use.
+export const INVERSE_SEVERITY_METRICS: ReadonlySet<keyof StatusThresholds> = new Set([
+  'slaPercent',
+  'fcrPercent',
+  'csatScore',
+]);
+
 export function getSeverity(value: number, thresholds: Thresholds): Severity {
   if (value >= thresholds.critical) return 'critical';
   if (value >= thresholds.warning) return 'warning';

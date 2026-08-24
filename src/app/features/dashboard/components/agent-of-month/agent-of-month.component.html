@@ -1,6 +1,6 @@
 <div class="card">
-  @if (agent()?.photoUrl) {
-    <img [src]="agent()!.photoUrl" alt="" class="photo" />
+  @if (showPhoto()) {
+    <img [src]="agent()!.photoUrl" alt="" class="photo" (error)="onPhotoError()" />
   } @else {
     <div class="photo photo--fallback">{{ initials() }}</div>
   }
