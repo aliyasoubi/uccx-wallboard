@@ -74,8 +74,8 @@ describe('DashboardStoreService', () => {
     expect(store.callSummary()).toEqual(snapshot.callSummary);
     expect(store.serviceMetrics()).toEqual(snapshot.serviceMetrics);
     expect(store.agentStateSummary()).toEqual(snapshot.agentStateSummary);
-    expect(store.agents()).toEqual(snapshot.agents);
-    expect(store.queues()).toEqual(snapshot.queues);
+    expect(store.agents()).toEqual(snapshot.agents!);
+    expect(store.queues()).toEqual(snapshot.queues!);
     expect(store.agentOfMonth()).toEqual(snapshot.agentOfMonth);
     expect(store.inboundStats()).toEqual(snapshot.inboundStats);
     expect(store.outboundStats()).toEqual(snapshot.outboundStats);
@@ -102,5 +102,101 @@ describe('DashboardStoreService', () => {
 
     updates$.next(buildSnapshot());
     expect(store.agents().length).toBe(2);
+  });
+
+  // The whole point of Phase 1: BffClientService now emits `null` for any
+  // field whose endpoint failed THIS poll (see DashboardSnapshot), and the
+  // store's job is to leave that one signal exactly where it was — not
+  // reset it to empty/null — so one bad endpoint dims only its own widgets
+  // instead of blanking the whole board.
+  describe('partial snapshots (one or more fields null)', () => {
+    it('preserves the previous value of a field that comes back null', () => {
+      updates$.next(buildSnapshot());
+
+      // Simulate the agent-of-month endpoint failing this tick — every
+      // other field still present, only agentOfMonth null.
+      updates$.next(buildSnapshot({ agentOfMonth: null }));
+
+      expect(store.agentOfMonth()).toEqual({ agentId: 'A1', name: 'John', photoUrl: null }); // unchanged
+      // The other fields were genuinely present this tick, so they DO
+      // re-set as normal — that's a separate guarantee, covered by the
+      // "still applies every field that DID come back" test below.
+      expect(store.agents().length).toBe(2);
+      expect(store.queues()).toEqual([]);
+    });
+
+    it('preserves every previous value when every field comes back null except fetchedAt', () => {
+      updates$.next(buildSnapshot());
+      const before = {
+        callSummary: store.callSummary(),
+        serviceMetrics: store.serviceMetrics(),
+        agentStateSummary: store.agentStateSummary(),
+        agents: store.agents(),
+        queues: store.queues(),
+        agentOfMonth: store.agentOfMonth(),
+        inboundStats: store.inboundStats(),
+        outboundStats: store.outboundStats(),
+      };
+
+      updates$.next(
+        buildSnapshot({
+          callSummary: null,
+          serviceMetrics: null,
+          agentStateSummary: null,
+          agents: null,
+          queues: null,
+          agentOfMonth: null,
+          inboundStats: null,
+          outboundStats: null,
+          fetchedAt: '2026-07-21T08:00:03.000Z',
+        }),
+      );
+
+      expect(store.callSummary()).toEqual(before.callSummary!);
+      expect(store.serviceMetrics()).toEqual(before.serviceMetrics!);
+      expect(store.agentStateSummary()).toEqual(before.agentStateSummary!);
+      expect(store.agents()).toEqual(before.agents);
+      expect(store.queues()).toEqual(before.queues);
+      expect(store.agentOfMonth()).toEqual(before.agentOfMonth!);
+      expect(store.inboundStats()).toEqual(before.inboundStats!);
+      expect(store.outboundStats()).toEqual(before.outboundStats!);
+      // fetchedAt is the one field that always advances — it answers "did we
+      // hear from the BFF at all", not "is every widget's data fresh".
+      expect(store.lastUpdated()).toEqual(new Date('2026-07-21T08:00:03.000Z'));
+    });
+
+    it('still applies every field that DID come back, alongside the ones that did not', () => {
+      updates$.next(buildSnapshot());
+      const newQueues = [
+        {
+          name: 'Sales',
+          totalCalls: 5,
+          handledCalls: 4,
+          abandonedCalls: 1,
+          avgWaitSeconds: 10,
+          callsWaiting: 0,
+          agentStates: { total: 1, ready: 1, talking: 0, notReady: 0 },
+          slaPercent: 99,
+          currentWaitSeconds: 0,
+          maxWaitSeconds: 30,
+          avgTalkSeconds: 90,
+        },
+      ];
+
+      updates$.next(buildSnapshot({ agentOfMonth: null, queues: newQueues }));
+
+      expect(store.queues()).toEqual(newQueues); // the field that succeeded updates normally
+      expect(store.agentOfMonth()).toEqual({ agentId: 'A1', name: 'John', photoUrl: null }); // the failed one holds
+    });
+
+    // A real empty result ([]) must still overwrite — null and [] are not
+    // the same thing (see DashboardSnapshot's doc comment).
+    it('distinguishes a genuinely empty roster/queue list ([]) from a failed fetch (null)', () => {
+      updates$.next(buildSnapshot());
+      expect(store.agents().length).toBe(2);
+
+      updates$.next(buildSnapshot({ agents: [] }));
+      expect(store.agents()).toEqual([]);
+    });
   });
 });

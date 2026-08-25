@@ -47,14 +47,27 @@ export class DashboardStoreService {
 
   constructor() {
     this.dataSource.updates$.pipe(takeUntilDestroyed()).subscribe((snapshot) => {
-      this._callSummary.set(snapshot.callSummary);
-      this._serviceMetrics.set(snapshot.serviceMetrics);
-      this._agentStateSummary.set(snapshot.agentStateSummary);
-      this._agents.set(snapshot.agents);
-      this._queues.set(snapshot.queues);
-      this._agentOfMonth.set(snapshot.agentOfMonth);
-      this._inboundStats.set(snapshot.inboundStats);
-      this._outboundStats.set(snapshot.outboundStats);
+      // Every field but fetchedAt can be null on a partial poll (see
+      // DashboardSnapshot) — null means "this resource failed to load THIS
+      // tick", not "the real value is empty". Skipping the .set() call for
+      // a null field leaves that signal at whatever it already held, so one
+      // bad endpoint dims only its own widgets instead of blanking the
+      // whole board. A signal only ever regresses to empty/null when its
+      // OWN field genuinely reports empty data, never as a side effect of
+      // an unrelated field failing.
+      if (snapshot.callSummary !== null) this._callSummary.set(snapshot.callSummary);
+      if (snapshot.serviceMetrics !== null) this._serviceMetrics.set(snapshot.serviceMetrics);
+      if (snapshot.agentStateSummary !== null) {
+        this._agentStateSummary.set(snapshot.agentStateSummary);
+      }
+      if (snapshot.agents !== null) this._agents.set(snapshot.agents);
+      if (snapshot.queues !== null) this._queues.set(snapshot.queues);
+      if (snapshot.agentOfMonth !== null) this._agentOfMonth.set(snapshot.agentOfMonth);
+      if (snapshot.inboundStats !== null) this._inboundStats.set(snapshot.inboundStats);
+      if (snapshot.outboundStats !== null) this._outboundStats.set(snapshot.outboundStats);
+      // fetchedAt always advances, even on a partial poll — see FooterComponent's
+      // staleness display, which is about "did we hear from the BFF at all
+      // recently", not "is every widget's data fresh".
       this._lastUpdated.set(new Date(snapshot.fetchedAt));
     });
 
