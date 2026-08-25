@@ -1,6 +1,6 @@
 {
   "apiBaseUrl": "http://127.0.0.1:3000/api/v1/wallboard",
-  "pollIntervalMs": 3000,
+  "pollIntervalMs": 1000,
   "thresholds": {
     "abandonedRatio": { "warning": 0.05, "critical": 0.1 },
     "avgWaitSeconds": { "warning": 30, "critical": 60 },

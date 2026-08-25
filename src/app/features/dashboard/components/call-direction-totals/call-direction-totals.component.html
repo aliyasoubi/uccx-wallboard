@@ -3,26 +3,28 @@
     icon="ti-phone-incoming"
     iconColorVar="var(--color-status-accent)"
     label="Total inbound calls"
-    [value]="inboundStats()?.count ?? '—'"
+    size="sm"
+    [value]="summary()?.inboundTotalCalls ?? '—'"
   />
   <app-metric-tile
     icon="ti-phone-outgoing"
     iconColorVar="var(--color-status-warning)"
     label="Total outbound calls"
-    [value]="outboundStats()?.count ?? '—'"
+    size="sm"
+    [value]="summary()?.outboundTotalCalls ?? '—'"
   />
   <app-metric-tile
     icon="ti-clock-play"
     iconColorVar="var(--color-status-accent)"
     label="Total inbound talk time"
     size="sm"
-    [value]="inboundStats()?.totalTalkSeconds | formatDuration"
+    [value]="summary()?.inboundTotalTalkTime | formatDurationLarge"
   />
   <app-metric-tile
     icon="ti-clock-play"
     iconColorVar="var(--color-status-warning)"
     label="Total outbound talk time"
     size="sm"
-    [value]="outboundStats()?.totalTalkSeconds | formatDuration"
+    [value]="summary()?.outboundTotalTalkTime | formatDurationLarge"
   />
 </div>

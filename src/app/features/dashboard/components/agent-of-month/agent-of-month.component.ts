@@ -23,24 +23,17 @@ interface PodiumEntry {
 })
 export class AgentOfMonthComponent {
   readonly agents = input<AgentOfMonth[] | null>(null);
-  /**
-   * Live roster, used only to resolve each winner's call count — the
-   * agent-of-month endpoint carries id/name/photo but no totals. A winner who
-   * has since logged out simply has no count rather than a fabricated zero.
-   */
-  readonly roster = input<Agent[]>([]);
+  
 
   private readonly entries = computed<PodiumEntry[]>(() => {
-    const roster = this.roster();
     return (this.agents() ?? []).map((agent, i) => {
-      const match = roster.find((a) => a.id === agent.agentId);
       return {
         agentId: agent.agentId,
         name: agent.name ?? '—',
         photoUrl: agent.photoUrl,
         initials: initialsOf(agent.name),
         rank: i + 1,
-        calls: match ? match.inboundCalls + match.outboundCalls : null,
+        calls: null,
       };
     });
   });

@@ -4,7 +4,7 @@ export const environment = {
   // When true, BffClientService reads from src/assets/fixtures/*.json
   // instead of calling apiBaseUrl. Flip this to false once a real BFF
   // endpoint exists in dev.
-  useMockFixtures: true,
+  useMockFixtures: false,
   apiBaseUrl: 'http://localhost:3000/api',
   pollIntervalMs: 3000,
 };

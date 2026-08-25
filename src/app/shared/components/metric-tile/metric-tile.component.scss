@@ -28,6 +28,10 @@
   transition:
     background var(--motion-medium) var(--motion-easing),
     border-color var(--motion-medium) var(--motion-easing);
+  height: 100%;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
 }
 
 // Severity escalates the whole tile, not just the number — a tinted value

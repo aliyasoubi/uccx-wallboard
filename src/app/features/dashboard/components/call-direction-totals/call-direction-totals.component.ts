@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { CallDirectionStats } from '../../../../core/models/domain';
 import { MetricTileComponent } from '../../../../shared/components';
 import { FormatDurationPipe } from '../../../../shared/pipes/format-duration.pipe';
+import { TotalCallSummary } from '../../../../core/models/domain/total-call-summary.model';
+import { FormatDurationLargePipe } from '../../../../shared/pipes/format-duration-large.pipe';
 
 // Organization-wide inbound/outbound totals, shown beneath the queue panels.
 // Replaced the Agent State + Agent of the Month pair that used to sit here
@@ -15,11 +16,10 @@ import { FormatDurationPipe } from '../../../../shared/pipes/format-duration.pip
   selector: 'app-call-direction-totals',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MetricTileComponent, FormatDurationPipe],
+  imports: [MetricTileComponent, FormatDurationLargePipe],
   templateUrl: './call-direction-totals.component.html',
   styleUrl: './call-direction-totals.component.scss',
 })
 export class CallDirectionTotalsComponent {
-  readonly inboundStats = input<CallDirectionStats | null>(null);
-  readonly outboundStats = input<CallDirectionStats | null>(null);
+  readonly summary = input<TotalCallSummary | null>(null);
 }

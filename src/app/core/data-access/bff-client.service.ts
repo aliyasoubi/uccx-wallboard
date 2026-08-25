@@ -22,6 +22,8 @@ import {
   OutboundCallStatsDto,
 } from '../models/dto';
 import { DashboardSnapshot } from '../models/domain';
+import { TotalCallSummary } from '../models/domain/total-call-summary.model';
+import { mapTotalCallSummary } from '../mappers/total-call-summary.mapper';
 
 // Stands in for the BFF described in the README (§3) until a real backend
 // endpoint exists. Base URL and mock-vs-real toggle both come from
@@ -60,6 +62,9 @@ export class BffClientService {
       agentOfMonth: this.http.get<AgentOfMonthDto[]>(
         this.endpoint('AgentOfMonth.json', '/agent-of-month'),
       ),
+      totalCallSummary: this.http.get<TotalCallSummary>(
+        this.endpoint('TotalCallSummary.json', '/total-call-summary'),
+      ),
     }).pipe(
       map(
         ({
@@ -70,6 +75,7 @@ export class BffClientService {
           agentStateCounts,
           queues,
           agentOfMonth,
+          totalCallSummary,
         }) => {
           const mappedAgents = mapAgents(agents);
           return {
@@ -81,6 +87,7 @@ export class BffClientService {
             agentsOfMonth: mapAgentsOfMonth(agentOfMonth),
             inboundStats: mapInboundCallDirectionStats(inboundCallStats, agents),
             outboundStats: mapOutboundCallDirectionStats(outboundCallStats, agents),
+            totalCallSummary: mapTotalCallSummary(totalCallSummary),
             fetchedAt: new Date().toISOString(),
           } satisfies DashboardSnapshot;
         },

@@ -44,8 +44,7 @@
 
       <app-call-direction-totals
         class="band band--direction-totals"
-        [inboundStats]="store.inboundStats()"
-        [outboundStats]="store.outboundStats()"
+        [summary]="store.totalCallSummary()"
       />
     </section>
 
@@ -55,7 +54,6 @@
       <app-agent-of-month
         class="band band--agents-of-month"
         [agents]="store.agentOfMonth()"
-        [roster]="store.agents()"
       />
     </section>
   </div>

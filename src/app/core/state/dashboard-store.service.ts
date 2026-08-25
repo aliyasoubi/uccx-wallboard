@@ -10,6 +10,7 @@ import {
   ServiceMetrics,
 } from '../models/domain';
 import { ConnectionState, DATA_SOURCE } from '../data-access/data-source.token';
+import { TotalCallSummary } from '../models/domain/total-call-summary.model';
 
 // Single source of truth for dashboard data. Components read signals from
 // here — no component ever calls HTTP or the DataSource directly.
@@ -26,6 +27,7 @@ export class DashboardStoreService {
   private readonly _inboundStats = signal<CallDirectionStats | null>(null);
   private readonly _outboundStats = signal<CallDirectionStats | null>(null);
   private readonly _lastUpdated = signal<Date | null>(null);
+  private readonly _totalCallSummary = signal<TotalCallSummary | null>(null);
   private readonly _connectionState = signal<ConnectionState>('connecting');
 
   readonly callSummary = this._callSummary.asReadonly();
@@ -38,6 +40,7 @@ export class DashboardStoreService {
   readonly outboundStats = this._outboundStats.asReadonly();
   readonly lastUpdated = this._lastUpdated.asReadonly();
   readonly connectionState = this._connectionState.asReadonly();
+  readonly totalCallSummary = this._totalCallSummary.asReadonly();
 
   // Derived state, computed once and reused by every component that needs
   // it — this is what replaces the duplicated inline logic from the old app.
@@ -56,6 +59,7 @@ export class DashboardStoreService {
       this._inboundStats.set(snapshot.inboundStats);
       this._outboundStats.set(snapshot.outboundStats);
       this._lastUpdated.set(new Date(snapshot.fetchedAt));
+      this._totalCallSummary.set(snapshot.totalCallSummary);
     });
 
     this.dataSource.connectionState$.pipe(takeUntilDestroyed()).subscribe((state) => {
