@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
 import { Agent, AgentOfMonth } from '../../../../core/models/domain';
 
 interface PodiumEntry {
@@ -25,12 +25,28 @@ export class AgentOfMonthComponent {
   readonly agents = input<AgentOfMonth[] | null>(null);
   
 
+  /** The podium layout is a fixed 3-column grid — see the .podium CSS. */
+  private static readonly MAX_WINNERS = 3;
+
+  // `photoUrl` being non-null says a URL was supplied, not that it actually
+  // loads — a broken (non-empty) URL rendered a broken-image icon instead of
+  // falling back to initials, because the template's @if only ever checked
+  // the data, never the <img>'s own (error) event. This tracks per-agent
+  // load failures so the fallback triggers at render time regardless of why
+  // the image failed.
+  private readonly failedPhotoIds = signal<ReadonlySet<string>>(new Set());
+
+  onPhotoError(agentId: string): void {
+    this.failedPhotoIds.update((prev) => new Set(prev).add(agentId));
+  }
+
   private readonly entries = computed<PodiumEntry[]>(() => {
+    const failed = this.failedPhotoIds();
     return (this.agents() ?? []).map((agent, i) => {
       return {
         agentId: agent.agentId,
         name: agent.name ?? '—',
-        photoUrl: agent.photoUrl,
+        photoUrl: failed.has(agent.agentId) ? null : agent.photoUrl,
         initials: initialsOf(agent.name),
         rank: i + 1,
         calls: null,
@@ -42,13 +58,14 @@ export class AgentOfMonthComponent {
    * Podium display order: 2nd, 1st, 3rd — so first place sits in the middle
    * and reads as the peak, matching how a real podium is arranged. Ranks stay
    * attached to each entry, so this is presentation order only, never a
-   * reordering of the actual standings.
+   * reordering of the actual standings. `entries` is already capped at 3, so
+   * there is never a slice(3) remainder to append here.
    */
   readonly podium = computed<PodiumEntry[]>(() => {
     const entries = this.entries();
     const [first, second, third] = entries;
     if (entries.length < 3) return entries;
-    return [second, first, third, ...entries.slice(3)];
+    return [second, first, third];
   });
 }
 
