@@ -618,3 +618,63 @@ just unit tests): temporarily breaking a fixture reproduced the
 `'connecting'` → `'stale'` → `'error'` escalation with the footer bar
 visibly tinting red and "Connection lost" displayed, and restoring the
 fixture recovered cleanly back to "Live" with fresh data.
+
+## Pass 14 — Snapshot resilience, plus self-hosting the icon font
+
+Two independent pieces of follow-through from Pass 13's review, both
+previously flagged and deferred.
+
+1. **One failing endpoint no longer freezes the whole board.**
+   `BffClientService.fetchSnapshot()` made 7 requests through a single
+   `forkJoin` — any one of them failing (agent photos, queue data,
+   anything) rejected the entire snapshot, so the six that succeeded were
+   discarded too, every poll, until the failing endpoint recovered. Each
+   request is now wrapped in its own `catchError`, degrading only its own
+   field to `null` ("failed this tick") rather than the whole poll.
+   `DashboardSnapshot` fields are now all nullable except `fetchedAt`, and
+   `DashboardStoreService` only calls `.set()` on a field when it actually
+   came back — a failed field holds its last-known-good value instead of
+   being blanked. `null` is never treated as "empty"; a genuine empty
+   result (`[]`) still overwrites normally, so the two aren't conflated.
+
+   One dependency case needed real judgment, not just plumbing:
+   `agentOfMonth` requires _both_ its own endpoint and `agents` to have
+   succeeded, not agentOfMonth alone falling back to an empty roster —
+   resolving a winner with a real photo but a blank name (because the
+   roster fetch failed) is a worse result on screen than simply holding
+   whatever was already showing. `outboundStats`, by contrast, only needs
+   its own endpoint; its per-agent high/low can degrade to the
+   already-established empty-roster default (0/0) without being
+   misleading the way a blank name would be.
+
+   The one case that must still read as a genuinely failed poll — every
+   endpoint down at once — is handled explicitly: after per-field
+   degradation, an all-null snapshot is turned back into a thrown error, so
+   `PollingDataSource`'s existing stale/error escalation (Pass 13) still
+   fires correctly instead of a total outage silently "succeeding" with an
+   empty board.
+
+   First spec file `BffClientService` ever had (it had none) — 9 tests
+   covering the happy path, single/multiple/total endpoint failure, and the
+   two dependency-chain cases above. Verified live, not just unit-tested:
+   deleted `AgentOfMonth.json` to simulate that one endpoint failing —
+   every other panel stayed fully populated, only the Agent of the Month
+   card showed its empty state, and the footer correctly still read "Live".
+
+2. **Icon font is now self-hosted, not a CDN link.** `index.html` loaded
+   `tabler-icons.min.css` from jsDelivr — Pass 13 pinned the version but
+   flagged full self-hosting as a follow-up. Now pulled in via the
+   `@tabler/icons-webfont` npm dependency (pinned to the exact `3.46.0`
+   already verified, `--save-exact`) and copied into
+   `assets/tabler-icons/` at build time by two `angular.json` asset globs
+   (the CSS, and only the base-weight `woff2`/`woff`/`ttf` font files —
+   the 200/300/filled weight variants and `.scss`/`.html`/`.map` sources
+   the app never references were left out of the copy rather than vendoring
+   the whole `dist/` folder). Removes both problems Pass 13's review raised:
+   a CDN/internet outage no longer removes every icon on the board, and
+   there's no longer an unauthenticated third-party request with no
+   Subresource Integrity check. `index.html`'s pin-rationale comment
+   rewritten to match — bump the npm dependency version now, not a URL.
+
+Verified with `npm run test:ci` (190/190 passing), `npm run lint`,
+`npm run format:check`, and a production build.

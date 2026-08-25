@@ -5,18 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Trip Wallboard</title>
     <!--
-      Pinned to a specific version, not @latest: an unpinned CDN URL means
-      the icon set (and, in principle, the file's content) can change
-      without a deploy or a code review, on a board with no offline
-      fallback for that request failing. 3.46.0 is the version this file
-      was verified against; bump deliberately, not implicitly.
-      TODO: vendor this webfont into src/assets for a fully offline-capable
-      board (no CDN dependency at all) — flagged, not done here.
+      Self-hosted, not a CDN link: this used to load from jsDelivr, which
+      meant an internet/CDN outage silently removed every icon on a board
+      with no offline fallback, and the request had no Subresource
+      Integrity check. Now bundled via the @tabler/icons-webfont npm
+      dependency (see angular.json's "assets" glob, which copies
+      tabler-icons.min.css + the base-weight font files into
+      assets/tabler-icons/ at build time) and served from the same origin
+      as everything else. Version is still pinned deliberately — bump the
+      npm dependency, not this path, and re-verify the icon set renders.
     -->
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.46.0/dist/tabler-icons.min.css"
-    />
+    <link rel="stylesheet" href="assets/tabler-icons/tabler-icons.min.css" />
   </head>
   <body>
     <app-root></app-root>
