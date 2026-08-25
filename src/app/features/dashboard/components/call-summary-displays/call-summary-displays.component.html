@@ -4,25 +4,25 @@
     <app-metric-tile
       icon="ti-phone-incoming"
       iconColorVar="var(--color-status-accent)"
-      label="Incoming calls"
+      label="Incoming"
       [value]="summary()?.totalCalls ?? '—'"
     />
     <app-metric-tile
       icon="ti-phone-outgoing"
       iconColorVar="var(--color-status-warning)"
-      label="Outbound calls"
+      label="Outbound"
       [value]="outboundStats()?.count ?? '—'"
     />
     <app-metric-tile
       icon="ti-phone-check"
       iconColorVar="var(--color-status-normal)"
-      label="Answered calls"
+      label="Answered"
       [value]="summary()?.handledCalls ?? '—'"
     />
     <app-metric-tile
       icon="ti-phone-x"
       iconColorVar="var(--color-status-critical)"
-      label="Abandoned calls"
+      label="Abandoned"
       [value]="summary()?.abandonedCalls ?? '—'"
       [severity]="abandonedSeverity()"
     />
