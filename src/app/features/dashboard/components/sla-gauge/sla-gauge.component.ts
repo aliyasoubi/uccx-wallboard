@@ -51,4 +51,31 @@ export class SlaGaugeComponent {
   });
 
   readonly maxPercent = SlaGaugeComponent.MAX_PERCENT;
+
+  readonly slaIconBg = computed(() => {
+    if (!this.hasData()) return 'var(--color-surface-2)';
+    switch (this.slaSeverity()) {
+      case 'critical':
+        return 'var(--color-status-critical-bg)';
+      case 'warning':
+        return 'var(--color-status-warning-bg)';
+      default:
+        return 'var(--color-status-normal-bg)';
+    }
+  });
+
+  readonly warningValue = computed(() => this.appConfig.config().thresholds.slaPercent.warning);
+  readonly criticalValue = computed(() => this.appConfig.config().thresholds.slaPercent.critical);
+
+  readonly statusLabel = computed(() => {
+    if (!this.hasData()) return 'No Data';
+    switch (this.slaSeverity()) {
+      case 'critical':
+        return 'Breached';
+      case 'warning':
+        return 'At Risk';
+      default:
+        return 'On Target';
+    }
+  });
 }

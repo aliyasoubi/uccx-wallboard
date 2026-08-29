@@ -1,20 +1,54 @@
-<div class="meter">
-  <svg viewBox="0 0 100 100" class="ring">
-    <circle class="ring-track" cx="50" cy="50" r="42" />
-    <circle
-      class="ring-value"
-      cx="50"
-      cy="50"
-      r="42"
-      [style.stroke]="colorVar()"
-      [style.strokeDasharray]="dashArray()"
-    />
-  </svg>
-  <div class="meter-text">
+<div class="meter" [class.meter--critical]="severity() === 'critical'">
+  <div class="meter-head">
     @if (icon()) {
-      <i class="ti {{ icon() }} meter-icon" [style.color]="iconColorVar()" aria-hidden="true"></i>
+      <span class="meter-icon-badge" [style.background]="iconBgVar()">
+        <i class="ti {{ icon() }}" [style.color]="iconColorVar()" aria-hidden="true"></i>
+      </span>
     }
-    <span class="meter-value">{{ displayValue() || value() }}</span>
     <span class="meter-label">{{ label() }}</span>
+    @if (statusLabel()) {
+      <span class="meter-status" [style.color]="colorVar()" [style.borderColor]="colorVar()">{{
+        statusLabel()
+      }}</span>
+    }
+  </div>
+
+  <div class="meter-dial-wrap">
+    <svg viewBox="0 0 100 60" class="dial" preserveAspectRatio="xMidYMax meet">
+      @if (hasZones()) {
+        <path
+          class="zone zone--critical"
+          d="M 3,50 A 47,47 0 0 1 97,50"
+          pathLength="100"
+          [style.strokeDasharray]="criticalZoneDash()"
+        />
+        <path
+          class="zone zone--warning"
+          d="M 3,50 A 47,47 0 0 1 97,50"
+          pathLength="100"
+          [style.strokeDasharray]="warningZoneDash()"
+          [style.strokeDashoffset]="warningZoneOffset()"
+        />
+        <path
+          class="zone zone--normal"
+          d="M 3,50 A 47,47 0 0 1 97,50"
+          pathLength="100"
+          [style.strokeDasharray]="normalZoneDash()"
+          [style.strokeDashoffset]="normalZoneOffset()"
+        />
+      }
+      <path class="dial-track" d="M 10,50 A 40,40 0 0 1 90,50" pathLength="100" />
+      <path
+        class="dial-value"
+        d="M 10,50 A 40,40 0 0 1 90,50"
+        pathLength="100"
+        [style.stroke]="colorVar()"
+        [style.strokeDasharray]="valueDashArray()"
+      />
+    </svg>
+
+    <div class="meter-value-wrap">
+      <span class="meter-value" [style.color]="colorVar()">{{ displayValue() || value() }}</span>
+    </div>
   </div>
 </div>

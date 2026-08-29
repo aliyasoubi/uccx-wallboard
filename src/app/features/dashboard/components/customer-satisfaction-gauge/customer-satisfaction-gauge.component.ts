@@ -53,4 +53,31 @@ export class CustomerSatisfactionGaugeComponent {
         return 'var(--color-status-accent)';
     }
   });
+
+  readonly csatIconBg = computed(() => {
+    if (!this.hasData()) return 'var(--color-surface-2)';
+    switch (this.csatSeverity()) {
+      case 'critical':
+        return 'var(--color-status-critical-bg)';
+      case 'warning':
+        return 'var(--color-status-warning-bg)';
+      default:
+        return 'var(--color-status-accent-bg)';
+    }
+  });
+
+  readonly warningValue = computed(() => this.appConfig.config().thresholds.csatScore.warning);
+  readonly criticalValue = computed(() => this.appConfig.config().thresholds.csatScore.critical);
+
+  readonly statusLabel = computed(() => {
+    if (!this.hasData()) return 'No Data';
+    switch (this.csatSeverity()) {
+      case 'critical':
+        return 'Poor';
+      case 'warning':
+        return 'Slipping';
+      default:
+        return 'Satisfied';
+    }
+  });
 }

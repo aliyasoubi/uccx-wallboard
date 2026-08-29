@@ -6,5 +6,10 @@
     [max]="maxPercent"
     [displayValue]="hasData() ? metrics()!.slaPercent.toFixed(1) + '%' : '—'"
     [colorVar]="slaColor()"
+    [iconBgVar]="slaIconBg()"
+    [severity]="slaSeverity()"
+    [statusLabel]="statusLabel()"
+    [warningValue]="warningValue()"
+    [criticalValue]="criticalValue()"
   />
 </div>

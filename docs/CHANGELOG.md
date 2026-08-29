@@ -678,3 +678,59 @@ previously flagged and deferred.
 
 Verified with `npm run test:ci` (190/190 passing), `npm run lint`,
 `npm run format:check`, and a production build.
+
+## Pass 15 — SLA/CSAT gauges redesigned as threshold-aware dials
+
+`MeterComponent` (`shared/components/meter/`) rebuilt from a full-ring gauge
+into a semicircular dial gauge — still no charting library, pure SVG. Every
+arc segment uses `pathLength="100"` so dasharray/offset are plain 0-100
+percentages instead of per-radius circumference math. Only two consumers
+(`SlaGaugeComponent`, `CustomerSatisfactionGaugeComponent`), so the redesign
+stayed additive: `slaColor`/`slaSeverity`/`csatColor`/`csatSeverity` and
+their existing specs were untouched.
+
+1. **Zone bands.** A thin outer ring now renders the live warning/critical
+   thresholds (read from `AppConfigService` via `status-thresholds.policy.ts`
+   — the same numbers already driving severity, nothing fabricated) as
+   critical/warning/normal color bands, so a viewer can see how much
+   headroom remains before a breach without reading the number. Ordering
+   assumes "lower is worse" (critical at the low end) — true for both
+   current consumers, since SLA%/CSAT are both inverse-severity metrics;
+   documented as an assumption in `MeterComponent`'s header comment for
+   whoever reuses it next.
+2. **Status pill.** A short status word (e.g. "On Target" / "At Risk" /
+   "Breached" for SLA; "Satisfied" / "Slipping" / "Poor" for CSAT) renders
+   beside the label — new `statusLabel` computeds on each gauge component,
+   MeterComponent itself stays wording-agnostic.
+3. **Critical pulse.** Mirrors `MetricTileComponent`'s existing `tile-glow`
+   convention (finite 4-iteration alternate animation via `--motion-pulse`,
+   not an infinite glow) rather than inventing a new animation pattern.
+
+**Follow-up in the same pass — layout was still messy, icon was unreadable.**
+First-round feedback: the value/icon/label/status/needle were all crammed
+into the semicircle's small flat-bottom negative space, so the number wasn't
+reading as the dominant element and the icon (13px in a ~190px-wide card)
+was too small to register. Rebuilt the internal layout: icon + label +
+status pill moved into a proper header row *outside* the SVG box (icon is
+now a 20-30px badge tinted with the matching `--color-status-*-bg` token via
+a new `iconBgVar` input, computed alongside each gauge's existing severity
+color), leaving the arc's interior for nothing but the big value — it went
+from sharing a cramped band with three other elements to owning the full
+band alone. The needle dot was dropped as redundant now that the value
+arc's own rounded end-cap already marks the current position, one less
+element competing for space. `.meter`'s outer box switched from a single
+aspect-ratio-locked box to explicit `width`/`height` clamps (header and dial
+are now independently-sized flex children, and nested aspect-ratio + flex-
+grow sizing isn't reliable across browsers).
+
+**Found, not fixed, in the same pass:** verifying in-browser at sub-1000px
+widths surfaced a pre-existing bug — both `.band--pair` rows in column 1
+(this gauge pair, and separately Top Inbound/Outbound Agent) collapse to
+`height: 0` on the stacked mobile layout regardless of their content,
+reproducing with the untouched Top Inbound/Outbound pair too. It's a
+`flex: 1 1 0` vs `flex: 0 0 auto` sizing interaction in
+`dashboard.component.scss`'s `.column`, not anything introduced here — left
+for a separate fix rather than folded into this change.
+
+Verified with `npm run test:ci` (190/190 passing), `npm run lint`,
+`npm run format:check`, and in-browser at desktop and tablet widths.
