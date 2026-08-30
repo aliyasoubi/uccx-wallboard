@@ -1,29 +1,31 @@
-// display:block + height:100% so this panel fills its grid/flex cell
-// (custom elements default to inline).
+// display:block + height:100% so this fills its cell (custom elements
+// default to inline).
 :host {
   display: block;
-  height: 100%;
-  min-height: 0;
+  min-width: 0;
 }
 
-.panel {
-  background: var(--color-surface-1);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-panel);
-  // --space-3, not --space-4: this panel shares a flexible band with its
-  // sibling and was overflowing its cell by a few pixels at 1366x768,
-  // clipping the agent name.
-  padding: var(--space-3);
-  height: 100%;
+// No card chrome here any more: both Top Agent components now render inside
+// TopAgentsComponent's single shared card (client's layout reference), so
+// this is a bare column. The left accent border — tinted per direction via
+// the inline --accent below — is what separates the two visually, in place
+// of the border/shadow each used to carry.
+.direction-column {
+  padding: 0 0 0 var(--space-3);
+  border-left: 3px solid var(--accent, var(--color-status-accent));
   box-sizing: border-box;
   overflow: hidden;
 }
 
-// --font-size-label, matching Agent of the Month's eyebrow: at heading size
-// "Top Inbound Agent" wrapped to two lines in this narrow panel and pushed
-// the card 15px past its cell. It's a label anyway — the count below is the
-// hero, and the two "top agent" cards now read consistently.
+// `nowrap` is load-bearing, the rest is the original label styling. A title
+// that wraps to two lines in one column and one in the other pushes that
+// column's value down and the two hero numbers stop lining up — which is
+// exactly what "TOP OUTBOUND AGENT" did here, overflowing the ~177px column
+// by under a pixel. Shortening the labels to "INBOUND"/"OUTBOUND" removed
+// the pressure with room to spare, so the tracking and icon gap are back to
+// their intended values; `nowrap` stays as the guarantee rather than relying
+// on that margin holding. `.direction-column`'s `overflow: hidden` clips a
+// longer future label instead of letting it re-break the alignment.
 .title {
   margin: 0 0 var(--space-1);
   display: flex;
@@ -33,6 +35,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.02em;
+  white-space: nowrap;
   color: var(--color-text-secondary);
 }
 
@@ -56,6 +59,9 @@
   margin: 2px 0 0;
   font-size: var(--font-size-body);
   color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .empty {

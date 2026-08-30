@@ -65,9 +65,14 @@ export abstract class TopAgentBase {
 
 // Centralized so both subclasses' title/icon/color choices stay in sync
 // rather than being duplicated per file.
+//
+// Just the direction, not "Top Inbound Agent": these are column labels
+// inside TopAgentsComponent's card, whose own title already says "Top
+// Agents". Repeating "Top"/"Agent" in each column said the same thing three
+// times and was the longest text in the narrowest box on the board.
 export const TOP_AGENT_TITLES: Record<CallDirection, string> = {
-  inbound: 'Top Inbound Agent',
-  outbound: 'Top Outbound Agent',
+  inbound: 'Inbound',
+  outbound: 'Outbound',
 };
 
 export const TOP_AGENT_ICONS: Record<CallDirection, string> = {

@@ -24,9 +24,18 @@ real backend), `docs/CHANGELOG.md` (history).
 | 11  | Header (Title/Clock/Date)                                                       | `app-header`                                                  | `features/dashboard/components/header/`                      |
 | 12  | Footer (System Status/Last Update)                                              | `app-footer`                                                  | `features/dashboard/components/footer/`                      |
 
-**Modules 2/3 are two separate components, not one parameterized
-component.** `TopInboundAgentComponent` and `TopOutboundAgentComponent`
-each have their own selector, file, and spec. They share their
+**Modules 2/3 share one card but are two separate components, not one
+parameterized component.** `TopAgentsComponent` (`app-top-agents`,
+`features/dashboard/components/top-agents/`) is a presentational
+wrapper: it owns the card chrome and the two-column grid, and is what
+`DashboardComponent` actually renders. Inside it,
+`TopInboundAgentComponent` and `TopOutboundAgentComponent`
+each have their own selector, file, and spec, and each renders a bare
+`.direction-column` (a per-direction left accent border in place of the
+card border/shadow they used to carry individually). The names below are
+the module names, not the on-screen text: the card is titled "Top
+Agents" and each column is labelled only by direction — "Inbound" /
+"Outbound". They share their
 tracker-wiring logic via an abstract `@Directive()` base class,
 `TopAgentBase` (`features/dashboard/components/top-agent-base/`), which
 provides the shared template/styles and the effect-driven tracker logic.
@@ -165,8 +174,8 @@ page-level scrollbar:
 
 Column layout:
 
-- **Column 1**: Call Summary Displays → Top Inbound/Outbound Agent →
-  SLA/CSAT gauges → KPI Metrics
+- **Column 1**: Call Summary Displays → Top Agents (Inbound &
+  Outbound, one shared card) → SLA/CSAT gauges → KPI Metrics
 - **Column 2**: One Queue Displays panel per queue (Sales/Support/
   Billing) → Agent State / Agent of the Month (side by side)
 - **Column 3**: Agent Summary (full height)

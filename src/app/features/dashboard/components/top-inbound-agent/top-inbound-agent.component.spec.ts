@@ -31,8 +31,8 @@ describe('TopInboundAgentComponent', () => {
 
   afterEach(() => localStorage.clear());
 
-  it('titles the panel "Top Inbound Agent"', () => {
-    expect(component.title).toBe('Top Inbound Agent');
+  it('labels its column "Inbound" — the card title supplies the "Top Agents" part', () => {
+    expect(component.title).toBe('Inbound');
   });
 
   it('shows the empty state before any agent data arrives', () => {

@@ -41,15 +41,32 @@ ARCHITECTURE.md; if a change is significant, add it to
   must stay free of HTTP/store knowledge. If a component needs to fetch
   data, it's not a shared primitive anymore — don't put fetching logic
   in these files.
-- **Top Inbound Agent and Top Outbound Agent are two separate
-  components** (`TopInboundAgentComponent`, `TopOutboundAgentComponent`
-  — own selectors `app-top-inbound-agent` / `app-top-outbound-agent`,
-  own files, own specs), NOT one component parameterized by a
-  `direction` input. They share tracker-wiring logic via an abstract
-  `@Directive()` base, `TopAgentBase`
-  (`features/dashboard/components/top-agent-base/`). If a task
-  description says "one `app-top-agent` component with a direction
-  input," that's stale — follow the actual two-component structure.
+- **Top Inbound Agent and Top Outbound Agent render as one card, but
+  are still two components.** `TopAgentsComponent`
+  (`app-top-agents`, `features/dashboard/components/top-agents/`) is a
+  presentational wrapper that owns the card chrome (border, shadow,
+  title) and lays the two out as side-by-side columns.
+  `TopInboundAgentComponent` and `TopOutboundAgentComponent` keep their
+  own selectors (`app-top-inbound-agent` / `app-top-outbound-agent`),
+  files and specs, and each renders a bare `.direction-column` — no
+  card of its own. They are still NOT one component parameterized by a
+  `direction` input, and they share tracker-wiring logic via an
+  abstract `@Directive()` base, `TopAgentBase`
+  (`features/dashboard/components/top-agent-base/`). "One card" is a
+  layout fact; "two components" is the structure. `DashboardComponent`
+  renders `<app-top-agents>`, never the two children directly.
+- **The title is split across the two levels, and says each thing
+  once.** The card is titled "Top Agents"; each column is labelled only
+  by its direction — "Inbound" / "Outbound" (`TOP_AGENT_TITLES` in
+  `top-agent-base.ts`). Don't restore "Top Inbound Agent" as a column
+  label: it repeats the card title in the narrowest box on the board,
+  and at that width it wrapped to two lines in one column but not the
+  other, which pushed one value down and broke the alignment of the two
+  hero numbers. `.title` carries `white-space: nowrap` to keep that
+  from recurring — a wrapped label there is a layout bug, not a
+  cosmetic one. "Top Inbound Agent" / "Top Outbound Agent" remain the
+  module names in `docs/ARCHITECTURE.md` §1; they are just no longer
+  the on-screen text.
 - `@Directive()` on `TopAgentBase` is required, not optional — Angular
   only registers a base class's `input()`s for template binding if it's
   been processed as a Directive/Component. Removing the decorator
@@ -59,9 +76,15 @@ ARCHITECTURE.md; if a change is significant, add it to
   `TopAgentBase`. Don't "fix" this into a shared service; the isolation
   is deliberate.
 - Every panel: `:host { display: block; height: 100%; }` — except Call
-  Summary Displays and KPI Metrics, which deliberately do NOT get
-  `height: 100%` (a `flex: 0 0 auto` band with a forced `height: 100%`
-  child creates a circular sizing bug — see `docs/CHANGELOG.md` Pass 1).
+  Summary Displays, KPI Metrics and Top Agents, which deliberately do
+  NOT get `height: 100%` (a `flex: 0 0 auto` band with a forced
+  `height: 100%` child creates a circular sizing bug — see
+  `docs/CHANGELOG.md` Pass 1). Top Agents is compact enough to size to
+  its own content, and at `height: 100%` it filled column 1 and
+  squashed the SLA/CSAT gauges below it.
+- The two Top Agent children are columns, not panels: their `:host` is
+  `display: block; min-width: 0` with no `height: 100%`, because the
+  card around them (`TopAgentsComponent`) is the panel.
 
 ## Signals gotchas — read before touching effect()/computed()
 

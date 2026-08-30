@@ -711,7 +711,7 @@ First-round feedback: the value/icon/label/status/needle were all crammed
 into the semicircle's small flat-bottom negative space, so the number wasn't
 reading as the dominant element and the icon (13px in a ~190px-wide card)
 was too small to register. Rebuilt the internal layout: icon + label +
-status pill moved into a proper header row *outside* the SVG box (icon is
+status pill moved into a proper header row _outside_ the SVG box (icon is
 now a 20-30px badge tinted with the matching `--color-status-*-bg` token via
 a new `iconBgVar` input, computed alongside each gauge's existing severity
 color), leaving the arc's interior for nothing but the big value — it went
@@ -734,3 +734,81 @@ for a separate fix rather than folded into this change.
 
 Verified with `npm run test:ci` (190/190 passing), `npm run lint`,
 `npm run format:check`, and in-browser at desktop and tablet widths.
+
+## Pass 16 — Top Inbound/Outbound Agent share one card
+
+Ported from `release/dotone`, which had already made this change: the two
+Top Agent panels now sit inside a single card instead of two adjacent
+ones.
+
+**This is a chrome change, not a merge.** `TopInboundAgentComponent` and
+`TopOutboundAgentComponent` are unchanged and remain two components with
+their own selectors, files and specs — their existing specs pass
+untouched. What moved is the card:
+
+1. **New `TopAgentsComponent`** (`app-top-agents`) — a presentational
+   wrapper owning the card (`.panel`), the shared title "Top Agents
+   (Inbound & Outbound)", and a two-column
+   `minmax(0, 1fr) minmax(0, 1fr)` grid. It takes the same `Agent[]`
+   input and passes it straight through to both children. `minmax(0,
+1fr)` rather than `1fr` so a long agent name ellipsizes inside its
+   column instead of forcing the column wider than the card — the same
+   overflow trap the roster guards against.
+2. **`TopAgentBase`'s template/styles stripped of card chrome.**
+   `.panel` became `.direction-column`: no background, border, radius or
+   shadow, and no `height: 100%` on `:host`. A 3px left accent border,
+   tinted per direction through an inline `--accent` custom property fed
+   from the existing `iconColorVar`, is what separates the two columns
+   visually now. `.agent-name` gained
+   `overflow/text-overflow/white-space` so it truncates rather than
+   overflowing the narrower column.
+3. **`TopAgentsComponent` gets `display: block` but deliberately NOT
+   `height: 100%`**, and its dashboard band is `flex: 0 0 auto`
+   alongside `.band--summary` / `.band--kpi`. The card's content (title
+   plus two short stat columns) is compact; at `height: 100%` it filled
+   column 1 and squashed the SLA/CSAT gauges below it to a sliver. This
+   is the same exception Call Summary Displays and KPI Metrics carry.
+4. **`DashboardComponent` renders `<app-top-agents>`** in place of the
+   `.band--pair` div that held the two children directly.
+
+5. **Title wrap fixed — a deviation from `release/dotone`, not a port
+   of it.** In the narrower shared-card column "TOP OUTBOUND AGENT"
+   needed ~178px against ~177px available: it overflowed by well under a
+   pixel, wrapped to two lines, and pushed the outbound value 15px below
+   the inbound one, so the two hero numbers no longer lined up. `.title`
+   dropped its `letter-spacing` and tightened its icon `gap` to buy ~8px,
+   with `white-space: nowrap` as the actual guarantee that the columns
+   stay aligned rather than relying on that margin holding.
+   `.direction-column`'s existing `overflow: hidden` clips a longer
+   future title instead of letting it re-break the alignment. Measured in
+   the browser before and after: both values now sit at the same `y`, and
+   the card got 15px shorter, which goes back to the SLA/CSAT gauges
+   below it. `release/dotone` still has the misalignment.
+
+6. **Titles split across the two levels, each thing said once.** The
+   card title dropped its parenthetical to just "Top Agents", and the
+   column labels dropped to "Inbound" / "Outbound" (`TOP_AGENT_TITLES`).
+   "Top Agents (Inbound & Outbound)" over columns reading "TOP INBOUND
+   AGENT" / "TOP OUTBOUND AGENT" said the same three words three times,
+   and spent them on the longest text in the narrowest box on the board.
+   This also removes the root cause behind item 5 rather than
+   compensating for it: with ~79px of slack instead of −1px, `.title`'s
+   `letter-spacing` and icon `gap` are back to their intended values and
+   only `white-space: nowrap` stays, as the standing guarantee that the
+   two columns keep their values aligned. The two leaf specs now assert
+   the column label is the bare direction; the wrapper spec asserts the
+   card supplies "Top Agents" and that neither long form comes back.
+
+**Incidentally fixed:** Pass 15 recorded that both `.band--pair` rows in
+column 1 collapse to `height: 0` on the stacked sub-1000px layout. Top
+Agents is no longer a `.band--pair` — it's a `flex: 0 0 auto` band — so
+that half of the bug is gone (measured 127.5px at 820px wide, where it
+previously measured 0). The SLA/CSAT gauge pair still collapses; that
+remains the open, pre-existing bug.
+
+Only the Top Agent slice of `release/dotone` was taken — that branch's
+meter rewrite, agents-of-month array, `call-direction-totals` panel and
+`bff-client` changes were deliberately left out of this pass.
+
+Verified with `npm run test:ci`, `npm run lint` and
+`npm run format:check`.

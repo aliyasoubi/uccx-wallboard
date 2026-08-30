@@ -12,8 +12,7 @@ import { AgentOfMonthComponent } from './components/agent-of-month/agent-of-mont
 import { AgentStateComponent } from './components/agent-state/agent-state.component';
 import { AgentSummaryComponent } from './components/agent-summary/agent-summary.component';
 import { QueueListComponent } from './components/queue-list/queue-list.component';
-import { TopInboundAgentComponent } from './components/top-inbound-agent/top-inbound-agent.component';
-import { TopOutboundAgentComponent } from './components/top-outbound-agent/top-outbound-agent.component';
+import { TopAgentsComponent } from './components/top-agents/top-agents.component';
 
 // The dashboard shell: reads the store and composes every module. Owns no
 // business logic of its own (no HTTP, no thresholds, no aggregation) — that
@@ -29,8 +28,7 @@ import { TopOutboundAgentComponent } from './components/top-outbound-agent/top-o
     KpiMetricsComponent,
     SlaGaugeComponent,
     CustomerSatisfactionGaugeComponent,
-    TopInboundAgentComponent,
-    TopOutboundAgentComponent,
+    TopAgentsComponent,
     AgentOfMonthComponent,
     AgentStateComponent,
     AgentSummaryComponent,

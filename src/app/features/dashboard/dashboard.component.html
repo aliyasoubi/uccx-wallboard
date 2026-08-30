@@ -11,10 +11,7 @@
         [outboundStats]="store.outboundStats()"
       />
 
-      <div class="band band--pair">
-        <app-top-inbound-agent class="pair-item" [agents]="store.agents()" />
-        <app-top-outbound-agent class="pair-item" [agents]="store.agents()" />
-      </div>
+      <app-top-agents class="band band--top-agents" [agents]="store.agents()" />
 
       <div class="band band--pair">
         <app-sla-gauge class="pair-item" [metrics]="store.serviceMetrics()" />

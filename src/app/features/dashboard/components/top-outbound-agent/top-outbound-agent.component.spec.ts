@@ -29,8 +29,8 @@ describe('TopOutboundAgentComponent', () => {
 
   afterEach(() => localStorage.clear());
 
-  it('titles the panel "Top Outbound Agent"', () => {
-    expect(component.title).toBe('Top Outbound Agent');
+  it('labels its column "Outbound" — the card title supplies the "Top Agents" part', () => {
+    expect(component.title).toBe('Outbound');
   });
 
   it('shows the empty state before any agent data arrives', () => {
