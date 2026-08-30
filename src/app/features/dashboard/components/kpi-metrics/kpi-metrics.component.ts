@@ -29,13 +29,17 @@ export class KpiMetricsComponent {
   readonly summary = input<CallSummary | null>(null);
   readonly serviceMetrics = input<ServiceMetrics | null>(null);
 
-  readonly hasFcrData = computed(() => this.serviceMetrics() !== null);
+  // Number.isFinite, not just a null check: the template renders
+  // `fcrPercent + '%'` directly (no toFixed to throw), so a missing/malformed
+  // reading used to slip through as the literal string "NaN%" instead of
+  // falling back to "—" — the same failure mode SlaGaugeComponent.hasData
+  // and CustomerSatisfactionGaugeComponent.hasData already guard against.
+  readonly hasFcrData = computed(() => Number.isFinite(this.serviceMetrics()?.fcrPercent));
 
   readonly fcrSeverity = computed(() => {
-    const serviceMetrics = this.serviceMetrics();
-    if (!serviceMetrics) return 'normal' as const;
+    if (!this.hasFcrData()) return 'normal' as const;
     return getInverseSeverity(
-      serviceMetrics.fcrPercent,
+      this.serviceMetrics()!.fcrPercent,
       this.appConfig.config().thresholds.fcrPercent,
     );
   });

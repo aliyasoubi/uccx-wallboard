@@ -27,9 +27,9 @@
 
     <!-- Column 2: queue health (waiting/serving) -> agent state -> agent of the month -->
     <section class="column column--2">
-      <div class="band band--pair band--queues">
+      <div class="band band--pair band--queues" [style.--queue-count]="store.queues().length || 1">
         @for (queue of store.queues(); track queue.name) {
-          <app-queue-list class="pair-item" variant="waiting" [queue]="queue" />
+          <app-queue-list class="pair-item" [queue]="queue" />
         }
       </div>
 

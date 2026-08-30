@@ -71,6 +71,23 @@
 // actual content height rather than a ratio guess.
 .band--queues {
   flex: 1 1 auto;
+  // Overrides .band--pair's fixed 2-column split: the queue list is one
+  // panel PER QUEUE (today: Sales/Support; docs describe up to 3 —
+  // see ARCHITECTURE.md §9/§11), not a fixed pair. A hardcoded `1fr 1fr`
+  // here only happened to look right because the fixture currently has
+  // exactly 2 queues — a 3rd would render alone in an orphaned second row
+  // with empty space beside it.
+  //
+  // `repeat(auto-fit, minmax(...))` was tried first and reverted: at this
+  // column's actual width (~440px in a 3-column 1000-1920px board) any
+  // minmax floor wide enough to hold real queue-panel content (9 stat
+  // rows) also fit only ONE track per row, so 2 queues stacked into 2
+  // rows instead of sitting side by side — each panel then got half its
+  // usual HEIGHT and clipped its bottom rows via `overflow: hidden`.
+  // `--queue-count` (set from `store.queues().length` in the template)
+  // sizes exactly N equal columns instead, so column width is never
+  // guessed from a pixel breakpoint.
+  grid-template-columns: repeat(var(--queue-count, 2), 1fr);
 }
 
 .band--agent-highlights {

@@ -79,6 +79,24 @@ describe('KpiMetricsComponent', () => {
     expect(component.fcrSeverity()).toBe('critical');
   });
 
+  // Regression guard: the template renders `fcrPercent + '%'` directly, so a
+  // malformed reading must be caught by hasFcrData() before it ever reaches
+  // that expression — otherwise it renders the literal string "NaN%".
+  it('falls back to the no-data state instead of rendering "NaN%" when fcrPercent is missing or not a number', () => {
+    for (const bad of [undefined, null, NaN]) {
+      fixture.componentRef.setInput('summary', summary);
+      fixture.componentRef.setInput('serviceMetrics', {
+        ...serviceMetrics,
+        fcrPercent: bad as unknown as number,
+      });
+      fixture.detectChanges();
+      expect(component.hasFcrData()).toBeFalse();
+      expect(component.fcrSeverity()).toBe('normal');
+      expect(fixture.nativeElement.textContent).toContain('—');
+      expect(fixture.nativeElement.textContent).not.toContain('NaN');
+    }
+  });
+
   it('uses a runtime-configured threshold instead of the compiled-in default', async () => {
     TestBed.resetTestingModule();
     const customThresholds = {

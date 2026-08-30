@@ -812,3 +812,45 @@ meter rewrite, agents-of-month array, `call-direction-totals` panel and
 
 Verified with `npm run test:ci`, `npm run lint` and
 `npm run format:check`.
+
+## Pass 17 — Whole-app review follow-ups
+
+Three small fixes from a full read-through of `core/`, `features/dashboard/`
+and `shared/` (lint/tests/`tsc --noEmit` were already clean going in).
+
+1. **KPI Metrics' FCR tile could render the literal string "NaN%".**
+   `KpiMetricsComponent.hasFcrData` only checked `serviceMetrics() !== null`,
+   not whether `fcrPercent` was actually a finite number — unlike
+   `SlaGaugeComponent.hasData`/`CustomerSatisfactionGaugeComponent.hasData`,
+   which both exist specifically to catch this. A malformed/missing `fcr`
+   field slipped through to the template's `fcrPercent + '%'` expression.
+   `hasFcrData` (and `fcrSeverity`, which depended on it) now use
+   `Number.isFinite`, matching the SLA/CSAT pattern; added the same
+   NaN/undefined/null regression test the SLA gauge already had.
+2. **Queue Displays' grid was hardcoded to exactly 2 columns.**
+   `.band--queues` inherited `.band--pair`'s `grid-template-columns: 1fr
+   1fr`, but Queue Displays renders one panel *per queue*
+   (§9/§11 — docs describe up to 3: Sales/Support/Billing), not a fixed
+   pair. This only looked correct because `CsqStats.json` currently has
+   exactly 2 queues (Sales, Support — Billing isn't actually in the
+   fixture); a 3rd queue would have rendered alone in an orphaned second
+   row with empty space beside it. First attempt used `repeat(auto-fit,
+   minmax(240px, 1fr))` — reverted after checking it in the browser: at
+   this column's real width (~440px), no minmax floor wide enough for a
+   9-stat-row panel's content also left room for 2 tracks, so the 2
+   real queues collapsed into ONE column and stacked into two rows
+   instead of sitting side by side, halving each panel's height and
+   clipping its bottom rows behind `overflow: hidden`. Fixed instead
+   with `grid-template-columns: repeat(var(--queue-count), 1fr)`, with
+   `--queue-count` set from `store.queues().length` in the template —
+   exactly N equal columns for N queues, no pixel-width guessing.
+   Verified in-browser with a synthetic 3rd queue: three even columns,
+   one row, no clipping.
+3. **Dead `variant` prop removed.** `dashboard.component.html` passed a
+   static `variant="waiting"` attribute to `<app-queue-list>`, and
+   `queue-list.component.ts` exported an unused `QueueListVariant` type —
+   both leftover from the pre-Pass-9 aggregated waiting/serving design.
+   `QueueListComponent` has never had a `variant` input, so this was a
+   silent no-op. Removed both.
+
+Verified with `npm run test:ci` and `npm run lint`.

@@ -9,8 +9,6 @@ import {
 import { AppConfigService } from '../../../../core/config/app-config.service';
 import { formatDurationSeconds } from '../../../../shared/pipes/format-duration.pipe';
 
-export type QueueListVariant = 'waiting' | 'serving';
-
 /** Shown in place of a percentage that has no meaningful value (0 of 0 calls). */
 const PERCENT_PLACEHOLDER = '--%';
 
